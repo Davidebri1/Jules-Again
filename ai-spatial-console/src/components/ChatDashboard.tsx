@@ -1,91 +1,62 @@
-import React, { useMemo, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
+import React, { useMemo } from 'react';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
-import { PhysicalCard } from './PhysicalCard';
+import { ModelCard } from './ModelCard';
 
 export const ChatDashboard: React.FC = () => {
   const activeModels = useAppStore((state) => state.activeModels);
   const activeLayout = useAppStore((state) => state.activeLayout);
+  const { width, height } = useWindowDimensions();
 
-  // Calculate grid positions based on layout
-  const gridPositions = useMemo(() => {
-    const positions: [number, number, number][] = [];
-    const spacingX = 3.5;
-    const spacingY = 4.5;
+  // Grid logic
+  const cols = activeLayout === '1x1' ? 1 : activeLayout === '2x2' ? 2 : 3;
+  const rows = activeLayout === '1x1' ? 1 : activeLayout === '2x2' ? 2 : 3;
 
-    let cols = 2;
-    let rows = 2;
+  // Account for padding and spacing
+  const SPACING = 15;
+  const PADDING_TOP = 80;
+  const PADDING_BOTTOM = 250;
 
-    if (activeLayout === '1x1') {
-      cols = 1; rows = 1;
-    } else if (activeLayout === '3x3') {
-      cols = 3; rows = 3;
-    }
+  const availableWidth = width - (SPACING * (cols + 1));
+  const availableHeight = height - PADDING_TOP - PADDING_BOTTOM - (SPACING * (rows - 1));
 
-    const startX = -((cols - 1) * spacingX) / 2;
-    const startY = ((rows - 1) * spacingY) / 2;
-
-    for (let i = 0; i < activeModels.length; i++) {
-      const row = Math.floor(i / cols);
-      const col = i % cols;
-      if (row < rows) {
-        positions.push([startX + col * spacingX, startY - row * spacingY, 0]);
-      } else {
-        // Push extra cards backward into bokeh depth
-        positions.push([startX + col * spacingX, startY - row * spacingY, -5]);
-      }
-    }
-    return positions;
-  }, [activeLayout, activeModels.length]);
+  const cardWidth = availableWidth / cols;
+  const cardHeight = availableHeight / rows;
 
   return (
-    <Canvas
-      camera={{ position: [0, 0, 10], fov: 45 }}
-      gl={{ alpha: true, antialias: true }}
-      style={{ flex: 1 }}
-    >
-      <Suspense fallback={null}>
-        <color attach="background" args={['#050505']} />
+    <View style={styles.container}>
+      {activeModels.map((model, index) => {
+        // Calculate position
+        const col = index % cols;
+        const row = Math.floor(index / cols);
 
-        {/* Lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight
-          position={[5, 10, 5]}
-          intensity={2}
-          castShadow
-          shadow-mapSize={2048}
-        />
-        <spotLight
-          position={[-5, 5, 10]}
-          intensity={1}
-          angle={0.5}
-          penumbra={1}
-          castShadow
-        />
+        // Hide cards that don't fit in the current layout grid
+        const isVisible = row < rows;
 
-        {/* Environment for reflections */}
-        <Environment preset="city" />
+        const left = SPACING + (col * (cardWidth + SPACING));
+        const top = PADDING_TOP + (row * (cardHeight + SPACING));
 
-        {/* Render Cards */}
-        {activeModels.map((model, index) => (
-          <PhysicalCard
+        return (
+          <ModelCard
             key={model.id}
             model={model}
-            position={gridPositions[index] || [0, 0, -10]}
-            isActive={index < (activeLayout === '1x1' ? 1 : activeLayout === '2x2' ? 4 : 9)}
+            width={cardWidth}
+            height={cardHeight}
+            left={left}
+            top={top}
+            isVisible={isVisible}
           />
-        ))}
-
-        {/* Shadows below cards */}
-        <ContactShadows
-          position={[0, -4.5, 0]}
-          opacity={0.4}
-          scale={20}
-          blur={2}
-          far={10}
-        />
-      </Suspense>
-    </Canvas>
+        );
+      })}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    // background image will be handled by a ThemeProvider later
+    backgroundColor: '#0a0a0a',
+  },
+});
