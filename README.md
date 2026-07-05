@@ -1,2 +1,1 @@
-# Superdesign-Multi-AI
-Superdesign based App
+Jules from Scratch
