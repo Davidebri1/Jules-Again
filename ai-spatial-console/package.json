@@ -3,21 +3,25 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
+    "@react-spring/three": "^10.1.2",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
     "axios": "^1.18.1",
     "expo": "~57.0.2",
-    "expo-blur": "~57.0.0",
     "expo-gl": "~57.0.1",
-    "expo-linear-gradient": "~57.0.0",
+    "expo-sensors": "^57.0.1",
     "expo-status-bar": "~57.0.0",
     "lucide-react-native": "^1.23.0",
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-reanimated": "4.5.0",
     "react-native-svg": "15.15.4",
+    "three": "^0.185.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "@types/three": "^0.185.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
