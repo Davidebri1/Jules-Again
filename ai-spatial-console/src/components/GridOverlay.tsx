@@ -17,7 +17,7 @@ export const GridOverlay: React.FC = () => {
     { id: 'general', label: 'General' },
     { id: 'image', label: 'Image' },
     { id: 'video', label: 'Video' },
-    { id: 'music', label: 'Music' },
+    { id: 'audio', label: 'Audio' },
     { id: 'coding', label: 'Coding' },
   ];
 

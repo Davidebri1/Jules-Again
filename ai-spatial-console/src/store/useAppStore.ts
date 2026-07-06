@@ -1,7 +1,9 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type GridLayout = '1x1' | '2x2' | '3x3';
-export type ModelCategory = 'general' | 'image' | 'video' | 'music' | 'coding';
+export type ModelCategory = 'general' | 'image' | 'video' | 'audio' | 'coding';
 export type ModelTier = 'free' | 'pro' | 'elite';
 
 export interface ModelProvider {
@@ -29,13 +31,13 @@ export interface Conversation {
 }
 
 export interface AppState {
-  // Layout & Core UI
+  // Layout & Core UI (Persisted)
   activeLayout: GridLayout;
   setActiveLayout: (layout: GridLayout) => void;
   currentThemeId: string;
   setCurrentThemeId: (id: string) => void;
 
-  // Models
+  // Models (Partially persisted, e.g., active models)
   availableModels: ModelProvider[];
   activeModelIds: string[];
   toggleActiveModel: (modelId: string) => void;
@@ -59,79 +61,122 @@ export interface AppState {
 }
 
 const INITIAL_MODELS: ModelProvider[] = [
-  // GENERAL
-  { id: 'llama-3-8b', name: 'LLaMA 3 (8B)', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama3-8b-8192' },
+  // ================= GENERAL =================
+  // Free (Minimum 6 required)
+  { id: 'llama-3-8b', name: 'LLaMA 3 8B', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama3-8b-8192' },
   { id: 'gemma-7b', name: 'Gemma 7B', provider: 'google', tier: 'free', category: 'general', description: 'Google lightweight model.', routingKey: 'gemma-7b-it' },
   { id: 'mistral-7b', name: 'Mistral 7B', provider: 'mistral', tier: 'free', category: 'general', description: 'Solid foundational model.', routingKey: 'mistralai/mistral-7b-instruct:free' },
   { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free' },
   { id: 'phi-3-mini', name: 'Phi-3 Mini', provider: 'other', tier: 'free', category: 'general', description: 'Microsoft small model.', routingKey: 'microsoft/phi-3-mini-128k-instruct:free' },
   { id: 'openchat-3.5', name: 'OpenChat 3.5', provider: 'other', tier: 'free', category: 'general', description: 'Open source chat model.', routingKey: 'openchat/openchat-7b:free' },
-
+  // Pro/Elite
   { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o' },
   { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet' },
   { id: 'gemini-1-5-pro', name: 'Gemini 1.5 Pro', provider: 'google', tier: 'pro', category: 'general', description: 'Google multimodal expert.', routingKey: 'google/gemini-1.5-pro' },
   { id: 'grok-1-5', name: 'Grok 1.5', provider: 'xai', tier: 'pro', category: 'general', description: 'xAI advanced model.', routingKey: 'x-ai/grok-2' },
 
-  // IMAGE
-  { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'Premium image generation.' },
-  { id: 'flux-schnell', name: 'Flux Schnell', provider: 'other', tier: 'pro', category: 'image', description: 'Fast image generation.' },
+  // ================= IMAGE (Minimum 6 required) =================
+  { id: 'flux-schnell', name: 'Flux Schnell', provider: 'other', tier: 'pro', category: 'image', description: 'Fast image generation.', routingKey: 'black-forest-labs/flux-schnell' },
+  { id: 'flux-pro', name: 'Flux Pro', provider: 'other', tier: 'elite', category: 'image', description: 'Premium Flux model.', routingKey: 'black-forest-labs/flux-pro' },
+  { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'OpenAI Premium image generation.' },
+  { id: 'midjourney-v6', name: 'Midjourney v6', provider: 'other', tier: 'elite', category: 'image', description: 'Highly artistic generations.' },
+  { id: 'sdxl', name: 'SDXL', provider: 'other', tier: 'pro', category: 'image', description: 'Stable Diffusion XL.', routingKey: 'stability-ai/sdxl' },
+  { id: 'ideogram', name: 'Ideogram', provider: 'other', tier: 'pro', category: 'image', description: 'Excellent at text rendering.' },
 
-  // CODING
+  // ================= VIDEO (Minimum 6 required) =================
+  { id: 'sora', name: 'Sora', provider: 'openai', tier: 'elite', category: 'video', description: 'OpenAI video generation.' },
+  { id: 'runway-gen3', name: 'Runway Gen-3', provider: 'other', tier: 'elite', category: 'video', description: 'High fidelity video synthesis.' },
+  { id: 'kling', name: 'Kling AI', provider: 'other', tier: 'elite', category: 'video', description: 'Advanced physics video.' },
+  { id: 'luma-dream-machine', name: 'Luma Dream', provider: 'other', tier: 'pro', category: 'video', description: 'Fast video generation.' },
+  { id: 'haiper-v1', name: 'Haiper V1', provider: 'other', tier: 'pro', category: 'video', description: 'Creative video models.' },
+  { id: 'pika-labs', name: 'Pika', provider: 'other', tier: 'pro', category: 'video', description: 'Animation and video.' },
+
+  // ================= AUDIO (Minimum 6 required) =================
+  { id: 'suno-v3', name: 'Suno v3', provider: 'other', tier: 'elite', category: 'audio', description: 'Full song generation.' },
+  { id: 'udio', name: 'Udio', provider: 'other', tier: 'elite', category: 'audio', description: 'High fidelity music tracks.' },
+  { id: 'elevenlabs', name: 'ElevenLabs', provider: 'other', tier: 'pro', category: 'audio', description: 'Premium voice synthesis.' },
+  { id: 'stable-audio', name: 'Stable Audio', provider: 'other', tier: 'pro', category: 'audio', description: 'Instrumentals and SFX.' },
+  { id: 'musicgen', name: 'MusicGen', provider: 'meta', tier: 'pro', category: 'audio', description: 'Meta audio synthesis.' },
+  { id: 'openai-tts', name: 'OpenAI TTS', provider: 'openai', tier: 'pro', category: 'audio', description: 'Text to speech.' },
+
+  // ================= CODING (Minimum 6 required) =================
+  { id: 'claude-3-5-sonnet-code', name: 'Claude Sonnet', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Industry leading code logic.', routingKey: 'anthropic/claude-3.5-sonnet' },
   { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus' },
-  { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'pro', category: 'coding', description: 'Code specific model.' },
+  { id: 'gpt-4o-code', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'coding', description: 'Strong multi-file reasoning.', routingKey: 'openai/gpt-4o' },
+  { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'other', tier: 'pro', category: 'coding', description: 'Specialized coding model.', routingKey: 'deepseek/deepseek-coder' },
+  { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'pro', category: 'coding', description: 'Open weights code model.' },
+  { id: 'phind-codellama', name: 'Phind CodeLlama', provider: 'other', tier: 'pro', category: 'coding', description: 'Search and code.' },
 ];
 
-export const useAppStore = create<AppState>((set) => ({
-  activeLayout: '2x2',
-  setActiveLayout: (layout) => set({ activeLayout: layout }),
-  currentThemeId: 'dark-obsidian',
-  setCurrentThemeId: (id) => set({ currentThemeId: id }),
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      // Default state
+      activeLayout: '2x2',
+      setActiveLayout: (layout) => set({ activeLayout: layout }),
 
-  availableModels: INITIAL_MODELS,
-  activeModelIds: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'],
-  toggleActiveModel: (id) => set((state) => {
-    if (state.activeModelIds.includes(id)) {
-      return { activeModelIds: state.activeModelIds.filter(m => m !== id) };
-    }
-    return { activeModelIds: [...state.activeModelIds, id] };
-  }),
+      currentThemeId: 'dark-obsidian',
+      setCurrentThemeId: (id) => set({ currentThemeId: id }),
 
-  selectedTab: 'general',
-  setSelectedTab: (tab) => set({ selectedTab: tab }),
-  focusedModelId: null,
-  setFocusedModelId: (id) => set({ focusedModelId: id }),
-
-  conversations: {},
-  addMessage: (modelId, role, content) => set((state) => {
-    const convo = state.conversations[modelId] || { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
-    const newMessage: Message = {
-      id: Math.random().toString(36).substring(7),
-      role,
-      content,
-      timestamp: Date.now()
-    };
-    return {
-      conversations: {
-        ...state.conversations,
-        [modelId]: {
-          ...convo,
-          messages: [...convo.messages, newMessage],
-          updatedAt: Date.now()
+      availableModels: INITIAL_MODELS,
+      activeModelIds: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'],
+      toggleActiveModel: (id) => set((state) => {
+        if (state.activeModelIds.includes(id)) {
+          return { activeModelIds: state.activeModelIds.filter(m => m !== id) };
         }
-      }
-    };
-  }),
-  clearConversation: (modelId) => set((state) => ({
-    conversations: {
-      ...state.conversations,
-      [modelId]: { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() }
-    }
-  })),
+        return { activeModelIds: [...state.activeModelIds, id] };
+      }),
 
-  isSettingsOpen: false,
-  setSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
-  isConsensusOpen: false,
-  setConsensusOpen: (isOpen) => set({ isConsensusOpen: isOpen }),
-  isSmartGenOpen: false,
-  setSmartGenOpen: (isOpen) => set({ isSmartGenOpen: isOpen }),
-}));
+      selectedTab: 'general',
+      setSelectedTab: (tab) => set({ selectedTab: tab }),
+
+      focusedModelId: null,
+      setFocusedModelId: (id) => set({ focusedModelId: id }),
+
+      conversations: {},
+      addMessage: (modelId, role, content) => set((state) => {
+        const convo = state.conversations[modelId] || { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
+        const newMessage: Message = {
+          id: Math.random().toString(36).substring(7),
+          role,
+          content,
+          timestamp: Date.now()
+        };
+        return {
+          conversations: {
+            ...state.conversations,
+            [modelId]: {
+              ...convo,
+              messages: [...convo.messages, newMessage],
+              updatedAt: Date.now()
+            }
+          }
+        };
+      }),
+      clearConversation: (modelId) => set((state) => ({
+        conversations: {
+          ...state.conversations,
+          [modelId]: { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() }
+        }
+      })),
+
+      isSettingsOpen: false,
+      setSettingsOpen: (isOpen) => set({ isSettingsOpen: isOpen }),
+      isConsensusOpen: false,
+      setConsensusOpen: (isOpen) => set({ isConsensusOpen: isOpen }),
+      isSmartGenOpen: false,
+      setSmartGenOpen: (isOpen) => set({ isSmartGenOpen: isOpen }),
+    }),
+    {
+      name: 'spatial-console-storage', // unique name
+      storage: createJSONStorage(() => AsyncStorage),
+      // We only want to persist certain things
+      partialize: (state) => ({
+        activeLayout: state.activeLayout,
+        currentThemeId: state.currentThemeId,
+        activeModelIds: state.activeModelIds,
+        conversations: state.conversations,
+      }),
+    }
+  )
+);
