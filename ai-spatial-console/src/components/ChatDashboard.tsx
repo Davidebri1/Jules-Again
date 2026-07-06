@@ -5,8 +5,13 @@ import { useAppStore } from '../store/useAppStore';
 import { PhysicalCard } from './PhysicalCard';
 
 export const ChatDashboard: React.FC = () => {
-  const activeModels = useAppStore((state) => state.activeModels);
+  const activeModelIds = useAppStore((state) => state.activeModelIds);
+  const availableModels = useAppStore((state) => state.availableModels);
   const activeLayout = useAppStore((state) => state.activeLayout);
+
+  const activeModels = useMemo(() => {
+    return activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(Boolean);
+  }, [activeModelIds, availableModels]);
 
   // Calculate grid positions based on layout
   const gridPositions = useMemo(() => {
@@ -69,12 +74,14 @@ export const ChatDashboard: React.FC = () => {
 
         {/* Render Cards */}
         {activeModels.map((model, index) => (
-          <PhysicalCard
-            key={model.id}
-            model={model}
-            position={gridPositions[index] || [0, 0, -10]}
-            isActive={index < (activeLayout === '1x1' ? 1 : activeLayout === '2x2' ? 4 : 9)}
-          />
+          model ? (
+            <PhysicalCard
+              key={model.id}
+              model={model as any}
+              position={gridPositions[index] || [0, 0, -10]}
+              isActive={index < (activeLayout === '1x1' ? 1 : activeLayout === '2x2' ? 4 : 9)}
+            />
+          ) : null
         ))}
 
         {/* Shadows below cards */}

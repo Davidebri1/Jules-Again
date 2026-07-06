@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Layers, Sparkles } from 'lucide-react-native';
+import { Settings, User, Sparkles } from 'lucide-react-native';
 
 export const GridOverlay: React.FC = () => {
-  const { activeLayout, setActiveLayout, selectedTab, setSelectedTab } = useAppStore();
+  const {
+    activeLayout, setActiveLayout,
+    selectedTab, setSelectedTab,
+    availableModels, activeModelIds, toggleActiveModel,
+    setSettingsOpen, setConsensusOpen
+  } = useAppStore();
 
   const handleLayoutChange = (layout: GridLayout) => setActiveLayout(layout);
 
@@ -16,12 +21,17 @@ export const GridOverlay: React.FC = () => {
     { id: 'coding', label: 'Coding' },
   ];
 
+  // Filter models based on the currently selected tab/category
+  const displayedModels = useMemo(() => {
+    return availableModels.filter(m => m.category === selectedTab);
+  }, [availableModels, selectedTab]);
+
   return (
     <SafeAreaView style={styles.overlay} pointerEvents="box-none">
 
       {/* Top Bar: Brand, Layout, Profile */}
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
           <Settings color="#fff" size={20} />
         </TouchableOpacity>
 
@@ -61,34 +71,39 @@ export const GridOverlay: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Model Selector Tray Stub */}
+        {/* Model Selector Tray (Dynamic based on selected tab) */}
         <View style={styles.modelTrayContainer}>
            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
-              {/* Free Tier Stub */}
-              <TouchableOpacity style={[styles.modelBubble, { borderColor: 'rgba(255,255,255,0.3)' }]}>
-                 <Text style={styles.modelBubbleText}>LLaMA</Text>
-              </TouchableOpacity>
-              {/* Pro Tier Stub */}
-              <TouchableOpacity style={[styles.modelBubble, { borderColor: '#10a37f' }]}>
-                 <Text style={styles.modelBubbleText}>GPT</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modelBubble, { borderColor: '#d97757' }]}>
-                 <Text style={styles.modelBubbleText}>CLD</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.modelBubble, { borderColor: '#4285F4' }]}>
-                 <Text style={styles.modelBubbleText}>GEM</Text>
-              </TouchableOpacity>
+              {displayedModels.map(model => {
+                 const isActive = activeModelIds.includes(model.id);
+                 let borderColor = 'rgba(255,255,255,0.3)';
+                 if (model.tier === 'pro') borderColor = '#4285F4'; // Blue for pro
+                 if (model.tier === 'elite') borderColor = '#d97757'; // Orange for elite
+                 if (model.provider === 'openai') borderColor = '#10a37f'; // OpenAI Green override
+
+                 return (
+                  <TouchableOpacity
+                    key={model.id}
+                    style={[styles.modelBubble, { borderColor, backgroundColor: isActive ? borderColor : 'rgba(0,0,0,0.5)' }]}
+                    onPress={() => toggleActiveModel(model.id)}
+                  >
+                     <Text style={[styles.modelBubbleText, { color: isActive ? '#000' : '#fff' }]}>
+                       {model.name.substring(0, 6).toUpperCase()}
+                     </Text>
+                  </TouchableOpacity>
+                 );
+              })}
            </ScrollView>
         </View>
 
         {/* Collide / Chat Stub */}
         <View style={styles.actionRow}>
-           <TouchableOpacity style={styles.collideButton}>
+           <TouchableOpacity style={styles.collideButton} onPress={() => setConsensusOpen(true)}>
               <Sparkles color="#fff" size={20} style={{ marginRight: 8 }} />
               <Text style={styles.collideText}>COLLIDE</Text>
            </TouchableOpacity>
            <View style={styles.inputMock}>
-              <Text style={styles.inputTextMock}>Message AI Spatial Console...</Text>
+              <Text style={styles.inputTextMock}>Message Active Models...</Text>
            </View>
         </View>
       </View>
@@ -178,10 +193,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modelBubbleText: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 12,
   },
