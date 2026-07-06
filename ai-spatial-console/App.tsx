@@ -7,6 +7,7 @@ import { SettingsPanel, THEMES } from './src/components/SettingsPanel';
 import { ConsensusDrawer } from './src/components/ConsensusDrawer';
 import { SmartGenTools } from './src/components/SmartGenTools';
 import { UpgradePage } from './src/components/UpgradePage';
+import { HistoryDrawer } from './src/components/HistoryDrawer';
 import { useAppStore } from './src/store/useAppStore';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
       </View>
 
       {/* Absolute Full Screen Drawers/Panels */}
+      <HistoryDrawer />
       <SettingsPanel />
       <ConsensusDrawer />
       <SmartGenTools />

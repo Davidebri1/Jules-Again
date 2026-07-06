@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
 import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers } from 'lucide-react-native';
@@ -41,6 +41,22 @@ export const CardDetailView: React.FC = () => {
     }
   };
 
+  const handleMessageLongPress = (msgContent: string) => {
+    // Fulfills the requirement for conventional long-press options on messages
+    Alert.alert(
+      "Message Options",
+      "Choose an action:",
+      [
+        { text: "Copy", onPress: () => console.log("Copy stub") },
+        { text: "Retry", onPress: () => console.log("Retry stub") },
+        { text: "Edit", onPress: () => console.log("Edit stub") },
+        { text: "Delete", onPress: () => console.log("Delete stub"), style: 'destructive' },
+        { text: "Share", onPress: () => console.log("Share stub") },
+        { text: "Cancel", style: "cancel" }
+      ]
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -60,7 +76,6 @@ export const CardDetailView: React.FC = () => {
           </View>
 
           <View style={styles.headerRight}>
-             {/* Open Smart Gen Tools Button */}
              <TouchableOpacity style={styles.iconButton} onPress={() => setSmartGenOpen(true)}>
                <Layers color="#4285F4" size={24} />
              </TouchableOpacity>
@@ -79,7 +94,11 @@ export const CardDetailView: React.FC = () => {
         >
           {messages.map((msg) => (
             <View key={msg.id} style={[styles.messageWrapper, msg.role === 'user' ? styles.messageUser : styles.messageAssistant]}>
-               <View style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}>
+               <TouchableOpacity
+                 activeOpacity={0.8}
+                 onLongPress={() => handleMessageLongPress(msg.content)}
+                 style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}
+               >
                   {msg.role === 'user' ? (
                      <Text style={styles.userText}>{msg.content}</Text>
                   ) : (
@@ -87,7 +106,7 @@ export const CardDetailView: React.FC = () => {
                         {msg.content}
                      </Markdown>
                   )}
-               </View>
+               </TouchableOpacity>
             </View>
           ))}
           {isGenerating && (

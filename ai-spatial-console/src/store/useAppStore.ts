@@ -24,6 +24,7 @@ export interface Message {
 }
 
 export interface Conversation {
+  modelId: string;
   id: string;
   title: string;
   messages: Message[];
@@ -57,6 +58,10 @@ export interface AppState {
   isConsensusOpen: boolean;
   setConsensusOpen: (isOpen: boolean) => void;
   isSmartGenOpen: boolean;
+  isHistoryOpen: boolean;
+  setHistoryOpen: (isOpen: boolean) => void;
+  archivedConversations: Conversation[];
+  archiveConversation: (modelId: string) => void;
   isUpgradeOpen: boolean;
   setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
@@ -144,7 +149,7 @@ export const useAppStore = create<AppState>()(
 
       conversations: {},
       addMessage: (modelId, role, content) => set((state) => {
-        const convo = state.conversations[modelId] || { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
+        const convo = state.conversations[modelId] || { id: modelId, modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
         const newMessage: Message = {
           id: Math.random().toString(36).substring(7),
           role,
@@ -165,7 +170,7 @@ export const useAppStore = create<AppState>()(
       clearConversation: (modelId) => set((state) => ({
         conversations: {
           ...state.conversations,
-          [modelId]: { id: modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() }
+          [modelId]: { id: modelId, modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() }
         }
       })),
 
@@ -174,6 +179,20 @@ export const useAppStore = create<AppState>()(
       isConsensusOpen: false,
       setConsensusOpen: (isOpen) => set({ isConsensusOpen: isOpen }),
       isSmartGenOpen: false,
+      isHistoryOpen: false,
+      setHistoryOpen: (isOpen) => set({ isHistoryOpen: isOpen }),
+      archivedConversations: [],
+      archiveConversation: (modelId) => set((state) => {
+        const convo = state.conversations[modelId];
+        if (!convo || convo.messages.length === 0) return state;
+        return {
+          archivedConversations: [convo, ...state.archivedConversations],
+          conversations: {
+            ...state.conversations,
+            [modelId]: { id: modelId, modelId, title: "New Conversation", messages: [], updatedAt: Date.now() }
+          }
+        };
+      }),
       setSmartGenOpen: (isOpen) => set({ isSmartGenOpen: isOpen }),
       isUpgradeOpen: false,
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
@@ -185,7 +204,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         activeLayout: state.activeLayout,
         currentThemeId: state.currentThemeId,
-        activeModelIds: state.activeModelIds,
+        activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
         conversations: state.conversations,
       }),
     }

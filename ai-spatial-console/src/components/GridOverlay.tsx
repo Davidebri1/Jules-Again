@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock } from 'lucide-react-native';
 
 export const GridOverlay: React.FC = () => {
   const {
     activeLayout, setActiveLayout,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
-    setSettingsOpen, setConsensusOpen
+    setSettingsOpen, setConsensusOpen, setHistoryOpen
   } = useAppStore();
 
   const handleLayoutChange = (layout: GridLayout) => setActiveLayout(layout);
@@ -31,9 +31,14 @@ export const GridOverlay: React.FC = () => {
 
       {/* Top Bar: Brand, Layout, Profile */}
       <View style={styles.topBar}>
-        <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
-          <Settings color="#fff" size={20} />
-        </TouchableOpacity>
+        <View style={{flexDirection: 'row', gap: 10}}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
+            <Settings color="#fff" size={20} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => setHistoryOpen(true)}>
+            <Clock color="#fff" size={20} />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.gridSelector}>
           {(['1x1', '2x2', '3x3'] as GridLayout[]).map((layout, i) => (
