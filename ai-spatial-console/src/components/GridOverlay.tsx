@@ -51,7 +51,7 @@ export const GridOverlay: React.FC = () => {
      if (selectedTab === 'general') {
          // General tab uses Message Limits
          if (userProfile.tier === 'free' && !deductMessage()) {
-             Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging.");
+             Alert.alert("Message Limit Reached", "Please upgrade to Pro or Elite for unlimited general messaging.");
              setUpgradeOpen(true);
              return;
          }

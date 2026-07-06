@@ -143,6 +143,12 @@ export const useAppStore = create<AppState>()(
       userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
       deductMessage: () => {
          const { userProfile } = get();
+         // Paid users have unlimited general messages
+         if (userProfile.tier === 'pro' || userProfile.tier === 'elite') {
+             return true;
+         }
+
+         // Free users are capped
          if (userProfile.messageCount < userProfile.messageLimit) {
             set({ userProfile: { ...userProfile, messageCount: userProfile.messageCount + 1 } });
             return true;

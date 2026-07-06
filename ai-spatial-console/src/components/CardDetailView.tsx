@@ -28,7 +28,7 @@ export const CardDetailView: React.FC = () => {
     // 2. Validate Balance
     if (model.category === 'general') {
        if (!deductMessage()) {
-          Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging.");
+          Alert.alert("Message Limit Reached", "Please upgrade to Pro or Elite for unlimited general messaging.");
           setUpgradeOpen(true);
           return;
        }
