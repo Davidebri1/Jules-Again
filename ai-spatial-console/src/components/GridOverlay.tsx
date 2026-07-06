@@ -11,7 +11,7 @@ export const GridOverlay: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const {
     activeLayout, setActiveLayout,
-    userProfile, deductCredits, refundCredits, setUpgradeOpen,
+    userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen,
     addMessage, conversations,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
@@ -46,8 +46,15 @@ export const GridOverlay: React.FC = () => {
         return sum + cost;
      }, 0);
 
-     // 2. Validate Balance
-     if (!deductCredits(totalCost)) {
+     // 2. Validate Balance & Message Limits
+     const hasGeneral = activeModels.some(m => m.category === 'general');
+     if (hasGeneral && !deductMessage()) {
+         Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging general models.");
+         setUpgradeOpen(true);
+         return;
+     }
+
+     if (totalCost > 0 && !deductCredits(totalCost)) {
          setUpgradeOpen(true);
          return;
      }
@@ -139,6 +146,14 @@ export const GridOverlay: React.FC = () => {
         </View>
 
         {/* Model Selector Tray (Dynamic based on selected tab) */}
+        {selectedTab !== 'general' && (
+           <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
+              <TouchableOpacity style={styles.marketPill} onPress={() => setMarketplaceOpen(true)}>
+                 <Globe color="#fff" size={12} />
+                 <Text style={styles.marketPillText}>Browse {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)} Market</Text>
+              </TouchableOpacity>
+           </View>
+        )}
         <View style={styles.modelTrayContainer}>
            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
               {displayedModels.map(model => {
@@ -270,6 +285,23 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     color: '#fff',
+  },
+  marketPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(66, 133, 244, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+    borderWidth: 1,
+    borderColor: '#4285F4'
+  },
+  marketPillText: {
+    color: '#4285F4',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase'
   },
   modelTrayContainer: {
     marginBottom: 20,

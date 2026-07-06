@@ -2,12 +2,13 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders } from 'lucide-react-native';
 import { generateResponse } from '../utils/api';
 
 export const CardDetailView: React.FC = () => {
-  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, setUpgradeOpen } = useAppStore();
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen, setFileManagerOpen } = useAppStore();
   const [inputText, setInputText] = useState('');
+  const [isParamsOpen, setIsParamsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -25,9 +26,17 @@ export const CardDetailView: React.FC = () => {
     if (model.category === 'general' && userProfile.tier !== 'free') cost = 0;
 
     // 2. Validate Balance
-    if (!deductCredits(cost)) {
-        setUpgradeOpen(true);
-        return;
+    if (model.category === 'general') {
+       if (!deductMessage()) {
+          Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging.");
+          setUpgradeOpen(true);
+          return;
+       }
+    } else {
+       if (!deductCredits(cost)) {
+          setUpgradeOpen(true);
+          return;
+       }
     }
 
     const userMessage = inputText.trim();
@@ -82,17 +91,92 @@ export const CardDetailView: React.FC = () => {
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{model.name}</Text>
             <Text style={styles.subtitle}>{model.provider} • {model.tier}</Text>
+            {model.category !== 'general' && (
+               <TouchableOpacity style={styles.marketPill} onPress={() => {}}>
+                  <Text style={styles.marketPillText}>Generated to File Manager</Text>
+               </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.headerRight}>
+             <TouchableOpacity style={styles.iconButton} onPress={() => setIsParamsOpen(!isParamsOpen)}>
+               <Sliders color={isParamsOpen ? "#4285F4" : "#fff"} size={22} />
+             </TouchableOpacity>
              <TouchableOpacity style={styles.iconButton} onPress={() => setSmartGenOpen(true)}>
-               <Layers color="#4285F4" size={24} />
+               <Layers color="#4285F4" size={22} />
              </TouchableOpacity>
              <TouchableOpacity style={styles.iconButton}>
                <MoreHorizontal color="#fff" size={24} />
              </TouchableOpacity>
           </View>
         </View>
+
+        {/* Model Parameters Dropdown */}
+        {isParamsOpen && (
+           <View style={styles.paramsContainer}>
+              {model.category === 'video' && (
+                 <>
+                    <Text style={styles.paramTitle}>Video Options</Text>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>1080p</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>4K HDR</Text></TouchableOpacity>
+                    </View>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>5s Loop</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>10s</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Fluid Motion</Text></TouchableOpacity>
+                    </View>
+                 </>
+              )}
+              {model.category === 'image' && (
+                 <>
+                    <Text style={styles.paramTitle}>Image Options</Text>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>16:9</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>1:1</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>9:16</Text></TouchableOpacity>
+                    </View>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>Raw</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Photoreal</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Anime</Text></TouchableOpacity>
+                    </View>
+                 </>
+              )}
+              {model.category === 'audio' && (
+                 <>
+                    <Text style={styles.paramTitle}>Audio Options</Text>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>Song (Vocals)</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Instrumental</Text></TouchableOpacity>
+                    </View>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Voiceover</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Sound Effect</Text></TouchableOpacity>
+                    </View>
+                 </>
+              )}
+              {model.category === 'coding' && (
+                 <>
+                    <Text style={styles.paramTitle}>Coding Environment</Text>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>Enable Canvas UI</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Auto-Execute</Text></TouchableOpacity>
+                    </View>
+                 </>
+              )}
+              {model.category === 'general' && (
+                 <>
+                    <Text style={styles.paramTitle}>Model Behavior</Text>
+                    <View style={styles.paramRow}>
+                       <TouchableOpacity style={styles.paramPillActive}><Text style={styles.paramTextActive}>Standard</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Creative</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.paramPill}><Text style={styles.paramText}>Precise</Text></TouchableOpacity>
+                    </View>
+                 </>
+              )}
+           </View>
+        )}
 
         {/* Chat Area */}
         <ScrollView
@@ -143,7 +227,7 @@ export const CardDetailView: React.FC = () => {
           </View>
 
           <View style={styles.inputBox}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={() => setFileManagerOpen(true)}>
                 <Paperclip color="rgba(255,255,255,0.7)" size={20} />
             </TouchableOpacity>
 
@@ -174,6 +258,50 @@ export const CardDetailView: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  paramsContainer: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+    padding: 15,
+  },
+  paramTitle: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  paramRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  paramPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  paramPillActive: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: 'rgba(66, 133, 244, 0.2)',
+    borderWidth: 1,
+    borderColor: '#4285F4',
+  },
+  paramText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+  },
+  paramTextActive: {
+    color: '#4285F4',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   container: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -212,6 +340,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textTransform: 'uppercase',
     marginTop: 2,
+  },
+  marketPill: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  marketPillText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 9,
   },
   chatArea: {
     flex: 1,

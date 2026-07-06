@@ -1,8 +1,10 @@
 import React, { useMemo, Suspense } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Canvas } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
-import { useAppStore } from '../store/useAppStore';
+import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing';
+import { Environment, PerspectiveCamera, ContactShadows } from '@react-three/drei';
 import { PhysicalCard } from './PhysicalCard';
+import { useAppStore } from '../store/useAppStore';
 
 export const ChatDashboard: React.FC = () => {
   const activeModelIds = useAppStore((state) => state.activeModelIds);

@@ -10,6 +10,8 @@ export interface UserProfile {
   tier: SubscriptionTier;
   credits: number;
   monthlyLimit: number;
+  messageCount: number;
+  messageLimit: number;
 }
 
 
@@ -47,6 +49,7 @@ export interface AppState {
   userProfile: UserProfile;
   deductCredits: (amount: number) => boolean;
   refundCredits: (amount: number) => void;
+  deductMessage: () => boolean;
   setUserTier: (tier: SubscriptionTier) => void;
   // Layout & Core UI (Persisted)
   activeLayout: GridLayout;
@@ -81,6 +84,8 @@ export interface AppState {
   isUpgradeOpen: boolean;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
+  isFileManagerOpen: boolean;
+  setFileManagerOpen: (isOpen: boolean) => void;
   setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
 }
@@ -135,7 +140,15 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       // User Profile & Credits
-      userProfile: { tier: 'free', credits: 150, monthlyLimit: 150 },
+      userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
+      deductMessage: () => {
+         const { userProfile } = get();
+         if (userProfile.messageCount < userProfile.messageLimit) {
+            set({ userProfile: { ...userProfile, messageCount: userProfile.messageCount + 1 } });
+            return true;
+         }
+         return false;
+      },
       deductCredits: (amount) => {
          const { userProfile } = get();
          if (userProfile.credits >= amount) {
@@ -148,8 +161,9 @@ export const useAppStore = create<AppState>()(
          set((state) => ({ userProfile: { ...state.userProfile, credits: state.userProfile.credits + amount } }));
       },
       setUserTier: (tier) => {
-         const limits: Record<SubscriptionTier, number> = { free: 150, pro: 12000, elite: 35000 };
-         set({ userProfile: { tier, credits: limits[tier], monthlyLimit: limits[tier] } });
+         const creditLimits: Record<SubscriptionTier, number> = { free: 150, pro: 12000, elite: 35000 };
+         const msgLimits: Record<SubscriptionTier, number> = { free: 50, pro: 1000, elite: 5000 };
+         set({ userProfile: { tier, credits: creditLimits[tier], monthlyLimit: creditLimits[tier], messageCount: 0, messageLimit: msgLimits[tier] } });
       },
       // Default state
       activeLayout: '2x2',
@@ -236,6 +250,8 @@ export const useAppStore = create<AppState>()(
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
       isMarketplaceOpen: false,
       setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
+      isFileManagerOpen: false,
+      setFileManagerOpen: (isOpen) => set({ isFileManagerOpen: isOpen }),
     }),
     {
       name: 'spatial-console-storage', // unique name

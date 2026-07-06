@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export const UpgradePage: React.FC = () => {
   const { isUpgradeOpen, setUpgradeOpen } = useAppStore();
+  const [isAnnual, setIsAnnual] = useState(false);
   const [enterpriseMessage, setEnterpriseMessage] = useState('');
 
   if (!isUpgradeOpen) return null;
