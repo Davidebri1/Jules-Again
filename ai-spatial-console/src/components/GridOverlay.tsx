@@ -1,18 +1,22 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X, EyeOff, Plus, Paperclip, Search } from 'lucide-react-native';
 
 import { generateResponse } from '../utils/api';
 
 
 export const GridOverlay: React.FC = () => {
   const [inputText, setInputText] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isWebEnabled, setIsWebEnabled] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const {
     activeLayout, setActiveLayout,
     userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen,
-    addMessage, conversations, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, setAuthOpen,
+    addMessage, conversations, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, setAuthOpen, isPrivateMode, setPrivateMode, archiveConversation, setFileManagerOpen,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
     setSettingsOpen, setConsensusOpen, setHistoryOpen, setMarketplaceOpen
@@ -106,8 +110,8 @@ export const GridOverlay: React.FC = () => {
       {/* Top Bar: Brand, Layout, Profile */}
       <View style={styles.topBar}>
         <View style={{flexDirection: 'row', gap: 10}}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
-            <Settings color="#fff" size={20} />
+          <TouchableOpacity style={styles.iconButton} onPress={() => setIsSearchOpen(!isSearchOpen)}>
+            <Search color={isSearchOpen ? "#4285F4" : "#fff"} size={20} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={() => setHistoryOpen(true)}>
             <Clock color="#fff" size={20} />
@@ -133,6 +137,25 @@ export const GridOverlay: React.FC = () => {
           <User color="#fff" size={20} />
         </TouchableOpacity>
       </View>
+
+      {isSearchOpen && (
+          <View style={styles.searchContainer}>
+             <Search color="rgba(255,255,255,0.4)" size={16} />
+             <TextInput
+                 style={styles.searchInput}
+                 placeholder="Search conversations, files, memories..."
+                 placeholderTextColor="rgba(255,255,255,0.4)"
+                 value={searchQuery}
+                 onChangeText={setSearchQuery}
+                 autoFocus
+             />
+             {searchQuery.length > 0 && (
+                 <TouchableOpacity onPress={() => setSearchQuery('')}>
+                    <X color="rgba(255,255,255,0.4)" size={16} />
+                 </TouchableOpacity>
+             )}
+          </View>
+      )}
 
       {/* Tabs and Model Selector Tray */}
       <View style={styles.bottomSection}>
@@ -209,30 +232,45 @@ export const GridOverlay: React.FC = () => {
                  ))}
               </ScrollView>
            )}
-           <View style={styles.inputMock}>
-              <TouchableOpacity style={styles.iconButtonSmall}><Sparkles color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
-              <TextInput
-                 style={styles.inputTextMock}
-                 placeholder="Message Active Models..."
-                 placeholderTextColor="rgba(255,255,255,0.4)"
-                 value={inputText}
-                 onChangeText={setInputText}
-                 multiline
-              />
-              <View style={styles.inputRightActions}>
-                {isGenerating ? (
-                   <ActivityIndicator color="#fff" size="small" />
-                ) : inputText.trim() ? (
-                   <TouchableOpacity style={styles.iconButtonSmall} onPress={handleSendGlobal}>
-                      <Send color="#fff" size={16} />
-                   </TouchableOpacity>
-                ) : (
-                   <>
-                     <TouchableOpacity style={styles.iconButtonSmall}><Globe color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
-                     <TouchableOpacity style={styles.iconButtonSmall}><Settings color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
-                     <TouchableOpacity style={styles.iconButtonSmall}><Mic color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
-                   </>
-                )}
+           <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-end' }}>
+              <TouchableOpacity
+                  style={styles.newConvoBtn}
+                  onPress={() => activeModelIds.forEach(id => archiveConversation(id))}
+              >
+                  <Plus color="#000" size={20} />
+              </TouchableOpacity>
+
+              <View style={[styles.inputMock, isPrivateMode && { borderColor: 'rgba(255, 69, 58, 0.3)' }]}>
+                 <TouchableOpacity style={styles.iconButtonSmall} onPress={() => setFileManagerOpen(true)}>
+                    <Paperclip color="rgba(255,255,255,0.7)" size={16} />
+                 </TouchableOpacity>
+                 <TextInput
+                    style={styles.inputTextMock}
+                    placeholder={isPrivateMode ? "Private Message..." : "Message Active Models..."}
+                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    value={inputText}
+                    onChangeText={setInputText}
+                    multiline
+                 />
+                 <View style={styles.inputRightActions}>
+                   {isGenerating ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                   ) : inputText.trim() ? (
+                      <TouchableOpacity style={styles.iconButtonSmall} onPress={handleSendGlobal}>
+                         <Send color="#fff" size={16} />
+                      </TouchableOpacity>
+                   ) : (
+                      <>
+                        <TouchableOpacity style={styles.iconButtonSmall} onPress={() => setIsWebEnabled(!isWebEnabled)}><Globe color={isWebEnabled ? "#10a37f" : "rgba(255,255,255,0.7)"} size={16} /></TouchableOpacity>
+                        <TouchableOpacity style={styles.iconButtonSmall} onPress={() => setPrivateMode(!isPrivateMode)}>
+                           <EyeOff color={isPrivateMode ? "#ff453a" : "rgba(255,255,255,0.7)"} size={16} />
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.iconButtonSmall, isRecording && { backgroundColor: 'rgba(255, 69, 58, 0.2)', borderRadius: 12 }]} onPress={() => setIsRecording(!isRecording)}>
+                           <Mic color={isRecording ? "#ff453a" : "rgba(255,255,255,0.7)"} size={16} />
+                        </TouchableOpacity>
+                      </>
+                   )}
+                 </View>
               </View>
            </View>
         </View>
@@ -262,6 +300,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  searchContainer: {
+    marginHorizontal: 20,
+    marginTop: 10,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 14,
   },
   gridSelector: {
     flexDirection: 'row',
@@ -404,6 +460,16 @@ const styles = StyleSheet.create({
     color: '#4285F4',
     fontSize: 10,
     fontWeight: '700',
+  },
+
+  newConvoBtn: {
+    backgroundColor: '#fff',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 2, // align with inputMock
   },
   inputMock: {
     flex: 1,

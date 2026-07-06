@@ -4,7 +4,7 @@ import { useAppStore, Conversation } from '../store/useAppStore';
 import { X, Search, Clock, Hash } from 'lucide-react-native';
 
 export const HistoryDrawer: React.FC = () => {
-  const { isHistoryOpen, setHistoryOpen, archivedConversations, availableModels } = useAppStore();
+  const { isHistoryOpen, setHistoryOpen, archivedConversations, availableModels, conversations, archiveConversation } = useAppStore();
 
   if (!isHistoryOpen) return null;
 

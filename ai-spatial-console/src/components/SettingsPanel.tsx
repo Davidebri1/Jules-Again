@@ -100,6 +100,38 @@ const styles = StyleSheet.create({
   section: {
     gap: 15,
   },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  settingLabel: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  toggleTrack: {
+    width: 50,
+    height: 28,
+    borderRadius: 15,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    justifyContent: 'center',
+    padding: 3,
+  },
+  toggleTrackActive: {
+    backgroundColor: '#4285F4',
+  },
+  toggleThumb: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#fff',
+  },
+  toggleThumbActive: {
+    transform: [{ translateX: 22 }],
+  },
   sectionTitle: {
     color: 'rgba(255,255,255,0.5)',
     textTransform: 'uppercase',

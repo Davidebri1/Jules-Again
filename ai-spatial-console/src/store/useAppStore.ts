@@ -46,6 +46,7 @@ export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: number;
+  smartGenEvent?: { type: 'memory' | 'task' | 'reminder', desc: string };
 }
 
 export interface Conversation {
@@ -79,7 +80,8 @@ export interface AppState {
 
   // Conversations
   conversations: Record<string, Conversation>;
-  addMessage: (modelId: string, role: 'user' | 'assistant', content: string) => void;
+  addMessage: (modelId: string, role: 'user' | 'assistant' | 'system', content: string) => string;
+  updateMessageEvent: (modelId: string, msgId: string, event: Message['smartGenEvent']) => void;
   clearConversation: (modelId: string) => void;
 
   // Drawers & Panels
@@ -111,6 +113,15 @@ export interface AppState {
   isAuthenticated: boolean;
   setAuthenticated: (isAuth: boolean) => void;
   logout: () => void;
+  isPrivateMode: boolean;
+  isSmartGenEnabled: boolean;
+  setSmartGenEnabled: (enabled: boolean) => void;
+  processSmartGenLogic: (content: string) => Promise<Message['smartGenEvent'] | undefined>;
+  setPrivateMode: (isPrivate: boolean) => void;
+  accountId: string | null;
+  login: (accountId: string) => void;
+  files: StoredFile[];
+  setFiles: (files: StoredFile[] | ((prev: StoredFile[]) => StoredFile[])) => void;
   setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
 }
@@ -166,6 +177,17 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       // User Profile & Credits
       userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
+      processSmartGenLogic: async (content) => {
+          if (content.length < 10) return undefined;
+
+          try {
+             // In a real execution environment, we import generateResponse here
+             // but to avoid circular dependencies in Zustand, we abstract the logic wrapper
+             // The UI layer will handle the API call and update the message block directly.
+             // We return a structured format indicator here.
+          } catch(e) { console.error(e); }
+          return undefined;
+      },
       deductMessage: () => {
          const { userProfile } = get();
          // Paid users have unlimited general messages
@@ -231,24 +253,39 @@ export const useAppStore = create<AppState>()(
       setFocusedModelId: (id) => set({ focusedModelId: id }),
 
       conversations: {},
-      addMessage: (modelId, role, content) => set((state) => {
-        const convo = state.conversations[modelId] || { id: modelId, modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
-        const newMessage: Message = {
-          id: Math.random().toString(36).substring(7),
-          role,
-          content,
-          timestamp: Date.now()
-        };
-        return {
-          conversations: {
-            ...state.conversations,
-            [modelId]: {
-              ...convo,
-              messages: [...convo.messages, newMessage],
-              updatedAt: Date.now()
+      addMessage: (modelId, role, content) => {
+        const newId = Math.random().toString(36).substring(7);
+        set((state) => {
+            const convo = state.conversations[modelId] || { id: modelId, modelId, title: 'New Conversation', messages: [], updatedAt: Date.now() };
+            const newMessage: Message = {
+                id: newId,
+                role,
+                content,
+                timestamp: Date.now(),
+            };
+            return {
+                conversations: {
+                    ...state.conversations,
+                    [modelId]: {
+                        ...convo,
+                        messages: [...convo.messages, newMessage],
+                        updatedAt: Date.now()
+                    }
+                }
+            };
+        });
+        return newId;
+      },
+      updateMessageEvent: (modelId: string, msgId: string, event: Message['smartGenEvent']) => set((state) => {
+         const convo = state.conversations[modelId];
+         if (!convo) return state;
+         const updatedMessages = convo.messages.map(m => m.id === msgId ? { ...m, smartGenEvent: event } : m);
+         return {
+            conversations: {
+               ...state.conversations,
+               [modelId]: { ...convo, messages: updatedMessages }
             }
-          }
-        };
+         };
       }),
       clearConversation: (modelId) => set((state) => ({
         conversations: {
@@ -284,9 +321,9 @@ export const useAppStore = create<AppState>()(
 
       pendingContextFiles: [],
       pendingSourceFile: null,
-      addContextFile: (file) => set((state) => ({
-          pendingContextFiles: state.pendingContextFiles.find(f => f.id === file.id) ? state.pendingContextFiles : [...state.pendingContextFiles, file]
-      })),
+      addContextFile: (file) => set((state) => {
+          return { pendingContextFiles: state.pendingContextFiles.find(f => f.id === file.id) ? state.pendingContextFiles : [...state.pendingContextFiles, file] };
+      }),
       removeContextFile: (id) => set((state) => ({ pendingContextFiles: state.pendingContextFiles.filter(f => f.id !== id) })),
       setSourceFile: (file) => set({ pendingSourceFile: file }),
       clearPendingAttachments: () => set({ pendingContextFiles: [], pendingSourceFile: null }),
@@ -302,17 +339,44 @@ export const useAppStore = create<AppState>()(
       setAuthOpen: (isOpen) => set({ isAuthOpen: isOpen }),
       isAuthenticated: false,
       setAuthenticated: (isAuth) => set({ isAuthenticated: isAuth }),
-      logout: () => set({ isAuthenticated: false, userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 } }),
+      isPrivateMode: false,
+      isSmartGenEnabled: true,
+      setSmartGenEnabled: (enabled) => set({ isSmartGenEnabled: enabled }),
+      setPrivateMode: (isPrivate) => set({ isPrivateMode: isPrivate }),
+      accountId: null,
+      login: (accountId) => set({ isAuthenticated: true, accountId }),
+      logout: () => set({
+         isAuthenticated: false,
+         accountId: null,
+         userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
+         activeModelIds: [],
+         conversations: {},
+         archivedConversations: [],
+         pendingContextFiles: [],
+         pendingSourceFile: null,
+         files: [],
+         starredFiles: []
+      }),
+      files: [],
+      setFiles: (update) => set((state) => ({
+         files: typeof update === 'function' ? update(state.files) : update
+      })),
     }),
     {
       name: 'spatial-console-storage', // unique name
       storage: createJSONStorage(() => AsyncStorage),
       // We only want to persist certain things
       partialize: (state) => ({
+        userProfile: state.userProfile,
+        accountId: state.accountId,
         activeLayout: state.activeLayout,
         currentThemeId: state.currentThemeId,
-        userProfile: state.userProfile, starredFiles: state.starredFiles, activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
-        conversations: state.conversations,
+        isPrivateMode: state.isPrivateMode, isSmartGenEnabled: state.isSmartGenEnabled,
+        files: state.isPrivateMode ? [] : state.files,
+        starredFiles: state.starredFiles,
+        activeModelIds: state.activeModelIds,
+        archivedConversations: state.isPrivateMode ? [] : state.archivedConversations,
+        conversations: state.isPrivateMode ? {} : state.conversations,
       }),
     }
   )

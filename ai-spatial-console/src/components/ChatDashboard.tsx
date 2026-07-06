@@ -4,12 +4,15 @@ import { Canvas } from '@react-three/fiber';
 import { EffectComposer, Bloom, DepthOfField, ToneMapping } from '@react-three/postprocessing';
 import { Environment, PerspectiveCamera, ContactShadows } from '@react-three/drei';
 import { PhysicalCard } from './PhysicalCard';
+import { SpatialAsset } from './SpatialAsset';
 import { useAppStore } from '../store/useAppStore';
 
 export const ChatDashboard: React.FC = () => {
   const activeModelIds = useAppStore((state) => state.activeModelIds);
   const availableModels = useAppStore((state) => state.availableModels);
   const selectedTab = useAppStore((state) => state.selectedTab);
+  const files = useAppStore((state) => state.files);
+  const activeFiles = files.filter(f => activeModelIds.includes(f.modelId || '') && f.category === 'generated');
   const activeLayout = useAppStore((state) => state.activeLayout);
 
   const activeModels = useMemo(() => {

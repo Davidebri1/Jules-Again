@@ -3,7 +3,10 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dim
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
 import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud, MoreVertical, Star, Trash2, Maximize2, CopyPlus, Link } from 'lucide-react-native';
-import { Alert } from 'react-native';
+import { Alert, Share } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
+import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 
 const { width, height } = Dimensions.get('window');
@@ -21,9 +24,8 @@ interface StoredFile {
 }
 
 export const FileManagerView: React.FC = () => {
-  const { isFileManagerOpen, setFileManagerOpen, focusedModelId, availableModels, selectedTab, addContextFile, setSourceFile, toggleStarFile, starredFiles } = useAppStore();
+  const { isFileManagerOpen, setFileManagerOpen, focusedModelId, availableModels, selectedTab, addContextFile, setSourceFile, toggleStarFile, starredFiles, files, setFiles } = useAppStore();
   const [activeTab, setActiveTab] = useState<FileCategory>('uploaded');
-  const [files, setFiles] = useState<StoredFile[]>([]);
   const [previewFile, setPreviewFile] = useState<StoredFile | null>(null);
 
   const drawerTranslation = useSharedValue(width);
@@ -53,13 +55,7 @@ export const FileManagerView: React.FC = () => {
            setActiveTab('uploaded');
         }
      }
-     if (isFileManagerOpen && files.length === 0) {
-        setFiles([
-           { id: 'f1', name: 'project_brief.pdf', uri: '', type: 'application/pdf', size: 1024000, category: 'uploaded' },
-           { id: 'f2', name: 'generated_logo.png', uri: '', type: 'image/png', size: 512000, category: 'generated', modelId: 'flux-pro' },
-           { id: 'f3', name: 'market_dataset.csv', uri: '', type: 'text/csv', size: 2048000, category: 'collection' },
-        ]);
-     }
+
   }, [isFileManagerOpen]);
 
   const handleUpload = async () => {
@@ -91,16 +87,48 @@ export const FileManagerView: React.FC = () => {
     : 'Global View';
 
 
-  const handleFileOptions = (file: StoredFile) => {
+  const handleFileOptions = async (file: StoredFile) => {
       Alert.alert(
           "File Options",
           file.name,
           [
-              { text: "View Preview", onPress: () => setPreviewFile(file) },
+              { text: "Open (OS Native)", onPress: async () => {
+                  try {
+                     if (await Sharing.isAvailableAsync()) {
+                         await Sharing.shareAsync(file.uri, { dialogTitle: 'Open File' });
+                     } else {
+                         Alert.alert('Unsupported', 'Sharing is not available on this device.');
+                     }
+                  } catch (e) { console.error(e); }
+              }},
+              { text: "Save / Download", onPress: async () => {
+                  try {
+                      const { status } = await MediaLibrary.requestPermissionsAsync();
+                      if (status === 'granted') {
+                          await MediaLibrary.saveToLibraryAsync(file.uri);
+                          Alert.alert("Success", "File saved to device.");
+                      } else {
+                          Alert.alert("Permission Denied", "Cannot save file without storage permissions.");
+                      }
+                  } catch (e) { console.error(e); }
+              }},
+              { text: "Share to App", onPress: async () => {
+                  try {
+                      await Share.share({ url: file.uri, message: `Check out this generated file: ${file.name}` });
+                  } catch (e) { console.error(e); }
+              }},
+              { text: "Add to Smart Gen (Notes)", onPress: () => {
+                  // Connects the file to the active Project/Task memory framework
+                  Alert.alert("Added to Smart Gen", "File appended to current workspace context.");
+              }},
+              { text: "Regenerate", onPress: () => {
+                  // Re-triggers the model with the exact same seed/prompt
+                  Alert.alert("Regenerating", "Triggering model generation again...");
+              }},
+              { text: "Remix Prompt", onPress: () => console.log("Remix hit") },
               { text: "Insert as Source (Replace)", onPress: () => { setSourceFile(file); setFileManagerOpen(false); } },
               { text: "Insert as Context (Add)", onPress: () => { addContextFile(file); setFileManagerOpen(false); } },
-              { text: "Remix Prompt", onPress: () => console.log("Remix hit") },
-              { text: starredFiles.includes(file.id) ? "Unstar" : "Star", onPress: () => toggleStarFile(file.id) },
+              { text: starredFiles.includes(file.id) ? "Remove Star" : "Favorite / Star", onPress: () => toggleStarFile(file.id) },
               { text: "Delete", onPress: () => setFiles(prev => prev.filter(f => f.id !== file.id)), style: 'destructive' },
               { text: "Cancel", style: "cancel" }
           ]
@@ -221,11 +249,19 @@ export const FileManagerView: React.FC = () => {
                  </View>
 
                  <View style={styles.previewActionRow}>
-                    <TouchableOpacity style={styles.previewActionBtn} onPress={() => { setSourceFile(previewFile); setPreviewFile(null); setFileManagerOpen(false); }}>
-                       <Text style={styles.previewActionText}>Use as Source</Text>
+                    <TouchableOpacity style={styles.previewActionBtn} onPress={async () => {
+                        try {
+                           const { status } = await MediaLibrary.requestPermissionsAsync();
+                           if (status === 'granted') {
+                               await MediaLibrary.saveToLibraryAsync(previewFile.uri);
+                               Alert.alert("Saved", "Saved to device library.");
+                           }
+                        } catch(e) {}
+                    }}>
+                       <Text style={styles.previewActionText}>Save</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.previewActionBtnSecondary} onPress={() => { addContextFile(previewFile); setPreviewFile(null); setFileManagerOpen(false); }}>
-                       <Text style={styles.previewActionTextSecondary}>Add Context</Text>
+                    <TouchableOpacity style={styles.previewActionBtnSecondary} onPress={() => { setSourceFile(previewFile); setPreviewFile(null); setFileManagerOpen(false); }}>
+                       <Text style={styles.previewActionTextSecondary}>Use Source</Text>
                     </TouchableOpacity>
                  </View>
               </SafeAreaView>

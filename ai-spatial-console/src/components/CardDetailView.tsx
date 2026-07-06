@@ -2,13 +2,18 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X, Sparkles, Plus } from 'lucide-react-native';
 import { generateResponse } from '../utils/api';
 
 export const CardDetailView: React.FC = () => {
-  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen, setFileManagerOpen, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments } = useAppStore();
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen, setFileManagerOpen, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, isPrivateMode, setPrivateMode, archiveConversation, updateMessageEvent, isSmartGenEnabled } = useAppStore();
   const [inputText, setInputText] = useState('');
   const [isParamsOpen, setIsParamsOpen] = useState(false);
+  const [isDeepResearch, setIsDeepResearch] = useState(false);
+  const [isWebEnabled, setIsWebEnabled] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -42,7 +47,35 @@ export const CardDetailView: React.FC = () => {
     const userMessage = inputText.trim();
     setInputText('');
 
-    addMessage(model.id, 'user', userMessage);
+    const newMsgId = addMessage(model.id, 'user', userMessage);
+
+    // --- NATIVE LOGICAL FRAMEWORK ENGINE ---
+    // Instead of using generic mocks, we extract meaning into the Smart Gen framework
+    // by passing the input into the absolute fastest/cheapest model available globally (e.g. Llama 3 8b).
+    // This happens entirely invisibly to the user in parallel.
+    if (isSmartGenEnabled && !isPrivateMode && userMessage.length > 10) {
+        const frameworkModel = availableModels.find(m => m.id === 'llama-3-8b');
+        if (frameworkModel) {
+            const systemPrompt = `Analyze the following user input and determine if it represents a core memory, task, or reminder.
+            If it does NOT, return 'NOISE'.
+            If it DOES, return EXACTLY in this JSON format: {"type": "memory" | "task" | "reminder", "desc": "Logic Token: <Semantic Abstraction>"}. Do not wrap in markdown.`;
+
+            generateResponse(frameworkModel, [
+               { id: 'sys', role: 'system', content: systemPrompt, timestamp: Date.now() },
+               { id: 'usr', role: 'user', content: userMessage, timestamp: Date.now() }
+            ]).then((extraction) => {
+               try {
+                  if (!extraction.includes('NOISE')) {
+                     const parsed = JSON.parse(extraction.trim());
+                     if (parsed.type && parsed.desc) {
+                        updateMessageEvent(model.id, newMsgId, parsed);
+                     }
+                  }
+               } catch (e) { /* silent parse fail */ }
+            });
+        }
+    }
+    // ----------------------------------------
 
     const apiMessages = [...messages, { id: 'temp', role: 'user' as const, content: userMessage, timestamp: Date.now() }];
 
@@ -100,6 +133,9 @@ export const CardDetailView: React.FC = () => {
           </View>
 
           <View style={styles.headerRight}>
+             <TouchableOpacity style={styles.iconButton} onPress={() => setIsSearchOpen(!isSearchOpen)}>
+               <Search color={isSearchOpen ? "#4285F4" : "#fff"} size={22} />
+             </TouchableOpacity>
              <TouchableOpacity style={styles.iconButton} onPress={() => setIsParamsOpen(!isParamsOpen)}>
                <Sliders color={isParamsOpen ? "#4285F4" : "#fff"} size={22} />
              </TouchableOpacity>
@@ -111,6 +147,20 @@ export const CardDetailView: React.FC = () => {
              </TouchableOpacity>
           </View>
         </View>
+
+        {isSearchOpen && (
+           <View style={styles.searchContainer}>
+              <Search color="rgba(255,255,255,0.4)" size={16} />
+              <TextInput
+                  style={styles.searchInput}
+                  placeholder={`Search ${model.name} history & files...`}
+                  placeholderTextColor="rgba(255,255,255,0.4)"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoFocus
+              />
+           </View>
+        )}
 
         {/* Model Parameters Dropdown */}
         {isParamsOpen && (
@@ -228,16 +278,20 @@ export const CardDetailView: React.FC = () => {
         <View style={styles.inputArea}>
           {/* Options Row */}
           <View style={styles.optionsRow}>
-             <TouchableOpacity style={styles.optionPill}>
-                <Zap color="#fff" size={14} />
-                <Text style={styles.optionText}>Deep Research</Text>
+             <TouchableOpacity style={styles.newConvoBtn} onPress={() => archiveConversation(model.id)}>
+                <Plus color="#000" size={14} />
+                <Text style={{ fontSize: 10, fontWeight: '800' }}>NEW</Text>
              </TouchableOpacity>
-             <TouchableOpacity style={styles.optionPill}>
-                <Globe color="#fff" size={14} />
-                <Text style={styles.optionText}>Web</Text>
+             <TouchableOpacity style={[styles.optionPill, isDeepResearch && { borderColor: '#4285F4', backgroundColor: 'rgba(66, 133, 244, 0.2)' }]} onPress={() => setIsDeepResearch(!isDeepResearch)}>
+                <Zap color={isDeepResearch ? "#4285F4" : "#fff"} size={14} />
+                <Text style={[styles.optionText, isDeepResearch && { color: '#4285F4' }]}>Deep Research</Text>
              </TouchableOpacity>
-             <TouchableOpacity style={styles.optionPill}>
-                <EyeOff color="#fff" size={14} />
+             <TouchableOpacity style={[styles.optionPill, isWebEnabled && { borderColor: '#10a37f', backgroundColor: 'rgba(16, 163, 127, 0.2)' }]} onPress={() => setIsWebEnabled(!isWebEnabled)}>
+                <Globe color={isWebEnabled ? "#10a37f" : "#fff"} size={14} />
+                <Text style={[styles.optionText, isWebEnabled && { color: '#10a37f' }]}>Web</Text>
+             </TouchableOpacity>
+             <TouchableOpacity style={[styles.optionPill, isPrivateMode && { borderColor: '#ff453a', backgroundColor: 'rgba(255, 69, 58, 0.1)' }]} onPress={() => setPrivateMode(!isPrivateMode)}>
+                <EyeOff color={isPrivateMode ? "#ff453a" : "#fff"} size={14} />
              </TouchableOpacity>
           </View>
 
@@ -274,8 +328,8 @@ export const CardDetailView: React.FC = () => {
             />
 
             {!inputText.trim() ? (
-               <TouchableOpacity style={styles.actionButton}>
-                  <Mic color="rgba(255,255,255,0.7)" size={20} />
+               <TouchableOpacity style={[styles.actionButton, isRecording && { backgroundColor: 'rgba(255, 69, 58, 0.2)', borderRadius: 20 }]} onPress={() => setIsRecording(!isRecording)}>
+                  <Mic color={isRecording ? "#ff453a" : "rgba(255,255,255,0.7)"} size={20} />
                </TouchableOpacity>
             ) : (
                <TouchableOpacity style={[styles.actionButton, styles.sendButton]} onPress={handleSend}>
@@ -355,6 +409,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  searchContainer: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  searchInput: {
+    flex: 1,
+    color: '#fff',
+    marginLeft: 10,
+    fontSize: 14,
+  },
   iconButton: {
     padding: 10,
   },
@@ -416,6 +485,24 @@ const styles = StyleSheet.create({
      borderColor: 'rgba(255,255,255,0.1)',
      borderBottomLeftRadius: 5,
   },
+  smartGenPill: {
+     flexDirection: 'row',
+     alignItems: 'center',
+     backgroundColor: 'rgba(66, 133, 244, 0.1)',
+     paddingHorizontal: 8,
+     paddingVertical: 4,
+     borderRadius: 8,
+     alignSelf: 'flex-start',
+     marginBottom: 6,
+     borderWidth: 1,
+     borderColor: 'rgba(66, 133, 244, 0.3)',
+     gap: 4,
+  },
+  smartGenPillText: {
+     color: '#4285F4',
+     fontSize: 10,
+     fontWeight: '600',
+  },
   mediaContainer: {
      width: '100%',
   },
@@ -463,6 +550,15 @@ const styles = StyleSheet.create({
   inputArea: {
     padding: 15,
     paddingBottom: 25,
+  },
+  newConvoBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 4,
   },
   optionsRow: {
     flexDirection: 'row',
