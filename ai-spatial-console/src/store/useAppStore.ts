@@ -63,6 +63,8 @@ export interface AppState {
   archivedConversations: Conversation[];
   archiveConversation: (modelId: string) => void;
   isUpgradeOpen: boolean;
+  isMarketplaceOpen: boolean;
+  setMarketplaceOpen: (isOpen: boolean) => void;
   setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
 }
@@ -196,6 +198,8 @@ export const useAppStore = create<AppState>()(
       setSmartGenOpen: (isOpen) => set({ isSmartGenOpen: isOpen }),
       isUpgradeOpen: false,
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
+      isMarketplaceOpen: false,
+      setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
     }),
     {
       name: 'spatial-console-storage', // unique name

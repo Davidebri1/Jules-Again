@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles, Clock } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock, Globe } from 'lucide-react-native';
 
 export const GridOverlay: React.FC = () => {
   const {
     activeLayout, setActiveLayout,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
-    setSettingsOpen, setConsensusOpen, setHistoryOpen
+    setSettingsOpen, setConsensusOpen, setHistoryOpen, setMarketplaceOpen
   } = useAppStore();
 
   const handleLayoutChange = (layout: GridLayout) => setActiveLayout(layout);
@@ -52,6 +52,9 @@ export const GridOverlay: React.FC = () => {
           ))}
         </View>
 
+        <TouchableOpacity style={styles.iconButton} onPress={() => setMarketplaceOpen(true)}>
+          <Globe color="#fff" size={20} />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.iconButton}>
           <User color="#fff" size={20} />
         </TouchableOpacity>

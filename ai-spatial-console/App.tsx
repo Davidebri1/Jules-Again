@@ -5,7 +5,8 @@ import { GridOverlay } from './src/components/GridOverlay';
 import { CardDetailView } from './src/components/CardDetailView';
 import { SettingsPanel, THEMES } from './src/components/SettingsPanel';
 import { ConsensusDrawer } from './src/components/ConsensusDrawer';
-import { SmartGenTools } from './src/components/SmartGenTools';
+import { SmartGenSuiteView } from './src/components/SmartGenSuiteView';
+import { MarketplaceView } from './src/components/MarketplaceView';
 import { UpgradePage } from './src/components/UpgradePage';
 import { HistoryDrawer } from './src/components/HistoryDrawer';
 import { useAppStore } from './src/store/useAppStore';
@@ -31,7 +32,8 @@ export default function App() {
       <HistoryDrawer />
       <SettingsPanel />
       <ConsensusDrawer />
-      <SmartGenTools />
+      <SmartGenSuiteView />
+      <MarketplaceView />
       <UpgradePage />
 
       <StatusBar style="light" />
