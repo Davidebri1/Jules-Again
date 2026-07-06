@@ -6,6 +6,7 @@ import { CardDetailView } from './src/components/CardDetailView';
 import { SettingsPanel, THEMES } from './src/components/SettingsPanel';
 import { ConsensusDrawer } from './src/components/ConsensusDrawer';
 import { SmartGenTools } from './src/components/SmartGenTools';
+import { UpgradePage } from './src/components/UpgradePage';
 import { useAppStore } from './src/store/useAppStore';
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
       <SettingsPanel />
       <ConsensusDrawer />
       <SmartGenTools />
+      <UpgradePage />
 
       <StatusBar style="light" />
     </ImageBackground>

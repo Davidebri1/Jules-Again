@@ -57,6 +57,8 @@ export interface AppState {
   isConsensusOpen: boolean;
   setConsensusOpen: (isOpen: boolean) => void;
   isSmartGenOpen: boolean;
+  isUpgradeOpen: boolean;
+  setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
 }
 
@@ -124,6 +126,13 @@ export const useAppStore = create<AppState>()(
         if (state.activeModelIds.includes(id)) {
           return { activeModelIds: state.activeModelIds.filter(m => m !== id) };
         }
+        // Logic to trigger upgrade page if trying to use locked models
+        // Mocking user as 'free' tier for now.
+        const model = state.availableModels.find(m => m.id === id);
+        if (model && (model.tier === 'pro' || model.tier === 'elite')) {
+           // User is not upgraded, trigger upgrade modal instead of adding
+           return { isUpgradeOpen: true };
+        }
         return { activeModelIds: [...state.activeModelIds, id] };
       }),
 
@@ -166,6 +175,8 @@ export const useAppStore = create<AppState>()(
       setConsensusOpen: (isOpen) => set({ isConsensusOpen: isOpen }),
       isSmartGenOpen: false,
       setSmartGenOpen: (isOpen) => set({ isSmartGenOpen: isOpen }),
+      isUpgradeOpen: false,
+      setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
     }),
     {
       name: 'spatial-console-storage', // unique name

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
 import { X } from 'lucide-react-native';
@@ -6,20 +6,29 @@ import { X } from 'lucide-react-native';
 const { width } = Dimensions.get('window');
 
 export const ConsensusDrawer: React.FC = () => {
-  const { isConsensusOpen, setConsensusOpen, activeModelIds } = useAppStore();
+  const { isConsensusOpen, setConsensusOpen, activeModelIds, availableModels } = useAppStore();
+
+  const activeModels = useMemo(() => {
+    return activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(Boolean);
+  }, [activeModelIds, availableModels]);
 
   if (!isConsensusOpen) return null;
 
-  // Mocking the consensus computation based on active models
-  const total = activeModelIds.length;
-  // If > 2 models, mock a disagreement. Otherwise 100% agreement.
-  const agreed = total > 2 ? total - 1 : total;
+  // Compute Consensus Mathematics (Dynamic stub based on active models)
+  const total = activeModels.length;
+
+  // Let's assume if there are 3 models, 1 dissents. If 4, 2 dissent.
+  const dissenters = total > 2 ? Math.floor(total / 3) : 0;
+  const agreed = total - dissenters;
 
   // Color calculation based on proportion
   const proportion = total === 0 ? 0 : agreed / total;
   let scoreColor = '#ff4444'; // Red for low
   if (proportion >= 0.7) scoreColor = '#00C851'; // Emerald Green
   else if (proportion >= 0.4) scoreColor = '#ffbb33'; // Orange/Yellow
+
+  // Grab a subset of models to act as "dissenters" for visual mapping
+  const dissentingModels = activeModels.slice(0, dissenters);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,30 +54,40 @@ export const ConsensusDrawer: React.FC = () => {
          <View style={styles.summaryContainer}>
             <Text style={styles.summaryTitle}>SYNTHESIZED CONSENSUS</Text>
             <Text style={styles.summaryText}>
-               Based on the aggregated responses, the overarching conclusion is that Spatial Computing represents a paradigm shift in human-computer interaction, prioritizing physical heuristics over flat digital planes.
+               {total === 0
+                  ? "Select models to compute consensus."
+                  : "Based on the aggregated responses, the overarching conclusion is that Spatial Computing represents a paradigm shift in human-computer interaction, prioritizing physical heuristics over flat digital planes."}
             </Text>
          </View>
 
-         {/* Dissenting Views Mapping Area (Mock Spatial Field) */}
+         {/* Dissenting Views Mapping Area */}
          <View style={styles.dissentField}>
             <Text style={styles.dissentTitle}>DISSENTERS & DEVIATIONS</Text>
 
             {/* Visual mapping field */}
             <View style={styles.mappingArea}>
-               {/* Mock Consensus Anchor */}
+               {/* Central Consensus Anchor */}
                <View style={styles.consensusAnchor}>
                   <View style={styles.anchorDot} />
                   <Text style={styles.anchorText}>Consensus Center</Text>
                </View>
 
-               {/* Mock Dissenter mapped visually away from center */}
-               {total > 2 && (
-                  <View style={[styles.dissenterNode, { left: 40, bottom: 40 }]}>
-                     <View style={[styles.nodeDot, { backgroundColor: '#ffbb33' }]} />
-                     <Text style={styles.nodeText}>LLM-3</Text>
-                     <View style={styles.connectingLine} />
-                  </View>
-               )}
+               {/* Dynamically map dissenters visually away from center */}
+               {dissentingModels.map((model, index) => {
+                  if(!model) return null;
+                  // Calculate dynamic positions pushing away from center
+                  const leftPos = (index % 2 === 0) ? 40 : width - 100;
+                  const bottomPos = 20 + (index * 30);
+
+                  return (
+                    <View key={model.id} style={[styles.dissenterNode, { left: leftPos, bottom: bottomPos }]}>
+                       <View style={[styles.nodeDot, { backgroundColor: scoreColor }]} />
+                       <Text style={styles.nodeText}>{model.name.substring(0, 8)}</Text>
+                       {/* SVG lines would go here for true dynamic mapping */}
+                       <View style={styles.connectingLine} />
+                    </View>
+                  );
+               })}
             </View>
          </View>
       </View>

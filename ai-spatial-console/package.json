@@ -10,6 +10,7 @@
     "axios": "^1.18.1",
     "expo": "~57.0.2",
     "expo-gl": "~57.0.1",
+    "expo-linear-gradient": "~57.0.0",
     "expo-sensors": "^57.0.1",
     "expo-status-bar": "~57.0.0",
     "lucide-react-native": "^1.23.0",
