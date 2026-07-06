@@ -2,11 +2,11 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X } from 'lucide-react-native';
 import { generateResponse } from '../utils/api';
 
 export const CardDetailView: React.FC = () => {
-  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen, setFileManagerOpen } = useAppStore();
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen, setFileManagerOpen, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments } = useAppStore();
   const [inputText, setInputText] = useState('');
   const [isParamsOpen, setIsParamsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -47,6 +47,7 @@ export const CardDetailView: React.FC = () => {
     const apiMessages = [...messages, { id: 'temp', role: 'user' as const, content: userMessage, timestamp: Date.now() }];
 
     setIsGenerating(true);
+    clearPendingAttachments();
 
     try {
       const responseContent = await generateResponse(model, apiMessages);
@@ -240,6 +241,23 @@ export const CardDetailView: React.FC = () => {
              </TouchableOpacity>
           </View>
 
+
+          {(pendingContextFiles.length > 0 || pendingSourceFile) && (
+             <ScrollView horizontal style={styles.holdingArea} showsHorizontalScrollIndicator={false}>
+                {pendingSourceFile && (
+                   <View style={styles.attachmentPillSource}>
+                      <Text style={styles.attachmentPillTextSource}>Source: {pendingSourceFile.name}</Text>
+                      <TouchableOpacity onPress={() => setSourceFile(null)}><X color="#4285F4" size={14} /></TouchableOpacity>
+                   </View>
+                )}
+                {pendingContextFiles.map(f => (
+                   <View key={f.id} style={styles.attachmentPill}>
+                      <Text style={styles.attachmentPillText}>{f.name}</Text>
+                      <TouchableOpacity onPress={() => removeContextFile(f.id)}><X color="#fff" size={14} /></TouchableOpacity>
+                   </View>
+                ))}
+             </ScrollView>
+          )}
           <View style={styles.inputBox}>
             <TouchableOpacity style={styles.actionButton} onPress={() => setFileManagerOpen(true)}>
                 <Paperclip color="rgba(255,255,255,0.7)" size={20} />
@@ -467,6 +485,45 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+
+  holdingArea: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    maxHeight: 30,
+  },
+  attachmentPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    gap: 4,
+  },
+  attachmentPillText: {
+    color: '#fff',
+    fontSize: 10,
+  },
+  attachmentPillSource: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(66, 133, 244, 0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#4285F4',
+    gap: 4,
+  },
+  attachmentPillTextSource: {
+    color: '#4285F4',
+    fontSize: 10,
+    fontWeight: '700',
   },
   inputBox: {
     flexDirection: 'row',

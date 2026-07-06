@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles, Clock, Globe, Mic, Send } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X } from 'lucide-react-native';
 
 import { generateResponse } from '../utils/api';
 
@@ -12,7 +12,7 @@ export const GridOverlay: React.FC = () => {
   const {
     activeLayout, setActiveLayout,
     userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen,
-    addMessage, conversations,
+    addMessage, conversations, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, setAuthOpen,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
     setSettingsOpen, setConsensusOpen, setHistoryOpen, setMarketplaceOpen
@@ -69,6 +69,7 @@ export const GridOverlay: React.FC = () => {
      const userMessage = inputText.trim();
      setInputText('');
      setIsGenerating(true);
+     clearPendingAttachments();
 
      // 3. Dispatch in Parallel
      await Promise.allSettled(activeModels.map(async (model) => {
@@ -128,7 +129,7 @@ export const GridOverlay: React.FC = () => {
         <TouchableOpacity style={styles.iconButton} onPress={() => setMarketplaceOpen(true)}>
           <Globe color="#fff" size={20} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton} onPress={() => setAuthOpen(true)}>
           <User color="#fff" size={20} />
         </TouchableOpacity>
       </View>
@@ -191,6 +192,23 @@ export const GridOverlay: React.FC = () => {
               <Sparkles color="#fff" size={20} style={{ marginRight: 8 }} />
               <Text style={styles.collideText}>COLLIDE</Text>
            </TouchableOpacity>
+
+           {(pendingContextFiles.length > 0 || pendingSourceFile) && (
+              <ScrollView horizontal style={styles.holdingArea} showsHorizontalScrollIndicator={false}>
+                 {pendingSourceFile && (
+                    <View style={styles.attachmentPillSource}>
+                       <Text style={styles.attachmentPillTextSource}>Source: {pendingSourceFile.name}</Text>
+                       <TouchableOpacity onPress={() => setSourceFile(null)}><X color="#4285F4" size={14} /></TouchableOpacity>
+                    </View>
+                 )}
+                 {pendingContextFiles.map(f => (
+                    <View key={f.id} style={styles.attachmentPill}>
+                       <Text style={styles.attachmentPillText}>{f.name}</Text>
+                       <TouchableOpacity onPress={() => removeContextFile(f.id)}><X color="#fff" size={14} /></TouchableOpacity>
+                    </View>
+                 ))}
+              </ScrollView>
+           )}
            <View style={styles.inputMock}>
               <TouchableOpacity style={styles.iconButtonSmall}><Sparkles color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
               <TextInput
@@ -346,6 +364,46 @@ const styles = StyleSheet.create({
     color: 'orange',
     fontWeight: '800',
     letterSpacing: 1,
+  },
+
+  holdingArea: {
+    flexDirection: 'row',
+    marginBottom: 8,
+    paddingHorizontal: 20,
+    maxHeight: 40,
+  },
+  attachmentPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    gap: 4,
+  },
+  attachmentPillText: {
+    color: '#fff',
+    fontSize: 10,
+  },
+  attachmentPillSource: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(66, 133, 244, 0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#4285F4',
+    gap: 4,
+  },
+  attachmentPillTextSource: {
+    color: '#4285F4',
+    fontSize: 10,
+    fontWeight: '700',
   },
   inputMock: {
     flex: 1,

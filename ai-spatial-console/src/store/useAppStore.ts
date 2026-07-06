@@ -6,6 +6,17 @@ export type SubscriptionTier = 'free' | 'pro' | 'elite';
 export type ModelCategory = 'general' | 'image' | 'video' | 'audio' | 'coding';
 export type GridLayout = '1x1' | '2x2' | '3x3';
 
+
+export type FileCategory = 'uploaded' | 'generated' | 'collection';
+export interface StoredFile {
+  id: string;
+  name: string;
+  uri: string;
+  type: string;
+  size: number;
+  category: FileCategory;
+  modelId?: string;
+}
 export interface UserProfile {
   tier: SubscriptionTier;
   credits: number;
@@ -84,8 +95,22 @@ export interface AppState {
   isUpgradeOpen: boolean;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
+
+  pendingContextFiles: StoredFile[];
+  pendingSourceFile: StoredFile | null;
+  addContextFile: (file: StoredFile) => void;
+  removeContextFile: (id: string) => void;
+  setSourceFile: (file: StoredFile | null) => void;
+  clearPendingAttachments: () => void;
+  starredFiles: string[];
+  toggleStarFile: (id: string) => void;
   isFileManagerOpen: boolean;
   setFileManagerOpen: (isOpen: boolean) => void;
+  isAuthOpen: boolean;
+  setAuthOpen: (isOpen: boolean) => void;
+  isAuthenticated: boolean;
+  setAuthenticated: (isAuth: boolean) => void;
+  logout: () => void;
   setUpgradeOpen: (isOpen: boolean) => void;
   setSmartGenOpen: (isOpen: boolean) => void;
 }
@@ -256,8 +281,28 @@ export const useAppStore = create<AppState>()(
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
       isMarketplaceOpen: false,
       setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
+
+      pendingContextFiles: [],
+      pendingSourceFile: null,
+      addContextFile: (file) => set((state) => ({
+          pendingContextFiles: state.pendingContextFiles.find(f => f.id === file.id) ? state.pendingContextFiles : [...state.pendingContextFiles, file]
+      })),
+      removeContextFile: (id) => set((state) => ({ pendingContextFiles: state.pendingContextFiles.filter(f => f.id !== id) })),
+      setSourceFile: (file) => set({ pendingSourceFile: file }),
+      clearPendingAttachments: () => set({ pendingContextFiles: [], pendingSourceFile: null }),
+      starredFiles: [],
+      toggleStarFile: (id) => set((state) => ({
+          starredFiles: state.starredFiles.includes(id)
+            ? state.starredFiles.filter(fid => fid !== id)
+            : [...state.starredFiles, id]
+      })),
       isFileManagerOpen: false,
       setFileManagerOpen: (isOpen) => set({ isFileManagerOpen: isOpen }),
+      isAuthOpen: false,
+      setAuthOpen: (isOpen) => set({ isAuthOpen: isOpen }),
+      isAuthenticated: false,
+      setAuthenticated: (isAuth) => set({ isAuthenticated: isAuth }),
+      logout: () => set({ isAuthenticated: false, userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 } }),
     }),
     {
       name: 'spatial-console-storage', // unique name
@@ -266,7 +311,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         activeLayout: state.activeLayout,
         currentThemeId: state.currentThemeId,
-        userProfile: state.userProfile, activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
+        userProfile: state.userProfile, starredFiles: state.starredFiles, activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
         conversations: state.conversations,
       }),
     }

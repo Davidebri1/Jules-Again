@@ -7,6 +7,7 @@ import { SettingsPanel, THEMES } from './src/components/SettingsPanel';
 import { ConsensusDrawer } from './src/components/ConsensusDrawer';
 import { SmartGenSuiteView } from './src/components/SmartGenSuiteView';
 import { FileManagerView } from './src/components/FileManagerView';
+import { AuthOverlay } from './src/components/AuthOverlay';
 import { MarketplaceView } from './src/components/MarketplaceView';
 import { UpgradePage } from './src/components/UpgradePage';
 import { HistoryDrawer } from './src/components/HistoryDrawer';
@@ -35,6 +36,7 @@ export default function App() {
       <ConsensusDrawer />
       <SmartGenSuiteView />
         <FileManagerView />
+        <AuthOverlay />
       <MarketplaceView />
       <UpgradePage />
 

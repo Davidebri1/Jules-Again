@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions, Platform } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
-import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud } from 'lucide-react-native';
+import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud, MoreVertical, Star, Trash2, Maximize2, CopyPlus, Link } from 'lucide-react-native';
+import { Alert } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 
 const { width, height } = Dimensions.get('window');
@@ -20,9 +21,10 @@ interface StoredFile {
 }
 
 export const FileManagerView: React.FC = () => {
-  const { isFileManagerOpen, setFileManagerOpen, focusedModelId, availableModels } = useAppStore();
+  const { isFileManagerOpen, setFileManagerOpen, focusedModelId, availableModels, selectedTab, addContextFile, setSourceFile, toggleStarFile, starredFiles } = useAppStore();
   const [activeTab, setActiveTab] = useState<FileCategory>('uploaded');
   const [files, setFiles] = useState<StoredFile[]>([]);
+  const [previewFile, setPreviewFile] = useState<StoredFile | null>(null);
 
   const drawerTranslation = useSharedValue(width);
 
@@ -44,6 +46,13 @@ export const FileManagerView: React.FC = () => {
 
   // Mock data for initial view based on focused model or global
   React.useEffect(() => {
+     if (isFileManagerOpen) {
+        if (selectedTab !== 'general') {
+           setActiveTab('generated');
+        } else {
+           setActiveTab('uploaded');
+        }
+     }
      if (isFileManagerOpen && files.length === 0) {
         setFiles([
            { id: 'f1', name: 'project_brief.pdf', uri: '', type: 'application/pdf', size: 1024000, category: 'uploaded' },
@@ -80,6 +89,23 @@ export const FileManagerView: React.FC = () => {
   const currentModelName = focusedModelId
     ? availableModels.find(m => m.id === focusedModelId)?.name
     : 'Global View';
+
+
+  const handleFileOptions = (file: StoredFile) => {
+      Alert.alert(
+          "File Options",
+          file.name,
+          [
+              { text: "View Preview", onPress: () => setPreviewFile(file) },
+              { text: "Insert as Source (Replace)", onPress: () => { setSourceFile(file); setFileManagerOpen(false); } },
+              { text: "Insert as Context (Add)", onPress: () => { addContextFile(file); setFileManagerOpen(false); } },
+              { text: "Remix Prompt", onPress: () => console.log("Remix hit") },
+              { text: starredFiles.includes(file.id) ? "Unstar" : "Star", onPress: () => toggleStarFile(file.id) },
+              { text: "Delete", onPress: () => setFiles(prev => prev.filter(f => f.id !== file.id)), style: 'destructive' },
+              { text: "Cancel", style: "cancel" }
+          ]
+      );
+  };
 
   const displayFiles = files.filter(f => f.category === activeTab && (!focusedModelId || f.modelId === focusedModelId || !f.modelId));
 
@@ -150,16 +176,61 @@ export const FileManagerView: React.FC = () => {
                        {renderFileIcon(file.type)}
                     </View>
                     <View style={styles.fileInfo}>
-                       <Text style={styles.fileName} numberOfLines={1}>{file.name}</Text>
+                       <Text style={styles.fileName} numberOfLines={1}>{file.name} {starredFiles.includes(file.id) && <Star color="#FFD700" size={12} fill="#FFD700" />}</Text>
                        <Text style={styles.fileMeta}>
                           {(file.size / 1024 / 1024).toFixed(2)} MB • {file.type.split('/')[1] || 'unknown'}
                        </Text>
                     </View>
+                    <TouchableOpacity onPress={() => handleFileOptions(file)} style={{ padding: 10 }}>
+                       <MoreVertical color="rgba(255,255,255,0.5)" size={20} />
+                    </TouchableOpacity>
                  </View>
               ))
            )}
         </ScrollView>
 
+
+        {/* Fullscreen Preview Overlay */}
+        {previewFile && (
+           <View style={styles.previewOverlay}>
+              <SafeAreaView style={{ flex: 1 }}>
+                 <View style={styles.previewHeader}>
+                    <Text style={styles.previewTitle} numberOfLines={1}>{previewFile.name}</Text>
+                    <TouchableOpacity onPress={() => setPreviewFile(null)} style={styles.closeBtn}>
+                       <X color="#fff" size={24} />
+                    </TouchableOpacity>
+                 </View>
+
+                 <View style={styles.previewContent}>
+                    {previewFile.type.includes('image') ? (
+                       <View style={styles.previewImageMock}>
+                          <ImageIcon color="#4285F4" size={64} />
+                          <Text style={styles.previewMockText}>High-Res Image Render</Text>
+                       </View>
+                    ) : previewFile.type.includes('video') ? (
+                       <View style={styles.previewVideoMock}>
+                          <Video color="#d97757" size={64} />
+                          <Text style={styles.previewMockText}>Video Player (Playing)</Text>
+                       </View>
+                    ) : (
+                       <View style={styles.previewDocMock}>
+                          <FileText color="#10a37f" size={64} />
+                          <Text style={styles.previewMockText}>Document Viewer</Text>
+                       </View>
+                    )}
+                 </View>
+
+                 <View style={styles.previewActionRow}>
+                    <TouchableOpacity style={styles.previewActionBtn} onPress={() => { setSourceFile(previewFile); setPreviewFile(null); setFileManagerOpen(false); }}>
+                       <Text style={styles.previewActionText}>Use as Source</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.previewActionBtnSecondary} onPress={() => { addContextFile(previewFile); setPreviewFile(null); setFileManagerOpen(false); }}>
+                       <Text style={styles.previewActionTextSecondary}>Add Context</Text>
+                    </TouchableOpacity>
+                 </View>
+              </SafeAreaView>
+           </View>
+        )}
       </SafeAreaView>
     </Animated.View>
   );
@@ -289,5 +360,97 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: 'rgba(255,255,255,0.3)',
     fontSize: 14,
-  }
+  },
+  previewOverlay: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    zIndex: 400,
+    elevation: 400,
+  },
+  previewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  previewTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: 20,
+  },
+  previewContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  previewImageMock: {
+    width: '100%',
+    aspectRatio: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(66, 133, 244, 0.3)',
+  },
+  previewVideoMock: {
+    width: '100%',
+    aspectRatio: 16/9,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 87, 0.3)',
+  },
+  previewDocMock: {
+    width: '100%',
+    aspectRatio: 3/4,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  previewMockText: {
+    color: 'rgba(255,255,255,0.5)',
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  previewActionRow: {
+    flexDirection: 'row',
+    padding: 20,
+    gap: 15,
+  },
+  previewActionBtn: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 30,
+    alignItems: 'center',
+  },
+  previewActionText: {
+    color: '#000',
+    fontWeight: '800',
+    fontSize: 16,
+  },
+  previewActionBtnSecondary: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    padding: 15,
+    borderRadius: 30,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  previewActionTextSecondary: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+  },
 });

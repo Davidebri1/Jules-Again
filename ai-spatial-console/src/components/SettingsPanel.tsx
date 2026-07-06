@@ -146,5 +146,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  logoutBtn: {
+    marginTop: 30,
+    backgroundColor: 'rgba(255, 69, 58, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 69, 58, 0.5)',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#ff453a',
+    fontWeight: '700',
+    fontSize: 16,
   }
 });
