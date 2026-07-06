@@ -2,11 +2,11 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff } from 'lucide-react-native';
 import { generateResponse } from '../utils/api';
 
 export const CardDetailView: React.FC = () => {
-  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen } = useAppStore();
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, setSmartGenOpen, userProfile, deductCredits, refundCredits, setUpgradeOpen } = useAppStore();
   const [inputText, setInputText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
@@ -20,13 +20,21 @@ export const CardDetailView: React.FC = () => {
   const handleSend = async () => {
     if (!inputText.trim() || isGenerating) return;
 
+    // 1. Calculate Cost
+    let cost = model.baseCreditCost;
+    if (model.category === 'general' && userProfile.tier !== 'free') cost = 0;
+
+    // 2. Validate Balance
+    if (!deductCredits(cost)) {
+        setUpgradeOpen(true);
+        return;
+    }
+
     const userMessage = inputText.trim();
     setInputText('');
 
-    // Add user message to store
     addMessage(model.id, 'user', userMessage);
 
-    // Prepare message history for API (including the one just sent)
     const apiMessages = [...messages, { id: 'temp', role: 'user' as const, content: userMessage, timestamp: Date.now() }];
 
     setIsGenerating(true);
@@ -35,7 +43,8 @@ export const CardDetailView: React.FC = () => {
       const responseContent = await generateResponse(model, apiMessages);
       addMessage(model.id, 'assistant', responseContent);
     } catch (error) {
-       addMessage(model.id, 'assistant', 'Error generating response.');
+       refundCredits(cost);
+       addMessage(model.id, 'assistant', 'Error: Network failed. Credits refunded.');
     } finally {
       setIsGenerating(false);
     }
@@ -118,6 +127,21 @@ export const CardDetailView: React.FC = () => {
 
         {/* Bottom Input Area */}
         <View style={styles.inputArea}>
+          {/* Options Row */}
+          <View style={styles.optionsRow}>
+             <TouchableOpacity style={styles.optionPill}>
+                <Zap color="#fff" size={14} />
+                <Text style={styles.optionText}>Deep Research</Text>
+             </TouchableOpacity>
+             <TouchableOpacity style={styles.optionPill}>
+                <Globe color="#fff" size={14} />
+                <Text style={styles.optionText}>Web</Text>
+             </TouchableOpacity>
+             <TouchableOpacity style={styles.optionPill}>
+                <EyeOff color="#fff" size={14} />
+             </TouchableOpacity>
+          </View>
+
           <View style={styles.inputBox}>
             <TouchableOpacity style={styles.actionButton}>
                 <Paperclip color="rgba(255,255,255,0.7)" size={20} />
@@ -232,6 +256,28 @@ const styles = StyleSheet.create({
   inputArea: {
     padding: 15,
     paddingBottom: 25,
+  },
+  optionsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+    paddingHorizontal: 5,
+  },
+  optionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  optionText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   inputBox: {
     flexDirection: 'row',

@@ -1,11 +1,18 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles, Clock, Globe } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock, Globe, Mic, Send } from 'lucide-react-native';
+
+import { generateResponse } from '../utils/api';
+
 
 export const GridOverlay: React.FC = () => {
+  const [inputText, setInputText] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
   const {
     activeLayout, setActiveLayout,
+    userProfile, deductCredits, refundCredits, setUpgradeOpen,
+    addMessage, conversations,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
     setSettingsOpen, setConsensusOpen, setHistoryOpen, setMarketplaceOpen
@@ -20,6 +27,58 @@ export const GridOverlay: React.FC = () => {
     { id: 'audio', label: 'Audio' },
     { id: 'coding', label: 'Coding' },
   ];
+
+
+  const handleSendGlobal = async () => {
+     if (!inputText.trim() || isGenerating) return;
+     if (activeModelIds.length === 0) {
+        Alert.alert("No Models Selected", "Please select at least one model to message.");
+        return;
+     }
+
+     // 1. Calculate Total Credit Cost
+     const activeModels = activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(m => m !== undefined);
+     const totalCost = activeModels.reduce((sum, model) => {
+        // Handle free tier overrides (Pro/Elite users get general models free)
+        let cost = model.baseCreditCost;
+        if (model.category === 'general' && userProfile.tier !== 'free') cost = 0;
+        if (model.category === 'coding' && userProfile.tier === 'elite' && (model.id === 'qwen-coder' || model.id === 'deepseek-coder')) cost = 0;
+        return sum + cost;
+     }, 0);
+
+     // 2. Validate Balance
+     if (!deductCredits(totalCost)) {
+         setUpgradeOpen(true);
+         return;
+     }
+
+     const userMessage = inputText.trim();
+     setInputText('');
+     setIsGenerating(true);
+
+     // 3. Dispatch in Parallel
+     await Promise.allSettled(activeModels.map(async (model) => {
+         // Save to store immediately
+         addMessage(model.id, 'user', userMessage);
+
+         const convo = conversations[model.id];
+         const msgs = convo ? convo.messages : [];
+         const apiMessages = [...msgs, { id: 'temp', role: 'user' as const, content: userMessage, timestamp: Date.now() }];
+
+         try {
+            const responseContent = await generateResponse(model, apiMessages);
+            addMessage(model.id, 'assistant', responseContent);
+         } catch (e) {
+            // Refund cost of this specific model on failure
+            let refundAmt = model.baseCreditCost;
+            if (model.category === 'general' && userProfile.tier !== 'free') refundAmt = 0;
+            refundCredits(refundAmt);
+            addMessage(model.id, 'assistant', 'Network Error: Credits Refunded.');
+         }
+     }));
+
+     setIsGenerating(false);
+  };
 
   // Filter models based on the currently selected tab/category
   const displayedModels = useMemo(() => {
@@ -111,7 +170,30 @@ export const GridOverlay: React.FC = () => {
               <Text style={styles.collideText}>COLLIDE</Text>
            </TouchableOpacity>
            <View style={styles.inputMock}>
-              <Text style={styles.inputTextMock}>Message Active Models...</Text>
+              <TouchableOpacity style={styles.iconButtonSmall}><Sparkles color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
+              <TextInput
+                 style={styles.inputTextMock}
+                 placeholder="Message Active Models..."
+                 placeholderTextColor="rgba(255,255,255,0.4)"
+                 value={inputText}
+                 onChangeText={setInputText}
+                 multiline
+              />
+              <View style={styles.inputRightActions}>
+                {isGenerating ? (
+                   <ActivityIndicator color="#fff" size="small" />
+                ) : inputText.trim() ? (
+                   <TouchableOpacity style={styles.iconButtonSmall} onPress={handleSendGlobal}>
+                      <Send color="#fff" size={16} />
+                   </TouchableOpacity>
+                ) : (
+                   <>
+                     <TouchableOpacity style={styles.iconButtonSmall}><Globe color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
+                     <TouchableOpacity style={styles.iconButtonSmall}><Settings color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
+                     <TouchableOpacity style={styles.iconButtonSmall}><Mic color="rgba(255,255,255,0.7)" size={16} /></TouchableOpacity>
+                   </>
+                )}
+              </View>
            </View>
         </View>
       </View>
@@ -230,11 +312,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 30,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'space-between'
   },
   inputTextMock: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 16,
+    color: '#fff',
+    fontSize: 14,
+    flex: 1,
+    marginLeft: 10,
+    maxHeight: 100,
+  },
+  inputRightActions: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  iconButtonSmall: {
+    padding: 5,
   }
 });

@@ -2,18 +2,30 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type GridLayout = '1x1' | '2x2' | '3x3';
+export type SubscriptionTier = 'free' | 'pro' | 'elite';
 export type ModelCategory = 'general' | 'image' | 'video' | 'audio' | 'coding';
-export type ModelTier = 'free' | 'pro' | 'elite';
+export type GridLayout = '1x1' | '2x2' | '3x3';
+
+export interface UserProfile {
+  tier: SubscriptionTier;
+  credits: number;
+  monthlyLimit: number;
+}
+
+
+
+
+
 
 export interface ModelProvider {
   id: string;
   name: string;
-  provider: 'openai' | 'anthropic' | 'google' | 'xai' | 'meta' | 'mistral' | 'other';
-  tier: ModelTier;
+  provider: string;
+  tier: SubscriptionTier;
   category: ModelCategory;
   description: string;
   routingKey?: string;
+  baseCreditCost: number;
 }
 
 export interface Message {
@@ -32,6 +44,10 @@ export interface Conversation {
 }
 
 export interface AppState {
+  userProfile: UserProfile;
+  deductCredits: (amount: number) => boolean;
+  refundCredits: (amount: number) => void;
+  setUserTier: (tier: SubscriptionTier) => void;
   // Layout & Core UI (Persisted)
   activeLayout: GridLayout;
   setActiveLayout: (layout: GridLayout) => void;
@@ -71,55 +87,70 @@ export interface AppState {
 
 const INITIAL_MODELS: ModelProvider[] = [
   // ================= GENERAL =================
-  // Free (Minimum 6 required)
-  { id: 'llama-3-8b', name: 'LLaMA 3 8B', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama3-8b-8192' },
-  { id: 'gemma-7b', name: 'Gemma 7B', provider: 'google', tier: 'free', category: 'general', description: 'Google lightweight model.', routingKey: 'gemma-7b-it' },
-  { id: 'mistral-7b', name: 'Mistral 7B', provider: 'mistral', tier: 'free', category: 'general', description: 'Solid foundational model.', routingKey: 'mistralai/mistral-7b-instruct:free' },
-  { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free' },
-  { id: 'phi-3-mini', name: 'Phi-3 Mini', provider: 'other', tier: 'free', category: 'general', description: 'Microsoft small model.', routingKey: 'microsoft/phi-3-mini-128k-instruct:free' },
-  { id: 'openchat-3.5', name: 'OpenChat 3.5', provider: 'other', tier: 'free', category: 'general', description: 'Open source chat model.', routingKey: 'openchat/openchat-7b:free' },
-  // Pro/Elite
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o' },
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet' },
-  { id: 'gemini-1-5-pro', name: 'Gemini 1.5 Pro', provider: 'google', tier: 'pro', category: 'general', description: 'Google multimodal expert.', routingKey: 'google/gemini-1.5-pro' },
-  { id: 'grok-1-5', name: 'Grok 1.5', provider: 'xai', tier: 'pro', category: 'general', description: 'xAI advanced model.', routingKey: 'x-ai/grok-2' },
+  { id: 'llama-3-8b', name: 'LLaMA 3 8B', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama3-8b-8192', baseCreditCost: 1 },
+  { id: 'gemma-7b', name: 'Gemma 7B', provider: 'google', tier: 'free', category: 'general', description: 'Google lightweight model.', routingKey: 'gemma-7b-it', baseCreditCost: 1 },
+  { id: 'mistral-7b', name: 'Mistral 7B', provider: 'mistral', tier: 'free', category: 'general', description: 'Solid foundational model.', routingKey: 'mistralai/mistral-7b-instruct:free', baseCreditCost: 1 },
+  { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free', baseCreditCost: 1 },
+  { id: 'phi-3-mini', name: 'Phi-3 Mini', provider: 'other', tier: 'free', category: 'general', description: 'Microsoft small model.', routingKey: 'microsoft/phi-3-mini-128k-instruct:free', baseCreditCost: 1 },
+  { id: 'openchat-3.5', name: 'OpenChat 3.5', provider: 'other', tier: 'free', category: 'general', description: 'Open source chat model.', routingKey: 'openchat/openchat-7b:free', baseCreditCost: 1 },
+  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o', baseCreditCost: 5 },
+  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 6 },
+  { id: 'gemini-1-5-pro', name: 'Gemini 1.5 Pro', provider: 'google', tier: 'pro', category: 'general', description: 'Google multimodal expert.', routingKey: 'google/gemini-1.5-pro', baseCreditCost: 5 },
+  { id: 'grok-1-5', name: 'Grok 1.5', provider: 'xai', tier: 'pro', category: 'general', description: 'xAI advanced model.', routingKey: 'x-ai/grok-2', baseCreditCost: 8 },
 
-  // ================= IMAGE (Minimum 6 required) =================
-  { id: 'flux-schnell', name: 'Flux Schnell', provider: 'other', tier: 'pro', category: 'image', description: 'Fast image generation.', routingKey: 'black-forest-labs/flux-schnell' },
-  { id: 'flux-pro', name: 'Flux Pro', provider: 'other', tier: 'elite', category: 'image', description: 'Premium Flux model.', routingKey: 'black-forest-labs/flux-pro' },
-  { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'OpenAI Premium image generation.' },
-  { id: 'midjourney-v6', name: 'Midjourney v6', provider: 'other', tier: 'elite', category: 'image', description: 'Highly artistic generations.' },
-  { id: 'sdxl', name: 'SDXL', provider: 'other', tier: 'pro', category: 'image', description: 'Stable Diffusion XL.', routingKey: 'stability-ai/sdxl' },
-  { id: 'ideogram', name: 'Ideogram', provider: 'other', tier: 'pro', category: 'image', description: 'Excellent at text rendering.' },
+  // ================= IMAGE =================
+  { id: 'flux-schnell', name: 'Flux Schnell', provider: 'other', tier: 'pro', category: 'image', description: 'Fast image generation.', routingKey: 'black-forest-labs/flux-schnell', baseCreditCost: 15 },
+  { id: 'flux-pro', name: 'Flux Pro', provider: 'other', tier: 'elite', category: 'image', description: 'Premium Flux model.', routingKey: 'black-forest-labs/flux-pro', baseCreditCost: 35 },
+  { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'OpenAI Premium image.', baseCreditCost: 30 },
+  { id: 'midjourney-v6', name: 'Midjourney v6', provider: 'other', tier: 'elite', category: 'image', description: 'Highly artistic generations.', baseCreditCost: 40 },
+  { id: 'sdxl', name: 'SDXL', provider: 'other', tier: 'pro', category: 'image', description: 'Stable Diffusion XL.', routingKey: 'stability-ai/sdxl', baseCreditCost: 10 },
+  { id: 'ideogram', name: 'Ideogram', provider: 'other', tier: 'pro', category: 'image', description: 'Excellent at text rendering.', baseCreditCost: 15 },
 
-  // ================= VIDEO (Minimum 6 required) =================
-  { id: 'sora', name: 'Sora', provider: 'openai', tier: 'elite', category: 'video', description: 'OpenAI video generation.' },
-  { id: 'runway-gen3', name: 'Runway Gen-3', provider: 'other', tier: 'elite', category: 'video', description: 'High fidelity video synthesis.' },
-  { id: 'kling', name: 'Kling AI', provider: 'other', tier: 'elite', category: 'video', description: 'Advanced physics video.' },
-  { id: 'luma-dream-machine', name: 'Luma Dream', provider: 'other', tier: 'pro', category: 'video', description: 'Fast video generation.' },
-  { id: 'haiper-v1', name: 'Haiper V1', provider: 'other', tier: 'pro', category: 'video', description: 'Creative video models.' },
-  { id: 'pika-labs', name: 'Pika', provider: 'other', tier: 'pro', category: 'video', description: 'Animation and video.' },
+  // ================= VIDEO =================
+  { id: 'sora', name: 'Sora', provider: 'openai', tier: 'elite', category: 'video', description: 'OpenAI video generation.', baseCreditCost: 150 },
+  { id: 'runway-gen3', name: 'Runway Gen-3', provider: 'other', tier: 'elite', category: 'video', description: 'High fidelity video synthesis.', baseCreditCost: 120 },
+  { id: 'kling', name: 'Kling AI', provider: 'other', tier: 'elite', category: 'video', description: 'Advanced physics video.', baseCreditCost: 100 },
+  { id: 'luma-dream-machine', name: 'Luma Dream', provider: 'other', tier: 'pro', category: 'video', description: 'Fast video generation.', baseCreditCost: 80 },
+  { id: 'haiper-v1', name: 'Haiper V1', provider: 'other', tier: 'pro', category: 'video', description: 'Creative video models.', baseCreditCost: 60 },
+  { id: 'pika-labs', name: 'Pika', provider: 'other', tier: 'pro', category: 'video', description: 'Animation and video.', baseCreditCost: 60 },
 
-  // ================= AUDIO (Minimum 6 required) =================
-  { id: 'suno-v3', name: 'Suno v3', provider: 'other', tier: 'elite', category: 'audio', description: 'Full song generation.' },
-  { id: 'udio', name: 'Udio', provider: 'other', tier: 'elite', category: 'audio', description: 'High fidelity music tracks.' },
-  { id: 'elevenlabs', name: 'ElevenLabs', provider: 'other', tier: 'pro', category: 'audio', description: 'Premium voice synthesis.' },
-  { id: 'stable-audio', name: 'Stable Audio', provider: 'other', tier: 'pro', category: 'audio', description: 'Instrumentals and SFX.' },
-  { id: 'musicgen', name: 'MusicGen', provider: 'meta', tier: 'pro', category: 'audio', description: 'Meta audio synthesis.' },
-  { id: 'openai-tts', name: 'OpenAI TTS', provider: 'openai', tier: 'pro', category: 'audio', description: 'Text to speech.' },
+  // ================= AUDIO =================
+  { id: 'suno-v3', name: 'Suno v3', provider: 'other', tier: 'elite', category: 'audio', description: 'Full song generation.', baseCreditCost: 75 },
+  { id: 'udio', name: 'Udio', provider: 'other', tier: 'elite', category: 'audio', description: 'High fidelity music tracks.', baseCreditCost: 100 },
+  { id: 'elevenlabs', name: 'ElevenLabs', provider: 'other', tier: 'pro', category: 'audio', description: 'Premium voice synthesis.', baseCreditCost: 15 },
+  { id: 'stable-audio', name: 'Stable Audio', provider: 'other', tier: 'pro', category: 'audio', description: 'Instrumentals and SFX.', baseCreditCost: 20 },
+  { id: 'musicgen', name: 'MusicGen', provider: 'meta', tier: 'pro', category: 'audio', description: 'Meta audio synthesis.', baseCreditCost: 20 },
+  { id: 'openai-tts', name: 'OpenAI TTS', provider: 'openai', tier: 'pro', category: 'audio', description: 'Text to speech.', baseCreditCost: 10 },
 
-  // ================= CODING (Minimum 6 required) =================
-  { id: 'claude-3-5-sonnet-code', name: 'Claude Sonnet', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Industry leading code logic.', routingKey: 'anthropic/claude-3.5-sonnet' },
-  { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus' },
-  { id: 'gpt-4o-code', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'coding', description: 'Strong multi-file reasoning.', routingKey: 'openai/gpt-4o' },
-  { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'other', tier: 'pro', category: 'coding', description: 'Specialized coding model.', routingKey: 'deepseek/deepseek-coder' },
-  { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'pro', category: 'coding', description: 'Open weights code model.' },
-  { id: 'phind-codellama', name: 'Phind CodeLlama', provider: 'other', tier: 'pro', category: 'coding', description: 'Search and code.' },
+  // ================= CODING =================
+  { id: 'claude-3-5-sonnet-code', name: 'Claude Sonnet', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Industry leading code logic.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 6 },
+  { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus', baseCreditCost: 15 },
+  { id: 'gpt-4o-code', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'coding', description: 'Strong multi-file reasoning.', routingKey: 'openai/gpt-4o', baseCreditCost: 5 },
+  { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'other', tier: 'pro', category: 'coding', description: 'Specialized coding model.', routingKey: 'deepseek/deepseek-coder', baseCreditCost: 5 },
+  { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'pro', category: 'coding', description: 'Open weights code model.', baseCreditCost: 5 },
+  { id: 'phind-codellama', name: 'Phind CodeLlama', provider: 'other', tier: 'pro', category: 'coding', description: 'Search and code.', baseCreditCost: 5 },
 ];
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      // User Profile & Credits
+      userProfile: { tier: 'free', credits: 150, monthlyLimit: 150 },
+      deductCredits: (amount) => {
+         const { userProfile } = get();
+         if (userProfile.credits >= amount) {
+            set({ userProfile: { ...userProfile, credits: userProfile.credits - amount } });
+            return true;
+         }
+         return false; // Insufficient funds
+      },
+      refundCredits: (amount) => {
+         set((state) => ({ userProfile: { ...state.userProfile, credits: state.userProfile.credits + amount } }));
+      },
+      setUserTier: (tier) => {
+         const limits: Record<SubscriptionTier, number> = { free: 150, pro: 12000, elite: 35000 };
+         set({ userProfile: { tier, credits: limits[tier], monthlyLimit: limits[tier] } });
+      },
       // Default state
       activeLayout: '2x2',
       setActiveLayout: (layout) => set({ activeLayout: layout }),
@@ -133,12 +164,17 @@ export const useAppStore = create<AppState>()(
         if (state.activeModelIds.includes(id)) {
           return { activeModelIds: state.activeModelIds.filter(m => m !== id) };
         }
-        // Logic to trigger upgrade page if trying to use locked models
-        // Mocking user as 'free' tier for now.
         const model = state.availableModels.find(m => m.id === id);
-        if (model && (model.tier === 'pro' || model.tier === 'elite')) {
-           // User is not upgraded, trigger upgrade modal instead of adding
-           return { isUpgradeOpen: true };
+        const userTier = state.userProfile.tier;
+
+        // Enforce Monetization Gating
+        if (model) {
+           if (model.tier === 'elite' && userTier !== 'elite') {
+              return { isUpgradeOpen: true };
+           }
+           if (model.tier === 'pro' && userTier === 'free') {
+              return { isUpgradeOpen: true };
+           }
         }
         return { activeModelIds: [...state.activeModelIds, id] };
       }),
@@ -208,7 +244,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         activeLayout: state.activeLayout,
         currentThemeId: state.currentThemeId,
-        activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
+        userProfile: state.userProfile, activeModelIds: state.activeModelIds, archivedConversations: state.archivedConversations,
         conversations: state.conversations,
       }),
     }
