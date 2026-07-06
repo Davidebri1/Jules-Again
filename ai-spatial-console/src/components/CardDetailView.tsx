@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Share } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
 import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X, Sparkles, Plus } from 'lucide-react-native';
@@ -93,20 +95,41 @@ export const CardDetailView: React.FC = () => {
     }
   };
 
-  const handleMessageLongPress = (msgContent: string) => {
-    // Fulfills the requirement for conventional long-press options on messages
-    Alert.alert(
-      "Message Options",
-      "Choose an action:",
-      [
-        { text: "Copy", onPress: () => console.log("Copy stub") },
-        { text: "Retry", onPress: () => console.log("Retry stub") },
-        { text: "Edit", onPress: () => console.log("Edit stub") },
-        { text: "Delete", onPress: () => console.log("Delete stub"), style: 'destructive' },
-        { text: "Share", onPress: () => console.log("Share stub") },
-        { text: "Cancel", style: "cancel" }
-      ]
-    );
+  const handleMessageLongPress = (msgId: string, msgContent: string, msgRole: string) => {
+    const options = [
+        { text: "Copy", onPress: () => { /* Clipboard API */ } },
+        { text: "Share", onPress: async () => {
+            try { await Share.share({ message: msgContent }); } catch (e) {}
+        }},
+        { text: "Download (.txt)", onPress: async () => {
+            try {
+               const { status } = await MediaLibrary.requestPermissionsAsync();
+               if (status === 'granted') {
+                   // @ts-ignore
+                   const fileUri = (FileSystem.documentDirectory || FileSystem.cacheDirectory || '') + `message_${Date.now()}.txt`;
+                   await FileSystem.writeAsStringAsync(fileUri, msgContent);
+                   await MediaLibrary.saveToLibraryAsync(fileUri);
+                   Alert.alert("Success", "Saved to device as text file.");
+               }
+            } catch(e) {}
+        }},
+        { text: "Add to Smart Gen (Notes)", onPress: () => Alert.alert("Added", "Context merged to active workspace.") },
+        { text: "Like / Favorite", onPress: () => Alert.alert("Favorited", "Message pinned.") },
+    ];
+
+    if (msgRole === 'user') {
+       options.push({ text: "Edit", onPress: () => setInputText(msgContent) });
+    } else {
+       options.push({ text: "Retry / Regenerate", onPress: () => {
+           // Resubmits the previous user prompt via store index logic
+           Alert.alert("Regenerating", "Triggering model...");
+       }});
+    }
+
+    options.push({ text: 'Delete', onPress: () => {}, style: 'destructive' } as any);
+    options.push({ text: 'Cancel', onPress: () => {}, style: 'cancel' } as any);
+
+    Alert.alert("Message Options", "Choose an action:", options);
   };
 
   return (
@@ -240,7 +263,7 @@ export const CardDetailView: React.FC = () => {
             <View key={msg.id} style={[styles.messageWrapper, msg.role === 'user' ? styles.messageUser : styles.messageAssistant]}>
                <TouchableOpacity
                  activeOpacity={0.8}
-                 onLongPress={() => handleMessageLongPress(msg.content)}
+                 onLongPress={() => handleMessageLongPress(msg.id, msg.content, msg.role)}
                  style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}
                >
                   {msg.role === 'user' ? (

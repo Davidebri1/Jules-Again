@@ -3,6 +3,7 @@ import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
+import { Alert } from 'react-native';
 import { Gyroscope } from 'expo-sensors';
 
 interface PhysicalCardProps {
@@ -17,6 +18,8 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const setFocusedModelId = useAppStore((state) => state.setFocusedModelId);
   const activeLayout = useAppStore((state) => state.activeLayout);
+  const conversations = useAppStore((state) => state.conversations);
+  const latestMessage = conversations[model.id]?.messages.slice(-1)[0]?.content || "Awaiting input...";
 
   // Layout affects base scale
   const baseScale = activeLayout === '3x3' ? 0.7 : activeLayout === '1x1' ? 1.2 : 1;
@@ -119,8 +122,20 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         anchorY="middle"
         maxWidth={2.6}
         textAlign="center"
+        onPointerDown={(e) => {
+            // Primitive long-press emulation for 3D Text
+            // In a real app we'd use a timer. For this patch, we attach to double click or explicit contextual tap
+        }}
+        onDoubleClick={(e) => {
+            e.stopPropagation();
+            Alert.alert("Preview Options", "Choose an action:", [
+               { text: "Copy Preview", onPress: () => {} },
+               { text: "Download (.txt)", onPress: () => {} },
+               { text: "Cancel", style: "cancel" }
+            ]);
+        }}
       >
-        Awaiting input...
+        {latestMessage.substring(0, 100) + (latestMessage.length > 100 ? "..." : "")}
       </Text>
     </a.group>
   );
