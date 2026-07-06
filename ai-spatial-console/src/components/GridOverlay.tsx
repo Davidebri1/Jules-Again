@@ -36,27 +36,34 @@ export const GridOverlay: React.FC = () => {
         return;
      }
 
-     // 1. Calculate Total Credit Cost
-     const activeModels = activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(m => m !== undefined);
-     const totalCost = activeModels.reduce((sum, model) => {
-        // Handle free tier overrides (Pro/Elite users get general models free)
-        let cost = model.baseCreditCost;
-        if (model.category === 'general' && userProfile.tier !== 'free') cost = 0;
-        if (model.category === 'coding' && userProfile.tier === 'elite' && (model.id === 'qwen-coder' || model.id === 'deepseek-coder')) cost = 0;
-        return sum + cost;
-     }, 0);
+     // 1. Filter Active Models by Current Tab
+     const activeModels = activeModelIds
+        .map(id => availableModels.find(m => m.id === id))
+        .filter((m): m is import('../store/useAppStore').ModelProvider => m !== undefined && m.category === selectedTab);
 
-     // 2. Validate Balance & Message Limits
-     const hasGeneral = activeModels.some(m => m.category === 'general');
-     if (hasGeneral && !deductMessage()) {
-         Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging general models.");
-         setUpgradeOpen(true);
-         return;
+     if (activeModels.length === 0) {
+        Alert.alert("No Models Selected", "Please select at least one model in this tab to message.");
+        return;
      }
 
-     if (totalCost > 0 && !deductCredits(totalCost)) {
-         setUpgradeOpen(true);
-         return;
+
+     // 2. Validate Balance & Message Limits based on Tab
+     if (selectedTab === 'general') {
+         // General tab uses Message Limits
+         if (userProfile.tier === 'free' && !deductMessage()) {
+             Alert.alert("Message Limit Reached", "Please upgrade your tier to continue messaging.");
+             setUpgradeOpen(true);
+             return;
+         }
+         // Pro/Elite have unlimited general messaging
+     } else {
+         // Media tabs use Credits
+         const totalCost = activeModels.reduce((sum, model) => sum + model.baseCreditCost, 0);
+         if (!deductCredits(totalCost)) {
+             Alert.alert("Insufficient Credits", "You do not have enough credits to generate this.");
+             setUpgradeOpen(true);
+             return;
+         }
      }
 
      const userMessage = inputText.trim();

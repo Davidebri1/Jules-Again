@@ -194,10 +194,24 @@ export const CardDetailView: React.FC = () => {
                >
                   {msg.role === 'user' ? (
                      <Text style={styles.userText}>{msg.content}</Text>
-                  ) : (
-                     <Markdown style={markdownStyles}>
-                        {msg.content}
-                     </Markdown>
+                  ) : model.category === 'image' && msg.role === 'assistant' ? (
+                        <View style={styles.mediaContainer as any}>
+                           <View style={styles.imagePlaceholder as any}>
+                              <Text style={styles.imagePlaceholderText as any}>[Generated Image Output]</Text>
+                           </View>
+                           <Text style={styles.captionText as any}>{msg.content}</Text>
+                        </View>
+                     ) : model.category === 'audio' && msg.role === 'assistant' ? (
+                        <View style={styles.mediaContainer as any}>
+                           <View style={styles.audioPlaceholder as any}>
+                              <Text style={styles.audioPlaceholderText as any}>▶  [Generated Audio Output]</Text>
+                           </View>
+                           <Text style={styles.captionText as any}>{msg.content}</Text>
+                        </View>
+                     ) : (
+                        <Markdown style={markdownStyles}>
+                           {msg.content}
+                        </Markdown>
                   )}
                </TouchableOpacity>
             </View>
@@ -383,6 +397,42 @@ const styles = StyleSheet.create({
      borderWidth: 1,
      borderColor: 'rgba(255,255,255,0.1)',
      borderBottomLeftRadius: 5,
+  },
+  mediaContainer: {
+     width: '100%',
+  },
+  imagePlaceholder: {
+     width: 250,
+     height: 250,
+     backgroundColor: 'rgba(255,255,255,0.1)',
+     borderRadius: 8,
+     justifyContent: 'center',
+     alignItems: 'center',
+     marginBottom: 10,
+  },
+  imagePlaceholderText: {
+     color: 'rgba(255,255,255,0.3)',
+     fontSize: 12,
+  },
+  audioPlaceholder: {
+     width: 250,
+     height: 50,
+     backgroundColor: 'rgba(66, 133, 244, 0.2)',
+     borderRadius: 25,
+     justifyContent: 'center',
+     alignItems: 'center',
+     marginBottom: 10,
+     borderWidth: 1,
+     borderColor: 'rgba(66, 133, 244, 0.5)',
+  },
+  audioPlaceholderText: {
+     color: '#fff',
+     fontSize: 14,
+     fontWeight: '600',
+  },
+  captionText: {
+     color: 'rgba(255,255,255,0.6)',
+     fontSize: 12,
   },
   userText: {
      color: '#fff',

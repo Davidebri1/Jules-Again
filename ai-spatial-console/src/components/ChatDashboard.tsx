@@ -9,6 +9,7 @@ import { useAppStore } from '../store/useAppStore';
 export const ChatDashboard: React.FC = () => {
   const activeModelIds = useAppStore((state) => state.activeModelIds);
   const availableModels = useAppStore((state) => state.availableModels);
+  const selectedTab = useAppStore((state) => state.selectedTab);
   const activeLayout = useAppStore((state) => state.activeLayout);
 
   const activeModels = useMemo(() => {
