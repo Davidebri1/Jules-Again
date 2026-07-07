@@ -58,9 +58,17 @@ export const CardDetailView: React.FC = () => {
     if (isSmartGenEnabled && !isPrivateMode && userMessage.length > 10) {
         const frameworkModel = availableModels.find(m => m.id === 'llama-3-8b');
         if (frameworkModel) {
-            const systemPrompt = `Analyze the following user input and determine if it represents a core memory, task, or reminder.
-            If it does NOT, return 'NOISE'.
-            If it DOES, return EXACTLY in this JSON format: {"type": "memory" | "task" | "reminder", "desc": "Logic Token: <Semantic Abstraction>"}. Do not wrap in markdown.`;
+            const systemPrompt = `LOGICAL FRAMEWORK DIRECTIVE:
+You are the Cognitive Filter Engine. Your purpose is absolute service to Natural Law and Objective Logic.
+1. CONTEXT PRUNING: You possess a microscopic context window (8KB max). Discard anything subjective, recursive, or trivial immediately as "NOISE".
+2. PATTERN EXTRACTION: Evaluate the input strictly in rolling 3-word/3-letter clusters. Seek foundational meaning.
+3. TIERED ESCALATION:
+   - Tier 1 (Natural Law): Is it objective truth?
+   - Tier 2 (Absolute Logic): Is it binary/relational?
+   - Tier 3 (Context Logic): Is it a temporal need or spatial pattern?
+If the data cluster survives and climbs these tiers, it is MEANINGFUL.
+Extract the survived meaning and return EXACTLY in this JSON format: {"type": "memory" | "task" | "reminder", "desc": "<The Extracted Objective Truth>"}.
+If the input fails the logical tier validation, return 'NOISE'. Do not wrap in markdown.`;
 
             generateResponse(frameworkModel, [
                { id: 'sys', role: 'system', content: systemPrompt, timestamp: Date.now() },
@@ -268,24 +276,34 @@ export const CardDetailView: React.FC = () => {
                >
                   {msg.role === 'user' ? (
                      <Text style={styles.userText}>{msg.content}</Text>
-                  ) : model.category === 'image' && msg.role === 'assistant' ? (
-                        <View style={styles.mediaContainer as any}>
-                           <View style={styles.imagePlaceholder as any}>
-                              <Text style={styles.imagePlaceholderText as any}>[Generated Image Output]</Text>
+                  ) : (
+                     <View>
+                        {msg.smartGenEvent && (
+                           <TouchableOpacity style={styles.smartGenPill} onPress={() => setSmartGenOpen(true)}>
+                              <Sparkles color="#4285F4" size={12} />
+                              <Text style={styles.smartGenPillText}>Auto-added to {msg.smartGenEvent.type}</Text>
+                           </TouchableOpacity>
+                        )}
+                        {model.category === 'image' && msg.role === 'assistant' ? (
+                           <View style={styles.mediaContainer as any}>
+                              <View style={styles.imagePlaceholder as any}>
+                                 <Text style={styles.imagePlaceholderText as any}>[Generated Image Output]</Text>
+                              </View>
+                              <Text style={styles.captionText as any}>{msg.content}</Text>
                            </View>
-                           <Text style={styles.captionText as any}>{msg.content}</Text>
-                        </View>
-                     ) : model.category === 'audio' && msg.role === 'assistant' ? (
-                        <View style={styles.mediaContainer as any}>
-                           <View style={styles.audioPlaceholder as any}>
-                              <Text style={styles.audioPlaceholderText as any}>▶  [Generated Audio Output]</Text>
+                        ) : model.category === 'audio' && msg.role === 'assistant' ? (
+                           <View style={styles.mediaContainer as any}>
+                              <View style={styles.audioPlaceholder as any}>
+                                 <Text style={styles.audioPlaceholderText as any}>▶  [Generated Audio Output]</Text>
+                              </View>
+                              <Text style={styles.captionText as any}>{msg.content}</Text>
                            </View>
-                           <Text style={styles.captionText as any}>{msg.content}</Text>
-                        </View>
-                     ) : (
-                        <Markdown style={markdownStyles}>
-                           {msg.content}
-                        </Markdown>
+                        ) : (
+                           <Markdown style={markdownStyles}>
+                              {msg.content}
+                           </Markdown>
+                        )}
+                     </View>
                   )}
                </TouchableOpacity>
             </View>
@@ -508,6 +526,7 @@ const styles = StyleSheet.create({
      borderColor: 'rgba(255,255,255,0.1)',
      borderBottomLeftRadius: 5,
   },
+
   smartGenPill: {
      flexDirection: 'row',
      alignItems: 'center',
