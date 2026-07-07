@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
+
+let MediaLibrary: any = null;
+let FileSystem: any = null;
+let Sharing: any = null;
+if (Platform.OS !== 'web') {
+   MediaLibrary = require('expo-media-library');
+   FileSystem = require('expo-file-system');
+   Sharing = require('expo-sharing');
+}
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions, Platform } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
 import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud, MoreVertical, Star, Trash2, Maximize2, CopyPlus, Link } from 'lucide-react-native';
 import { Alert, Share } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
-import * as Sharing from 'expo-sharing';
+
+
+
 import * as DocumentPicker from 'expo-document-picker';
 
 const { width, height } = Dimensions.get('window');

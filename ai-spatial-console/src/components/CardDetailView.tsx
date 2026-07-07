@@ -1,9 +1,16 @@
 import React, { useState, useRef } from 'react';
+
+let MediaLibrary: any = null;
+let FileSystem: any = null;
+if (Platform.OS !== 'web') {
+   MediaLibrary = require('expo-media-library');
+   FileSystem = require('expo-file-system');
+}
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Share } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+
+
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
 import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X, Sparkles, Plus } from 'lucide-react-native';
