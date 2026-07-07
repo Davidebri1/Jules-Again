@@ -8,6 +8,20 @@ export type GridLayout = '1x1' | '2x2' | '3x3';
 
 
 export type FileCategory = 'uploaded' | 'generated' | 'collection';
+export type SmartGenType = 'memory' | 'project' | 'task' | 'reminder' | 'artifact';
+export interface SmartGenItem {
+  id: string;
+  type: SmartGenType;
+  name: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low' | 'none';
+  status: 'not_started' | 'in_progress' | 'completed';
+  tags: string[];
+  dueDate?: number;
+  projectId?: string;
+  modelId?: string;
+  updatedAt: number;
+}
 export interface StoredFile {
   id: string;
   name: string;
@@ -116,6 +130,8 @@ export interface AppState {
   isPrivateMode: boolean;
   isSmartGenEnabled: boolean;
   setSmartGenEnabled: (enabled: boolean) => void;
+  smartGenItems: SmartGenItem[];
+  addOrUpdateSmartGenItem: (item: Partial<SmartGenItem>) => void;
   processSmartGenLogic: (content: string) => Promise<Message['smartGenEvent'] | undefined>;
   setPrivateMode: (isPrivate: boolean) => void;
   accountId: string | null;
@@ -342,6 +358,30 @@ export const useAppStore = create<AppState>()(
       isPrivateMode: false,
       isSmartGenEnabled: true,
       setSmartGenEnabled: (enabled) => set({ isSmartGenEnabled: enabled }),
+      smartGenItems: [],
+      addOrUpdateSmartGenItem: (newItem) => set((state) => {
+         if (!newItem.id && !newItem.name) return state;
+         const items = [...state.smartGenItems];
+         const existingIdx = items.findIndex(i => i.id === newItem.id || (i.name === newItem.name && i.type === newItem.type));
+         if (existingIdx >= 0) {
+             items[existingIdx] = { ...items[existingIdx], ...newItem, updatedAt: Date.now() };
+         } else {
+             items.push({
+                 id: newItem.id || Math.random().toString(36).substring(7),
+                 type: newItem.type || 'memory',
+                 name: newItem.name || 'Unnamed',
+                 description: newItem.description || '',
+                 priority: newItem.priority || 'none',
+                 status: newItem.status || 'not_started',
+                 tags: newItem.tags || [],
+                 dueDate: newItem.dueDate,
+                 projectId: newItem.projectId,
+                 modelId: newItem.modelId,
+                 updatedAt: Date.now()
+             });
+         }
+         return { smartGenItems: items };
+      }),
       setPrivateMode: (isPrivate) => set({ isPrivateMode: isPrivate }),
       accountId: null,
       login: (accountId) => set({ isAuthenticated: true, accountId }),
@@ -355,6 +395,7 @@ export const useAppStore = create<AppState>()(
          pendingContextFiles: [],
          pendingSourceFile: null,
          files: [],
+         smartGenItems: [],
          starredFiles: []
       }),
       files: [],

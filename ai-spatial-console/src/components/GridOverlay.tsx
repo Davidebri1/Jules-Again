@@ -20,7 +20,7 @@ export const GridOverlay: React.FC = () => {
   const {
     activeLayout, setActiveLayout,
     userProfile, deductCredits, refundCredits, deductMessage, setUpgradeOpen,
-    addMessage, conversations, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, setAuthOpen, isPrivateMode, setPrivateMode, archiveConversation, setFileManagerOpen,
+    addMessage, conversations, pendingContextFiles, pendingSourceFile, removeContextFile, setSourceFile, clearPendingAttachments, setAuthOpen, isPrivateMode, setPrivateMode, archiveConversation, setFileManagerOpen, files, smartGenItems, archivedConversations,
     selectedTab, setSelectedTab,
     availableModels, activeModelIds, toggleActiveModel,
     setSettingsOpen, setConsensusOpen, setHistoryOpen, setMarketplaceOpen
@@ -160,6 +160,30 @@ export const GridOverlay: React.FC = () => {
                     <X color="rgba(255,255,255,0.4)" size={16} />
                  </TouchableOpacity>
              )}
+
+             {/* Streaming Search Results */}
+             {searchQuery.length > 2 && (
+                 <ScrollView style={styles.searchResultsContainer}>
+                     {files.filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase())).map(f => (
+                         <View key={f.id} style={styles.searchResultItem}>
+                            <Text style={styles.searchResultType}>FILE</Text>
+                            <Text style={styles.searchResultTitle}>{f.name}</Text>
+                         </View>
+                     ))}
+                     {smartGenItems.filter((i: any) => i.name.toLowerCase().includes(searchQuery.toLowerCase()) || i.description.toLowerCase().includes(searchQuery.toLowerCase())).map((i: any) => (
+                         <View key={i.id} style={styles.searchResultItem}>
+                            <Text style={styles.searchResultType}>SMART GEN ({i.type.toUpperCase()})</Text>
+                            <Text style={styles.searchResultTitle}>{i.name}</Text>
+                         </View>
+                     ))}
+                     {archivedConversations.filter(c => c.title?.toLowerCase().includes(searchQuery.toLowerCase()) || c.messages.some(m => m.content.toLowerCase().includes(searchQuery.toLowerCase()))).map(c => (
+                         <View key={c.id} style={styles.searchResultItem}>
+                            <Text style={styles.searchResultType}>HISTORY ({c.modelId.toUpperCase()})</Text>
+                            <Text style={styles.searchResultTitle} numberOfLines={1}>{c.messages[0]?.content || 'Empty'}</Text>
+                         </View>
+                     ))}
+                 </ScrollView>
+             )}
           </View>
       )}
 
@@ -289,6 +313,27 @@ export const GridOverlay: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  searchResultsContainer: {
+    maxHeight: 200,
+    marginTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  searchResultItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  searchResultType: {
+    color: '#4285F4',
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  searchResultTitle: {
+    color: '#fff',
+    fontSize: 14,
+  },
   specularTopEdge: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
