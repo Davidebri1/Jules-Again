@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
+import { Calendar, ChevronLeft as CalLeft, ChevronRight as CalRight } from 'lucide-react-native';
 import { X, Brain, FolderOpen, CheckSquare, Bell, Code, Plus } from 'lucide-react-native';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 
@@ -145,6 +146,64 @@ export const SmartGenSuiteView: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  calendarMonth: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 20,
+    paddingHorizontal: 5,
+  },
+  calDayHeader: {
+    width: '14.28%',
+    textAlign: 'center',
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  calCell: {
+    width: '14.28%',
+    aspectRatio: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calCellToday: {
+    backgroundColor: 'rgba(66, 133, 244, 0.2)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#4285F4',
+  },
+  calCellText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+  },
+  calCellTextToday: {
+    color: '#fff',
+    fontWeight: '800',
+  },
+  calEventDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#ff453a',
+    marginTop: 2,
+  },
+
   container: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(15,15,18,0.98)', // Deep slate with high opacity
