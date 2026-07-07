@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, CheckCircle2, Building, Send } from 'lucide-react-native';
+import { X, CheckCircle2, Building, Send } from './PremiumIcon';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export const UpgradePage: React.FC = () => {

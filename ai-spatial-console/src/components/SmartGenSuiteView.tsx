@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, Brain, FolderOpen, CheckSquare, Bell, Code, Plus } from 'lucide-react-native';
+import { X, Brain, FolderOpen, CheckSquare, Bell, Code, Plus } from './PremiumIcon';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 
 type ToolTab = 'Memories' | 'Projects' | 'Tasks' | 'Reminders' | 'Artifacts';

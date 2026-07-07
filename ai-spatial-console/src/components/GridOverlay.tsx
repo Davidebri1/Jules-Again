@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
-import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X, EyeOff, Plus, Paperclip, Search } from 'lucide-react-native';
+import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X, EyeOff, Plus, Paperclip, Search } from './PremiumIcon';
 
 import { generateResponse } from '../utils/api';
 

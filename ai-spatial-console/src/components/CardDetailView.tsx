@@ -6,7 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import Markdown from 'react-native-markdown-display';
 import { useAppStore } from '../store/useAppStore';
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X, Sparkles, Plus } from 'lucide-react-native';
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Layers, Globe, Zap, Search, EyeOff, Sliders, X, Sparkles, Plus } from './PremiumIcon';
 import { generateResponse } from '../utils/api';
 
 export const CardDetailView: React.FC = () => {

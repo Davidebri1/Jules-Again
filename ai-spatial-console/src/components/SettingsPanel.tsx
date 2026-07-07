@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, User, Shield, CreditCard } from 'lucide-react-native';
+import { X, User, Shield, CreditCard } from './PremiumIcon';
 
 export const THEMES = [
   { id: 'dark-obsidian', name: 'Obsidian', uri: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2940&auto=format&fit=crop' },

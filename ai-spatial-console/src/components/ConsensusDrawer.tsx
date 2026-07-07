@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X } from 'lucide-react-native';
+import { X } from './PremiumIcon';
 
 const { width } = Dimensions.get('window');
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from 'lucide-react-native';
+import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from './PremiumIcon';
 
 const MOCK_ARTIFACTS = [
   { id: '1', title: 'Cyberpunk Cityscape', creator: '@neon_dreams', likes: 1205, type: 'image' },

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Dimensions, Platform } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
-import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud, MoreVertical, Star, Trash2, Maximize2, CopyPlus, Link } from 'lucide-react-native';
+import { X, FileText, Image as ImageIcon, Video, Upload, Folder, Database, DownloadCloud, MoreVertical, Star, Trash2, Maximize2, CopyPlus, Link } from './PremiumIcon';
 import { Alert, Share } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';

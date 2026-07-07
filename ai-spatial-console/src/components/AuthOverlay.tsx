@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions, TextInput } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring, useSharedValue } from 'react-native-reanimated';
 import { useAppStore } from '../store/useAppStore';
-import { X, Mail, Apple, CheckCircle2 } from 'lucide-react-native';
+import { X, Mail, Apple, CheckCircle2 } from './PremiumIcon';
 import * as AppleAuthentication from 'expo-apple-authentication';
 
 const { height } = Dimensions.get('window');

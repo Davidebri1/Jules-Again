@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { useAppStore, Conversation } from '../store/useAppStore';
-import { X, Search, Clock, Hash } from 'lucide-react-native';
+import { X, Search, Clock, Hash } from './PremiumIcon';
 
 export const HistoryDrawer: React.FC = () => {
   const { isHistoryOpen, setHistoryOpen, archivedConversations, availableModels, conversations, archiveConversation } = useAppStore();
