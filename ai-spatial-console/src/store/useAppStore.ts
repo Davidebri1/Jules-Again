@@ -128,7 +128,7 @@ export interface AppState {
 
 const INITIAL_MODELS: ModelProvider[] = [
   // ================= GENERAL =================
-  { id: 'llama-3-8b', name: 'LLaMA 3 8B', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama3-8b-8192', baseCreditCost: 1 },
+  { id: 'llama-3-8b', name: 'LLaMA 3.1 8B', provider: 'meta', tier: 'free', category: 'general', description: 'Fast, capable general tasks.', routingKey: 'llama-3.1-8b-instant', baseCreditCost: 1 },
   { id: 'gemma-7b', name: 'Gemma 7B', provider: 'google', tier: 'free', category: 'general', description: 'Google lightweight model.', routingKey: 'gemma-7b-it', baseCreditCost: 1 },
   { id: 'mistral-7b', name: 'Mistral 7B', provider: 'mistral', tier: 'free', category: 'general', description: 'Solid foundational model.', routingKey: 'mistralai/mistral-7b-instruct:free', baseCreditCost: 1 },
   { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free', baseCreditCost: 1 },
