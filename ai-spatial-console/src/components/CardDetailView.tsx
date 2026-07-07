@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Share } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import Markdown from 'react-native-markdown-display';
@@ -146,9 +148,11 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       pointerEvents="box-none"
     >
+      <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
       <SafeAreaView style={styles.safeArea} pointerEvents="box-none">
         {/* Top Header */}
-        <View style={styles.header}>
+        <BlurView intensity={40} tint="dark" style={styles.header}>
+          <View style={styles.specularTopEdge} />
           <TouchableOpacity style={styles.iconButton} onPress={() => setFocusedModelId(null)}>
             <ChevronLeft color="#fff" size={24} />
           </TouchableOpacity>
@@ -177,7 +181,7 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                <MoreHorizontal color="#fff" size={24} />
              </TouchableOpacity>
           </View>
-        </View>
+        </BlurView>
 
         {isSearchOpen && (
            <View style={styles.searchContainer}>
@@ -353,7 +357,7 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                 ))}
              </ScrollView>
           )}
-          <View style={styles.inputBox}>
+          <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']} style={styles.inputBox}>
             <TouchableOpacity style={styles.actionButton} onPress={() => setFileManagerOpen(true)}>
                 <Paperclip color="rgba(255,255,255,0.7)" size={20} />
             </TouchableOpacity>
@@ -377,14 +381,19 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                   <Send color="#000" size={18} />
                </TouchableOpacity>
             )}
-          </View>
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({  specularTopEdge: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
   paramsContainer: {
     backgroundColor: 'rgba(255,255,255,0.03)',
     borderBottomWidth: 1,
@@ -431,7 +440,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.3)', // Let BlurView do the heavy lifting
   },
   safeArea: {
     flex: 1,
@@ -466,7 +475,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   iconButton: {
-    padding: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.15)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.5)',
+    marginLeft: 8,
   },
   titleContainer: {
     alignItems: 'center',

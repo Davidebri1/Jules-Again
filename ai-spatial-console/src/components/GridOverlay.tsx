@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator, Share } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
@@ -110,7 +112,9 @@ export const GridOverlay: React.FC = () => {
     <SafeAreaView style={styles.overlay} pointerEvents="box-none">
 
       {/* Top Bar: Brand, Layout, Profile */}
-      <View style={styles.topBar}>
+      <BlurView intensity={20} tint="dark" style={styles.topBar}>
+          {/* Specular edge light */}
+          <View style={styles.specularTopEdge} />
         <View style={{flexDirection: 'row', gap: 10}}>
           <TouchableOpacity style={styles.iconButton} onPress={() => setIsSearchOpen(!isSearchOpen)}>
             <Search color={isSearchOpen ? "#4285F4" : "#fff"} size={20} />
@@ -138,7 +142,7 @@ export const GridOverlay: React.FC = () => {
         <TouchableOpacity style={styles.iconButton} onPress={() => setAuthOpen(true)}>
           <User color="#fff" size={20} />
         </TouchableOpacity>
-      </View>
+      </BlurView>
 
       {isSearchOpen && (
           <View style={styles.searchContainer}>
@@ -160,7 +164,9 @@ export const GridOverlay: React.FC = () => {
       )}
 
       {/* Tabs and Model Selector Tray */}
-      <View style={styles.bottomSection}>
+      <BlurView intensity={30} tint="dark" style={styles.bottomSection}>
+         {/* Specular edge light */}
+         <View style={styles.specularTopEdge} />
         {/* Category Tabs */}
         <View style={styles.tabsContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
@@ -242,7 +248,7 @@ export const GridOverlay: React.FC = () => {
                   <Plus color="#000" size={20} />
               </TouchableOpacity>
 
-              <View style={[styles.inputMock, isPrivateMode && { borderColor: 'rgba(255, 69, 58, 0.3)' }]}>
+              <LinearGradient colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']} style={[styles.inputMock, isPrivateMode && { borderColor: 'rgba(255, 69, 58, 0.4)' }]}>
                  <TouchableOpacity style={styles.iconButtonSmall} onPress={() => setFileManagerOpen(true)}>
                     <Paperclip color="rgba(255,255,255,0.7)" size={16} />
                  </TouchableOpacity>
@@ -273,16 +279,23 @@ export const GridOverlay: React.FC = () => {
                       </>
                    )}
                  </View>
-              </View>
+              </LinearGradient>
            </View>
         </View>
-      </View>
+      </BlurView>
 
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  specularTopEdge: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+
   overlay: {
     flex: 1,
     justifyContent: 'space-between',
@@ -299,14 +312,22 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.05)', // Darker base for inner bevel
     justifyContent: 'center',
     alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.15)', // Specular top edge
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.5)',     // Shadowed bottom edge
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
   },
   searchContainer: {
     marginHorizontal: 20,
     marginTop: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -356,7 +377,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   tabButtonActive: {
     backgroundColor: 'rgba(255,255,255,0.2)',
