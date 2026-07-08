@@ -3,6 +3,15 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type SubscriptionTier = 'free' | 'pro' | 'elite';
+
+export type ThemeType = 'image' | 'video';
+export interface Theme {
+    id: string;
+    name: string;
+    uri: string;
+    type: ThemeType;
+}
+
 export type ModelCategory = 'general' | 'image' | 'video' | 'audio' | 'coding';
 export type GridLayout = '1x1' | '2x2' | '3x3';
 
@@ -67,7 +76,9 @@ export interface AppState {
   activeLayout: GridLayout;
   setActiveLayout: (layout: GridLayout) => void;
   currentThemeId: string;
+  themes: Theme[];
   setCurrentThemeId: (id: string) => void;
+  addTheme: (theme: Theme) => void;
 
   // Models (Partially persisted, e.g., active models)
   availableModels: ModelProvider[];
@@ -97,6 +108,8 @@ export interface AppState {
   isUpgradeOpen: boolean;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
+  marketCategory: string;
+  setMarketCategory: (cat: string) => void;
 
   pendingContextFiles: StoredFile[];
   pendingSourceFile: StoredFile | null;
@@ -222,8 +235,14 @@ export const useAppStore = create<AppState>()(
       activeLayout: '2x2',
       setActiveLayout: (layout) => set({ activeLayout: layout }),
 
-      currentThemeId: 'dark-obsidian',
+      themes: [
+    { id: 'dark-obsidian', name: 'Obsidian', uri: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2940&auto=format&fit=crop', type: 'image' },
+    { id: 'slate-frost', name: 'Slate Frost', uri: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2940&auto=format&fit=crop', type: 'image' },
+    { id: 'neon-dusk', name: 'Neon Dusk', uri: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=2940&auto=format&fit=crop', type: 'image' },
+  ],
+  currentThemeId: 'dark-obsidian',
       setCurrentThemeId: (id) => set({ currentThemeId: id }),
+  addTheme: (theme) => set((state) => ({ themes: [...state.themes, theme] })),
 
       availableModels: INITIAL_MODELS,
       activeModelIds: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'],
@@ -318,6 +337,8 @@ export const useAppStore = create<AppState>()(
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
       isMarketplaceOpen: false,
       setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
+      marketCategory: 'All',
+      setMarketCategory: (cat) => set({ marketCategory: cat }),
 
       pendingContextFiles: [],
       pendingSourceFile: null,

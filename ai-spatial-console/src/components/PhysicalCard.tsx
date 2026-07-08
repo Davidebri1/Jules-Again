@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
+import { RoundedBox, Text } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
@@ -75,18 +75,17 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         }}
         onPointerOut={(e) => { e.stopPropagation(); setPressed(false); }}
       >
-        {/* The core 3D spatial transmission material, rendering true physical light refraction instead of generic 2D blur */}
-        <MeshTransmissionMaterial
-          buffer={null as any}
+        {/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */}
+        <meshPhysicalMaterial
           color={cardColor}
-          transmission={0.8}
-          thickness={0.5}
+          transmission={0.9}
+          transparent={true}
+          opacity={1}
           roughness={0.2}
+          metalness={0.1}
           clearcoat={1}
           clearcoatRoughness={0.1}
           ior={1.5}
-          attenuationDistance={1}
-          attenuationColor="#ffffff"
         />
       </RoundedBox>
 
