@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
+import { Platform,
   StyleSheet,
   View,
   Text,
@@ -9,8 +9,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  Share,
-} from "react-native";
+  Share} from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import * as FileSystem from "expo-file-system";
@@ -134,8 +133,20 @@ export const GridOverlay: React.FC = () => {
       }
     }
 
-    const userMessage = inputText.trim();
+    let userMessage = inputText.trim();
     setInputText("");
+
+    // --- Inject Context ---
+    let injectedPrefix = "";
+    if (isWebEnabled) injectedPrefix += "[Web Search Enabled] ";
+    if (isPrivateMode) injectedPrefix += "[Private/Incognito Session] ";
+    if (pendingContextFiles.length > 0) {
+       injectedPrefix += `[Context Files: ${pendingContextFiles.map(f => f.name).join(', ')}] `;
+    }
+    if (pendingSourceFile) {
+       injectedPrefix += `[Source Context: ${pendingSourceFile.name}] `;
+    }
+    const fullMessage = injectedPrefix ? `${injectedPrefix}\n\n${userMessage}` : userMessage;
     setIsGenerating(true);
     clearPendingAttachments();
 
@@ -152,7 +163,7 @@ export const GridOverlay: React.FC = () => {
           {
             id: "temp",
             role: "user" as const,
-            content: userMessage,
+            content: fullMessage,
             timestamp: Date.now(),
           },
         ];
@@ -186,6 +197,12 @@ export const GridOverlay: React.FC = () => {
         {/* Specular edge light */}
         <View style={styles.specularTopEdge} />
         <View style={{ flexDirection: "row", gap: 10 }}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => setSettingsOpen(true)}
+          >
+            <Settings color="#fff" size={20} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.iconButton}
             onPress={() => setIsSearchOpen(!isSearchOpen)}
@@ -616,10 +633,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.4)', // tactile highlight
+    borderBottomColor: 'rgba(0,0,0,0.6)', // tactile shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5, // Android shadow
   },
   modelBubbleText: {
     fontWeight: "700",
-    fontSize: 12,
+    fontSize: 13,
+    fontFamily: Platform.OS === 'ios' ? 'AvenirNext-DemiBold' : 'sans-serif-medium',
+    letterSpacing: 0.5,
   },
   actionRow: {
     flexDirection: "row",

@@ -31,7 +31,7 @@ export default function App() {
           isMuted
         />
       ) : (
-        <ImageBackground source={{ uri: currentTheme?.uri }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        <ImageBackground source={typeof currentTheme?.uri === "string" ? { uri: currentTheme?.uri } : currentTheme?.uri} style={StyleSheet.absoluteFill} resizeMode="cover" />
       )}
 
       {/* 3D Spatial Canvas (Always in background, transparent to show image) */}

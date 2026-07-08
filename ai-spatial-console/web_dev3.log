@@ -1,0 +1,134 @@
+
+> ai-spatial-console@1.0.0 web
+> expo start --web
+
+Starting project at /app/ai-spatial-console
+Starting Metro Bundler
+
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Web Bundled 3111ms index.ts (3304 modules)
+Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
+Web  WARN  "textShadow*" style props are deprecated. Use "textShadow".
+Web  WARN  [expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
+Web  LOG  Running application "main" with appParams:
+ {"hydrate": undefined, "rootTag": "#root"}
+Development-level warnings: ON.
+Performance optimizations: OFF.
+Web  WARN  props.pointerEvents is deprecated. Use style.pointerEvents
+Web  WARN  THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
+Web Bundling failed 520ms index.ts (1 module)
+ ERROR  SyntaxError: /app/ai-spatial-console/src/components/GridOverlay.tsx: Unexpected token (13:0)
+
+  11 |   ActivityIndicator,
+  12 |   Share,
+> 13 | , Platform} from "react-native";
+     | ^
+  14 | import { BlurView } from "expo-blur";
+  15 | import { LinearGradient } from "expo-linear-gradient";
+  16 | import * as FileSystem from "expo-file-system";
+    at constructor (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:365:19)
+    at TypeScriptParserMixin.raise (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:6616:19)
+    at TypeScriptParserMixin.unexpected (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:6636:16)
+    at TypeScriptParserMixin.parseIdentifierName (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12220:12)
+    at TypeScriptParserMixin.parseIdentifier (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12198:23)
+    at TypeScriptParserMixin.parseModuleExportName (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14140:17)
+    at TypeScriptParserMixin.parseNamedImportSpecifiers (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14414:33)
+    at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14259:37)
+    at TypeScriptParserMixin.parseImport (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14252:17)
+    at TypeScriptParserMixin.parseImport (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:9370:26)
+    at TypeScriptParserMixin.parseStatementContent (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12893:27)
+    at TypeScriptParserMixin.parseStatementContent (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:9525:18)
+    at TypeScriptParserMixin.parseStatementLike (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12784:17)
+    at TypeScriptParserMixin.parseModuleItem (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12761:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:13333:36)
+    at TypeScriptParserMixin.parseBlockBody (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:13326:10)
+    at TypeScriptParserMixin.parseProgram (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12639:10)
+    at TypeScriptParserMixin.parseTopLevel (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12629:25)
+    at TypeScriptParserMixin.parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14505:25)
+    at TypeScriptParserMixin.parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:10143:18)
+    at parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14518:26)
+    at parser (/app/ai-spatial-console/node_modules/@babel/core/lib/parser/index.js:41:34)
+    at parser.next (<anonymous>)
+    at normalizeFile (/app/ai-spatial-console/node_modules/@babel/core/lib/transformation/normalize-file.js:51:37)
+    at normalizeFile.next (<anonymous>)
+    at run (/app/ai-spatial-console/node_modules/@babel/core/lib/transformation/index.js:22:50)
+    at run.next (<anonymous>)
+    at transform (/app/ai-spatial-console/node_modules/@babel/core/lib/transform.js:22:33)
+    at transform.next (<anonymous>)
+    at evaluateSync (/app/ai-spatial-console/node_modules/gensync/index.js:251:28)
+    at sync (/app/ai-spatial-console/node_modules/gensync/index.js:89:14)
+    at stopHiding - secret - don't use this - v1 (/app/ai-spatial-console/node_modules/@babel/core/lib/errors/rewrite-stack-trace.js:47:12)
+    at Object.transformSync (/app/ai-spatial-console/node_modules/@babel/core/lib/transform.js:40:76)
+    at parseWithBabel (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transformSync.js:75:18)
+    at transformSync (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transformSync.js:54:16)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/babel-transformer.js:146:58)
+    at transformJSWithBabel (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js:495:47)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js:614:12)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js:179:19)
+    at transformFile (/app/ai-spatial-console/node_modules/metro/src/DeltaBundler/Worker.flow.js:67:36)
+    at Object.transform (/app/ai-spatial-console/node_modules/metro/src/DeltaBundler/Worker.flow.js:42:10)
+    at execFunction (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:167:17)
+    at execHelper (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:155:5)
+    at execMethod (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:158:5)
+    at MessagePort.messageListener (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:52:7)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)
+Web Bundling failed 39ms index.ts (1 module)
+ ERROR  SyntaxError: /app/ai-spatial-console/src/components/GridOverlay.tsx: Unexpected token (13:0)
+
+  11 |   ActivityIndicator,
+  12 |   Share,
+> 13 | , Platform} from "react-native";
+     | ^
+  14 | import { BlurView } from "expo-blur";
+  15 | import { LinearGradient } from "expo-linear-gradient";
+  16 | import * as FileSystem from "expo-file-system";
+    at constructor (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:365:19)
+    at TypeScriptParserMixin.raise (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:6616:19)
+    at TypeScriptParserMixin.unexpected (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:6636:16)
+    at TypeScriptParserMixin.parseIdentifierName (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12220:12)
+    at TypeScriptParserMixin.parseIdentifier (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12198:23)
+    at TypeScriptParserMixin.parseModuleExportName (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14140:17)
+    at TypeScriptParserMixin.parseNamedImportSpecifiers (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14414:33)
+    at TypeScriptParserMixin.parseImportSpecifiersAndAfter (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14259:37)
+    at TypeScriptParserMixin.parseImport (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14252:17)
+    at TypeScriptParserMixin.parseImport (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:9370:26)
+    at TypeScriptParserMixin.parseStatementContent (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12893:27)
+    at TypeScriptParserMixin.parseStatementContent (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:9525:18)
+    at TypeScriptParserMixin.parseStatementLike (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12784:17)
+    at TypeScriptParserMixin.parseModuleItem (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12761:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:13333:36)
+    at TypeScriptParserMixin.parseBlockBody (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:13326:10)
+    at TypeScriptParserMixin.parseProgram (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12639:10)
+    at TypeScriptParserMixin.parseTopLevel (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:12629:25)
+    at TypeScriptParserMixin.parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14505:25)
+    at TypeScriptParserMixin.parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:10143:18)
+    at parse (/app/ai-spatial-console/node_modules/@babel/parser/lib/index.js:14518:26)
+    at parser (/app/ai-spatial-console/node_modules/@babel/core/lib/parser/index.js:41:34)
+    at parser.next (<anonymous>)
+    at normalizeFile (/app/ai-spatial-console/node_modules/@babel/core/lib/transformation/normalize-file.js:51:37)
+    at normalizeFile.next (<anonymous>)
+    at run (/app/ai-spatial-console/node_modules/@babel/core/lib/transformation/index.js:22:50)
+    at run.next (<anonymous>)
+    at transform (/app/ai-spatial-console/node_modules/@babel/core/lib/transform.js:22:33)
+    at transform.next (<anonymous>)
+    at evaluateSync (/app/ai-spatial-console/node_modules/gensync/index.js:251:28)
+    at sync (/app/ai-spatial-console/node_modules/gensync/index.js:89:14)
+    at stopHiding - secret - don't use this - v1 (/app/ai-spatial-console/node_modules/@babel/core/lib/errors/rewrite-stack-trace.js:47:12)
+    at Object.transformSync (/app/ai-spatial-console/node_modules/@babel/core/lib/transform.js:40:76)
+    at parseWithBabel (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transformSync.js:75:18)
+    at transformSync (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transformSync.js:54:16)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/babel-transformer.js:146:58)
+    at transformJSWithBabel (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js:495:47)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/metro-transform-worker.js:614:12)
+    at Object.transform (/app/ai-spatial-console/node_modules/expo/node_modules/@expo/metro-config/build/transform-worker/transform-worker.js:179:19)
+    at transformFile (/app/ai-spatial-console/node_modules/metro/src/DeltaBundler/Worker.flow.js:67:36)
+    at Object.transform (/app/ai-spatial-console/node_modules/metro/src/DeltaBundler/Worker.flow.js:42:10)
+    at execFunction (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:167:17)
+    at execHelper (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:155:5)
+    at execMethod (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:158:5)
+    at MessagePort.messageListener (/app/ai-spatial-console/node_modules/jest-worker/build/workers/threadChild.js:52:7)
+    at [nodejs.internal.kHybridDispatch] (node:internal/event_target:843:20)
+    at MessagePort.<anonymous> (node:internal/per_context/messageport:23:28)

@@ -1,3 +1,7 @@
+let MediaLibrary: any;
+if (Platform.OS !== 'web') {
+  MediaLibrary = require('expo-media-library');
+}
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -101,10 +105,28 @@ export const CardDetailView: React.FC = () => {
       }
     }
 
-    const userMessage = inputText.trim();
+    let userMessage = inputText.trim();
     setInputText("");
 
-    const newMsgId = addMessage(model.id, "user", userMessage);
+    // --- Inject Context ---
+    let injectedPrefix = "";
+    if (isDeepResearch) injectedPrefix += "[Deep Research Enabled] ";
+    else if (isWebEnabled) injectedPrefix += "[Web Search Enabled] ";
+
+    if (isPrivateMode) injectedPrefix += "[Private/Incognito Session] ";
+
+    if (pendingContextFiles.length > 0) {
+       injectedPrefix += `[Context Files: ${pendingContextFiles.map(f => f.name).join(', ')}] `;
+    }
+    if (pendingSourceFile) {
+       injectedPrefix += `[Source Context: ${pendingSourceFile.name}] `;
+    }
+
+    // Prefix the hidden context payload to the actual message but render it cleanly or pass it to system.
+    // For simplicity in UI logic, we prefix it to the user's message.
+    const fullMessage = injectedPrefix ? `${injectedPrefix}\n\n${userMessage}` : userMessage;
+
+    const newMsgId = addMessage(model.id, "user", fullMessage);
 
     // --- NATIVE LOGICAL FRAMEWORK ENGINE ---
     // Instead of using generic mocks, we extract meaning into the Smart Gen framework
@@ -206,6 +228,11 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
         text: "Download (.txt)",
         onPress: async () => {
           try {
+            let status = 'granted';
+            if (Platform.OS !== 'web') {
+              const { status: currentStatus } = await MediaLibrary.requestPermissionsAsync();
+              status = currentStatus;
+            }
             if (status === "granted") {
               // @ts-ignore
               const fileUri =
@@ -213,7 +240,7 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                   FileSystem.cacheDirectory ||
                   "") + `message_${Date.now()}.txt`;
               await FileSystem.writeAsStringAsync(fileUri, msgContent);
-              /* MediaLibrary save removed */
+              if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
               Alert.alert("Success", "Saved to device as text file.");
             }
           } catch (e) {}

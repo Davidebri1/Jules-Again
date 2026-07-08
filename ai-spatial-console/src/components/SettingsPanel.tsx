@@ -83,7 +83,13 @@ export const SettingsPanel: React.FC = () => {
               <TouchableOpacity
                 key={theme.id}
                 style={[styles.themeCard, currentThemeId === theme.id && styles.themeCardActive]}
-                onPress={() => setCurrentThemeId(theme.id)}
+                onPress={() => {
+    if (theme.type === 'video' && userProfile.tier === 'free') {
+      setUpgradeOpen(true);
+      return;
+    }
+    setCurrentThemeId(theme.id);
+  }}
               >
                 {theme.type === 'video' ? (
                   <View style={[styles.themeImage, { backgroundColor: '#333', justifyContent: 'center', alignItems: 'center' }]}>
@@ -93,7 +99,7 @@ export const SettingsPanel: React.FC = () => {
                      </View>
                   </View>
                 ) : (
-                  <ImageBackground source={{ uri: theme.uri }} style={styles.themeImage} resizeMode="cover">
+                  <ImageBackground source={typeof theme.uri === "string" ? { uri: theme.uri } : theme.uri} style={styles.themeImage} resizeMode="cover">
                     <View style={styles.themeLabelContainer}>
                       <Text style={styles.themeLabel}>{theme.name}</Text>
                     </View>
