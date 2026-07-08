@@ -2,8 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Alert, ActivityIndicator, Share } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+
+import { Platform } from 'react-native';
+let MediaLibrary: any = {};
+let FileSystem: any = {};
+
+if (Platform.OS !== 'web') {
+  try { MediaLibrary = require('expo-media-library'); } catch(e) {}
+  try { FileSystem = require('expo-file-system'); } catch(e) {}
+}
 import { useAppStore, GridLayout, ModelCategory } from '../store/useAppStore';
 import { Settings, User, Sparkles, Clock, Globe, Mic, Send, X, EyeOff, Plus, Paperclip, Search } from 'lucide-react-native';
 

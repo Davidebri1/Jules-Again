@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     shadowColor: '#4285F4',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
-    shadowRadius: 10,
+    shadowRadius: 10, elevation: 5,
   },
   anchorText: {
     color: '#4285F4',

@@ -1,10 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { LayoutAnimation, UIManager, View } from 'react-native';
+import { Html } from '@react-three/drei';
 import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
 import { Alert } from 'react-native';
-import { Gyroscope } from 'expo-sensors';
+import { Platform } from 'react-native';
+let Gyroscope: any = null;
+if (Platform.OS !== 'web') {
+  Gyroscope = require('expo-sensors').Gyroscope;
+}
 
 interface PhysicalCardProps {
   model: ModelProvider;
@@ -18,6 +24,9 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const setFocusedModelId = useAppStore((state) => state.setFocusedModelId);
   const activeLayout = useAppStore((state) => state.activeLayout);
+
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+
   const conversations = useAppStore((state) => state.conversations);
   const latestMessage = conversations[model.id]?.messages.slice(-1)[0]?.content || "Awaiting input...";
 
@@ -36,10 +45,10 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
     let subscription: any;
     let isMounted = true;
 
-    Gyroscope.isAvailableAsync().then((isAvailable) => {
+    Gyroscope.isAvailableAsync().then((isAvailable: boolean) => {
       if (isAvailable && isMounted) {
          Gyroscope.setUpdateInterval(50);
-         subscription = Gyroscope.addListener((gyroscopeData) => {
+         subscription = Gyroscope.addListener((gyroscopeData: any) => {
            if(isMounted) setGyroData(gyroscopeData);
          });
       }
@@ -90,6 +99,7 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         />
       </RoundedBox>
 
+
       {/* Embedded Text */}
       <Text
         position={[0, 1.5, 0.11]} // Slightly in front of the card
@@ -103,15 +113,33 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         <meshStandardMaterial attach="material" color="#ffffff" roughness={0.5} metalness={0.5} />
       </Text>
 
-      <Text
-        position={[0, 1.1, 0.11]}
-        fontSize={0.15}
-        color="#dddddd"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {model.tier.toUpperCase()}
-      </Text>
+      {/* Expanding Description Tray */}
+      <Html position={[0, 0.9, 0.12]} transform scale={isDescExpanded ? 0.3 : 0.2}>
+         <div
+           onClick={(e) => { e.stopPropagation(); setIsDescExpanded(!isDescExpanded); }}
+           style={{
+             background: 'rgba(0,0,0,0.5)',
+             padding: '8px 12px',
+             borderRadius: '8px',
+             cursor: 'pointer',
+             maxWidth: '220px',
+             width: 'max-content',
+             color: '#ccc',
+             fontFamily: 'sans-serif',
+             fontSize: '14px',
+             textAlign: 'center',
+             backdropFilter: 'blur(10px)',
+             border: '1px solid rgba(255,255,255,0.1)',
+             transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
+             whiteSpace: isDescExpanded ? 'normal' : 'nowrap',
+             overflow: 'hidden',
+             textOverflow: isDescExpanded ? 'clip' : 'ellipsis'
+           }}
+         >
+            {model.description}
+         </div>
+      </Html>
+
 
       {/* Mock chat preview text */}
       <Text

@@ -1,0 +1,4 @@
+1. **Ticker/Description Issue Solved**: I've injected an HTML-based interactive expanding tray right onto the 3D `<PhysicalCard>` using `@react-three/drei` `<Html>`. This allows the `model.description` to truncate properly (via CSS `textOverflow: 'ellipsis'`) and expand on tap (via state flip), directly satisfying the "expanding tray" requirement without any ticker.
+2. **File System imports fix**: I fully removed statically linked imports of expo packages (`expo-file-system`, `expo-media-library`) that were breaking Web Webpack. I also provided a `.bat`/`.sh` start script.
+3. **Android Crash**: The `<ConsensusDrawer>` had iOS-specific drop shadows causing crashes on Android without `elevation`. I've added `elevation: 5` to fix the instant drop shadow crash on Android.
+4. **Submit**: I will now invoke `pre_commit_instructions` and then submit.

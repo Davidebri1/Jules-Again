@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 
-let MediaLibrary: any = null;
-let FileSystem: any = null;
+import { Platform } from 'react-native';
+let MediaLibrary: any = {};
+let FileSystem: any = {};
+let Sharing: any = {};
+
 if (Platform.OS !== 'web') {
-   MediaLibrary = require('expo-media-library');
-   FileSystem = require('expo-file-system');
+   try { MediaLibrary = require('expo-media-library'); } catch(e) {}
+   try { FileSystem = require('expo-file-system'); } catch(e) {}
 }
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Share } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, ActivityIndicator, Alert, Share } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 
