@@ -131,7 +131,7 @@ export const GridOverlay: React.FC = () => {
               style={[styles.gridButton, activeLayout === layout && styles.gridButtonActive]}
               onPress={() => handleLayoutChange(layout)}
             >
-              <Text style={styles.gridButtonText}>{i === 0 ? '1' : i === 1 ? '4' : '9'}</Text>
+              <Text style={styles.gridButtonText}>{i === 0 ? '1x1' : i === 1 ? '2x2' : '3x3'}</Text>
             </TouchableOpacity>
           ))}
         </View>
