@@ -1,1 +1,2 @@
-#!/bin/bash\nnpm install && npm run web\n
+#!/bin/bash
+npm install && EXPO_USE_FAST_RESOLVER=true npx expo start --lan

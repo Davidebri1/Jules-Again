@@ -1,12 +1,12 @@
+# AI Spatial Console
 
-## How to run the project
+A AAA mobile application providing a tactile 3D interface for AI model interaction, adhering to natural logic frameworks.
 
-To quickly start the development server, run the included script:
+## Quick Start
+Run the following script to install dependencies and start the local development server (Expo Go compatible):
+
 ```bash
 ./run.sh
 ```
-Or, start it manually by running:
-```bash
-npm install
-npm run web
-```
+
+Then, scan the QR code using the Expo Go app on your mobile device. For direct IP connection, use the IP address logged in the terminal on port 8081 (e.g. `exp://192.168.0.2:8081`).
