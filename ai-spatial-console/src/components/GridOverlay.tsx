@@ -194,7 +194,7 @@ export const GridOverlay: React.FC = () => {
            </View>
         )}
         <View style={styles.modelTrayContainer}>
-           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
+           <View style={styles.modelTrayScroll}>
               {displayedModels.map(model => {
                  const isActive = activeModelIds.includes(model.id);
                  let borderColor = 'rgba(255,255,255,0.3)';
@@ -214,7 +214,7 @@ export const GridOverlay: React.FC = () => {
                   </TouchableOpacity>
                  );
               })}
-           </ScrollView>
+           </View>
         </View>
 
         {/* Collide / Chat Stub */}
@@ -413,6 +413,9 @@ const styles = StyleSheet.create({
   modelTrayScroll: {
     paddingHorizontal: 20,
     gap: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   modelBubble: {
     paddingHorizontal: 16,

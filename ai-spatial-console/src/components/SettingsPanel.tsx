@@ -1,16 +1,44 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, User, Shield, CreditCard } from 'lucide-react-native';
-
-export const THEMES = [
-  { id: 'dark-obsidian', name: 'Obsidian', uri: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2940&auto=format&fit=crop' },
-  { id: 'slate-frost', name: 'Slate Frost', uri: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2940&auto=format&fit=crop' },
-  { id: 'neon-dusk', name: 'Neon Dusk', uri: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=2940&auto=format&fit=crop' },
-];
+import { X, User, Shield, CreditCard, Upload } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { Alert } from 'react-native';
 
 export const SettingsPanel: React.FC = () => {
-  const { isSettingsOpen, setSettingsOpen, currentThemeId, setCurrentThemeId } = useAppStore();
+  const { isSettingsOpen, setSettingsOpen, currentThemeId, setCurrentThemeId, themes, addTheme, userProfile } = useAppStore();
+
+  const handleUploadMedia = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: false,
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
+        const isVideo = asset.type === 'video';
+
+        if (isVideo && userProfile.tier === 'free') {
+           Alert.alert("Premium Feature", "Live video wallpapers require a Pro or Elite subscription.");
+           return;
+        }
+
+        const newTheme = {
+           id: `custom-${Date.now()}`,
+           name: isVideo ? 'Custom Video' : 'Custom Image',
+           uri: asset.uri,
+           type: isVideo ? 'video' : 'image'
+        };
+
+        addTheme(newTheme as any);
+        setCurrentThemeId(newTheme.id);
+      }
+    } catch (e) {
+      console.log('Error picking media:', e);
+    }
+  };
 
   if (!isSettingsOpen) return null;
 
@@ -51,20 +79,34 @@ export const SettingsPanel: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Themes</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.themeScroll}>
-            {THEMES.map(theme => (
+            {themes && themes.map(theme => (
               <TouchableOpacity
                 key={theme.id}
                 style={[styles.themeCard, currentThemeId === theme.id && styles.themeCardActive]}
                 onPress={() => setCurrentThemeId(theme.id)}
               >
-                <ImageBackground source={{ uri: theme.uri }} style={styles.themeImage} resizeMode="cover">
-                  <View style={styles.themeLabelContainer}>
-                    <Text style={styles.themeLabel}>{theme.name}</Text>
+                {theme.type === 'video' ? (
+                  <View style={[styles.themeImage, { backgroundColor: '#333', justifyContent: 'center', alignItems: 'center' }]}>
+                     <Text style={{color: '#fff', fontSize: 10, padding: 5, textAlign: 'center'}}>LIVE WALLPAPER</Text>
+                     <View style={[styles.themeLabelContainer, {position: 'absolute', bottom: 0, width: '100%'}]}>
+                        <Text style={styles.themeLabel}>{theme.name}</Text>
+                     </View>
                   </View>
-                </ImageBackground>
+                ) : (
+                  <ImageBackground source={{ uri: theme.uri }} style={styles.themeImage} resizeMode="cover">
+                    <View style={styles.themeLabelContainer}>
+                      <Text style={styles.themeLabel}>{theme.name}</Text>
+                    </View>
+                  </ImageBackground>
+                )}
               </TouchableOpacity>
             ))}
           </ScrollView>
+
+          <TouchableOpacity style={[styles.row, { justifyContent: 'center', marginTop: 10, backgroundColor: 'rgba(255,255,255,0.1)' }]} onPress={handleUploadMedia}>
+             <Upload color="#fff" size={20} />
+             <Text style={[styles.rowText, {fontWeight: 'bold'}]}>Upload Custom Background</Text>
+          </TouchableOpacity>
         </View>
 
       </ScrollView>
