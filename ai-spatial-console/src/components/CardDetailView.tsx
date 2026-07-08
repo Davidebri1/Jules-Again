@@ -1,3 +1,7 @@
+let MediaLibrary: any;
+if (Platform.OS !== 'web') {
+  MediaLibrary = require('expo-media-library');
+}
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -206,6 +210,11 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
         text: "Download (.txt)",
         onPress: async () => {
           try {
+            let status = 'granted';
+            if (Platform.OS !== 'web') {
+              const { status: currentStatus } = await MediaLibrary.requestPermissionsAsync();
+              status = currentStatus;
+            }
             if (status === "granted") {
               // @ts-ignore
               const fileUri =
@@ -213,7 +222,7 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                   FileSystem.cacheDirectory ||
                   "") + `message_${Date.now()}.txt`;
               await FileSystem.writeAsStringAsync(fileUri, msgContent);
-              /* MediaLibrary save removed */
+              if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
               Alert.alert("Success", "Saved to device as text file.");
             }
           } catch (e) {}

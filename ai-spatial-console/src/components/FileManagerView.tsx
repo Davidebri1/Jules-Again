@@ -1,3 +1,7 @@
+let MediaLibrary: any;
+if (Platform.OS !== 'web') {
+  MediaLibrary = require('expo-media-library');
+}
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -155,8 +159,13 @@ export const FileManagerView: React.FC = () => {
         text: "Save / Download",
         onPress: async () => {
           try {
+            let status = 'granted';
+            if (Platform.OS !== 'web') {
+              const { status: currentStatus } = await MediaLibrary.requestPermissionsAsync();
+              status = currentStatus;
+            }
             if (status === "granted") {
-              /* MediaLibrary save removed */
+              if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
               Alert.alert("Success", "File saved to device.");
             } else {
               Alert.alert(
@@ -423,8 +432,13 @@ export const FileManagerView: React.FC = () => {
                   style={styles.previewActionBtn}
                   onPress={async () => {
                     try {
-                      if (status === "granted") {
-                        /* MediaLibrary save removed */
+                      let status = 'granted';
+            if (Platform.OS !== 'web') {
+              const { status: currentStatus } = await MediaLibrary.requestPermissionsAsync();
+              status = currentStatus;
+            }
+            if (status === "granted") {
+                        if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
                         Alert.alert("Saved", "Saved to device library.");
                       }
                     } catch (e) {}

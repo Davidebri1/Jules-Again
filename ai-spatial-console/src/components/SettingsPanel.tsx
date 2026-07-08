@@ -93,7 +93,7 @@ export const SettingsPanel: React.FC = () => {
                      </View>
                   </View>
                 ) : (
-                  <ImageBackground source={{ uri: theme.uri }} style={styles.themeImage} resizeMode="cover">
+                  <ImageBackground source={typeof theme.uri === "string" ? { uri: theme.uri } : theme.uri} style={styles.themeImage} resizeMode="cover">
                     <View style={styles.themeLabelContainer}>
                       <Text style={styles.themeLabel}>{theme.name}</Text>
                     </View>
