@@ -105,10 +105,28 @@ export const CardDetailView: React.FC = () => {
       }
     }
 
-    const userMessage = inputText.trim();
+    let userMessage = inputText.trim();
     setInputText("");
 
-    const newMsgId = addMessage(model.id, "user", userMessage);
+    // --- Inject Context ---
+    let injectedPrefix = "";
+    if (isDeepResearch) injectedPrefix += "[Deep Research Enabled] ";
+    else if (isWebEnabled) injectedPrefix += "[Web Search Enabled] ";
+
+    if (isPrivateMode) injectedPrefix += "[Private/Incognito Session] ";
+
+    if (pendingContextFiles.length > 0) {
+       injectedPrefix += `[Context Files: ${pendingContextFiles.map(f => f.name).join(', ')}] `;
+    }
+    if (pendingSourceFile) {
+       injectedPrefix += `[Source Context: ${pendingSourceFile.name}] `;
+    }
+
+    // Prefix the hidden context payload to the actual message but render it cleanly or pass it to system.
+    // For simplicity in UI logic, we prefix it to the user's message.
+    const fullMessage = injectedPrefix ? `${injectedPrefix}\n\n${userMessage}` : userMessage;
+
+    const newMsgId = addMessage(model.id, "user", fullMessage);
 
     // --- NATIVE LOGICAL FRAMEWORK ENGINE ---
     // Instead of using generic mocks, we extract meaning into the Smart Gen framework

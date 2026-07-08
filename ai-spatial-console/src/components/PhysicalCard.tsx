@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { RoundedBox, Text } from '@react-three/drei';
+import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
@@ -76,16 +76,20 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         onPointerOut={(e) => { e.stopPropagation(); setPressed(false); }}
       >
         {/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */}
-        <meshPhysicalMaterial
-          color={cardColor}
-          transmission={0.9}
-          transparent={true}
-          opacity={1}
-          roughness={0.2}
-          metalness={0.1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
+        <MeshTransmissionMaterial
+          samples={16}
+          resolution={512}
+          transmission={1}
+          thickness={0.5}
+          roughness={0.15}
           ior={1.5}
+          chromaticAberration={0.04}
+          anisotropy={0.3}
+          distortion={0.1}
+          distortionScale={0.3}
+          temporalDistortion={0.1}
+          color={cardColor}
+          clearcoat={1}
         />
       </RoundedBox>
 

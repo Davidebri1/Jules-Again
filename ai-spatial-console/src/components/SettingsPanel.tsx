@@ -83,7 +83,13 @@ export const SettingsPanel: React.FC = () => {
               <TouchableOpacity
                 key={theme.id}
                 style={[styles.themeCard, currentThemeId === theme.id && styles.themeCardActive]}
-                onPress={() => setCurrentThemeId(theme.id)}
+                onPress={() => {
+    if (theme.type === 'video' && userProfile.tier === 'free') {
+      setUpgradeOpen(true);
+      return;
+    }
+    setCurrentThemeId(theme.id);
+  }}
               >
                 {theme.type === 'video' ? (
                   <View style={[styles.themeImage, { backgroundColor: '#333', justifyContent: 'center', alignItems: 'center' }]}>

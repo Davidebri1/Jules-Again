@@ -165,7 +165,7 @@ export const FileManagerView: React.FC = () => {
               status = currentStatus;
             }
             if (status === "granted") {
-              if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
+              if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(previewFile?.uri || ''); }
               Alert.alert("Success", "File saved to device.");
             } else {
               Alert.alert(
@@ -438,7 +438,7 @@ export const FileManagerView: React.FC = () => {
               status = currentStatus;
             }
             if (status === "granted") {
-                        if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(fileUri); }
+                        if (Platform.OS !== 'web') { await MediaLibrary.createAssetAsync(previewFile?.uri || ''); }
                         Alert.alert("Saved", "Saved to device library.");
                       }
                     } catch (e) {}
