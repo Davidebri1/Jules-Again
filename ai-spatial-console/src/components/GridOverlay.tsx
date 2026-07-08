@@ -187,7 +187,7 @@ export const GridOverlay: React.FC = () => {
         {/* Model Selector Tray (Dynamic based on selected tab) */}
         {selectedTab !== 'general' && (
            <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
-              <TouchableOpacity style={styles.marketPill} onPress={() => setMarketplaceOpen(true)}>
+              <TouchableOpacity style={styles.marketPill} onPress={() => { useAppStore.getState().setMarketCategory(selectedTab); setMarketplaceOpen(true); }}>
                  <Globe color="#fff" size={12} />
                  <Text style={styles.marketPillText}>Browse {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)} Market</Text>
               </TouchableOpacity>

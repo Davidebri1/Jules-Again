@@ -108,6 +108,8 @@ export interface AppState {
   isUpgradeOpen: boolean;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
+  marketCategory: string;
+  setMarketCategory: (cat: string) => void;
 
   pendingContextFiles: StoredFile[];
   pendingSourceFile: StoredFile | null;
@@ -335,6 +337,8 @@ export const useAppStore = create<AppState>()(
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
       isMarketplaceOpen: false,
       setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
+      marketCategory: 'All',
+      setMarketCategory: (cat) => set({ marketCategory: cat }),
 
       pendingContextFiles: [],
       pendingSourceFile: null,

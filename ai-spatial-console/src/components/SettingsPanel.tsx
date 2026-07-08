@@ -6,7 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Alert } from 'react-native';
 
 export const SettingsPanel: React.FC = () => {
-  const { isSettingsOpen, setSettingsOpen, currentThemeId, setCurrentThemeId, themes, addTheme, userProfile } = useAppStore();
+  const { isSettingsOpen, setSettingsOpen, currentThemeId, setCurrentThemeId, themes, addTheme, userProfile, setAuthOpen, setUpgradeOpen } = useAppStore();
 
   const handleUploadMedia = async () => {
     try {
@@ -56,11 +56,11 @@ export const SettingsPanel: React.FC = () => {
         {/* Account Stub */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={() => { setSettingsOpen(false); setAuthOpen(true); }}>
             <User color="#aaa" size={20} />
             <Text style={styles.rowText}>Login / Register</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={() => Alert.alert('Privacy & Security', 'Coming soon.')}>
             <Shield color="#aaa" size={20} />
             <Text style={styles.rowText}>Privacy & Security</Text>
           </TouchableOpacity>
@@ -69,7 +69,7 @@ export const SettingsPanel: React.FC = () => {
         {/* Subscription Stub */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Subscription (Upgrade)</Text>
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={() => { setSettingsOpen(false); setUpgradeOpen(true); }}>
             <CreditCard color="#aaa" size={20} />
             <Text style={styles.rowText}>View Plans (Pro/Elite)</Text>
           </TouchableOpacity>

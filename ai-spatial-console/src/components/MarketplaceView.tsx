@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Image } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Image, Alert } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
 import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from 'lucide-react-native';
 
@@ -13,13 +13,13 @@ const MOCK_ARTIFACTS = [
 ];
 
 export const MarketplaceView: React.FC = () => {
-  const { isMarketplaceOpen, setMarketplaceOpen } = useAppStore();
+  const { isMarketplaceOpen, setMarketplaceOpen, marketCategory, setMarketCategory } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
+
 
   if (!isMarketplaceOpen) return null;
 
-  const categories = ['All', 'Images', 'Code', 'Audio', 'Video', 'Text'];
+  const categories = ['All', 'general', 'image', 'video', 'audio', 'coding'];
 
   return (
     <View style={styles.container}>
@@ -50,10 +50,10 @@ export const MarketplaceView: React.FC = () => {
             {categories.map(cat => (
               <TouchableOpacity
                 key={cat}
-                style={[styles.categoryBtn, activeCategory === cat && styles.categoryBtnActive]}
-                onPress={() => setActiveCategory(cat)}
+                style={[styles.categoryBtn, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryBtnActive]}
+                onPress={() => setMarketCategory(cat)}
               >
-                <Text style={[styles.categoryText, activeCategory === cat && styles.categoryTextActive]}>{cat}</Text>
+                <Text style={[styles.categoryText, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryTextActive]}>{cat === 'All' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -73,16 +73,16 @@ export const MarketplaceView: React.FC = () => {
                 <Text style={styles.artifactCreator}>{artifact.creator}</Text>
 
                 <View style={styles.artifactActions}>
-                  <TouchableOpacity style={styles.actionBtn}>
+                  <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Liked', 'You liked this artifact!')}>
                     <Heart color="#fff" size={16} />
                     <Text style={styles.actionText}>{artifact.likes}</Text>
                   </TouchableOpacity>
 
                   <View style={{flexDirection: 'row', gap: 10}}>
-                    <TouchableOpacity style={styles.iconBtn}>
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => Alert.alert('Download', 'Downloading artifact...')}>
                       <Download color="#fff" size={16} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.iconBtn, { backgroundColor: 'rgba(66, 133, 244, 0.3)', borderColor: '#4285F4' }]}>
+                    <TouchableOpacity style={[styles.iconBtn, { backgroundColor: 'rgba(66, 133, 244, 0.3)', borderColor: '#4285F4' }]} onPress={() => Alert.alert('External Link', 'Opening artifact page...')}>
                       <ArrowUpRight color="#4285F4" size={16} />
                     </TouchableOpacity>
                   </View>
@@ -93,7 +93,7 @@ export const MarketplaceView: React.FC = () => {
         </ScrollView>
 
         {/* Floating Upload Button */}
-        <TouchableOpacity style={styles.uploadBtn}>
+        <TouchableOpacity style={styles.uploadBtn} onPress={() => Alert.alert('Publish', 'Opening artifact publisher...')}>
           <Text style={styles.uploadBtnText}>+ PUBLISH ARTIFACT</Text>
         </TouchableOpacity>
 
