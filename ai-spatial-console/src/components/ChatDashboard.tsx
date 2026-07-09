@@ -22,8 +22,8 @@ export const ChatDashboard: React.FC = () => {
   // Calculate grid positions based on layout
   const gridPositions = useMemo(() => {
     const positions: [number, number, number][] = [];
-    const spacingX = 3.5;
-    const spacingY = 4.5;
+    const spacingX = 2.8; // Reduced X spacing for vertical cards
+    const spacingY = 5.0; // Increased Y spacing
 
     let cols = 2;
     let rows = 2;

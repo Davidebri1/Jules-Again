@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, ImageBackground } from 'react-native';
+import { StyleSheet, View, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 import { ChatDashboard } from './src/components/ChatDashboard';
 import { GridOverlay } from './src/components/GridOverlay';
 import { CardDetailView } from './src/components/CardDetailView';
@@ -26,9 +26,9 @@ export default function App() {
       </View>
 
       {/* 2D UI Overlay Switcher (Crisp native text and inputs) */}
-      <View style={styles.overlayContainer} pointerEvents="box-none">
+      <KeyboardAvoidingView style={styles.overlayContainer} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} pointerEvents="box-none">
          {focusedModelId ? <CardDetailView /> : <GridOverlay />}
-      </View>
+      </KeyboardAvoidingView>
 
       {/* Absolute Full Screen Drawers/Panels */}
       <HistoryDrawer />
