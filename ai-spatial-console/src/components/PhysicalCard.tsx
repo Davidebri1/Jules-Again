@@ -62,7 +62,7 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
     <a.group position={springPos as any} scale={springScale as any} rotation={springRot as any}>
       <RoundedBox
         ref={meshRef as any}
-        args={[3, 4, 0.2]} // Width, height, depth
+        args={[2.5, 4.5, 0.2]} // Vertical orientation
         radius={0.2}
         smoothness={4}
         onPointerDown={(e) => { e.stopPropagation(); setPressed(true); }}

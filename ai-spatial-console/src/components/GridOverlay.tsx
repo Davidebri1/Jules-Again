@@ -197,10 +197,13 @@ export const GridOverlay: React.FC = () => {
            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
               {displayedModels.map(model => {
                  const isActive = activeModelIds.includes(model.id);
-                 let borderColor = 'rgba(255,255,255,0.3)';
-                 if (model.tier === 'pro') borderColor = '#4285F4'; // Blue for pro
-                 if (model.tier === 'elite') borderColor = '#d97757'; // Orange for elite
-                 if (model.provider === 'openai') borderColor = '#10a37f'; // OpenAI Green override
+              let borderColor = "rgba(255,255,255,0.3)";
+              let bgColor = "rgba(0,0,0,0.3)";
+              if (isActive) {
+                if (model.tier === "pro") { bgColor = "rgba(66, 133, 244, 0.4)"; borderColor = "#4285F4"; }
+                else if (model.tier === "elite") { bgColor = "rgba(217, 119, 87, 0.4)"; borderColor = "#d97757"; }
+                else { bgColor = "rgba(16, 163, 127, 0.4)"; borderColor = "#10a37f"; }
+              }
 
                  return (
                   <TouchableOpacity
