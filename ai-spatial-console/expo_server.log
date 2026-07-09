@@ -1,0 +1,6 @@
+  --non-interactive is not supported, use $CI=1 instead
+Starting project at /app/ai-spatial-console
+Starting Metro Bundler
+
+Waiting on http://localhost:8081
+Logs for your project will appear below.
