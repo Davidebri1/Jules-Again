@@ -1,0 +1,346 @@
+{"_e":"root:init","_t":1783471871667,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783471871668,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783471871672,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783471872011,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783471872431,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783471879567,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1783471901399,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783471901400,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783471901402,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783471933674,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783471933675,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783471933678,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783471933928,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783471934299,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783471940287,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1783480498491,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783480498492,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783480498496,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783480499044,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783480499888,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783480507823,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1783484491846,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783484491848,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783484491852,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783484492348,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783484493061,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783484503429,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783484513379,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"root:init","_t":1783484611340,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783484611341,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783484611344,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783484611572,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783484611910,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783484618081,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783484631794,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783484643011,"id":"1","total":3307,"ms":11217.020017}
+{"_e":"metro:client_log","_t":1783484644678,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783484644680,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783484644805,"level":"error","data":["[Error: Cannot find native module 'ExpoMediaLibraryNext']","\n\nCode: CardDetailView.tsx\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mLinearGradient\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'expo-linear-gradient'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 5 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mFileSystem\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-file-system'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mMediaLibrary\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-media-library'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mMarkdown\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'react-native-markdown-display'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m \u001b[36mimport\u001b[39m { useAppStore } \u001b[36mfrom\u001b[39m \u001b[32m'../store/useAppStore'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mChevronLeft\u001b[39m\u001b[33m,\u001b[39m \u001b[33mMoreHorizontal\u001b[39m\u001b[33m,\u001b[39m \u001b[33mMic\u001b[39m\u001b[33m,\u001b[39m \u001b[33mPaperclip\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSend\u001b[39m\u001b[33m,\u001b[39m \u001b[33mLayers\u001b[39m\u001b[33m,\u001b[39m \u001b[33mGlobe\u001b[39m\u001b[33m,\u001b[39m \u001b[33mZap\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSearch\u001b[39m\u001b[33m,\u001b[39m \u001b[33mEyeOff\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSliders\u001b[39m\u001b[33m,\u001b[39m \u001b[33mX\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSparkles\u001b[39m\u001b[33m,\u001b[39m \u001b[33mPlus\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'lucide-react-native'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\nCall Stack\n  <global> (src/components/CardDetailView.tsx:6)"]}
+{"_e":"root:init","_t":1783484883053,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783484883054,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783484883057,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783484883355,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783484883784,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783484890284,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783484903567,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783484906458,"id":"1","total":3307,"ms":2890.810432}
+{"_e":"metro:client_log","_t":1783484908185,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783484908186,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783484908306,"level":"error","data":["[Error: Cannot find native module 'ExpoMediaLibraryNext']","\n\nCode: CardDetailView.tsx\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mLinearGradient\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'expo-linear-gradient'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 5 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mFileSystem\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-file-system'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mMediaLibrary\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-media-library'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mMarkdown\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'react-native-markdown-display'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 8 |\u001b[39m \u001b[36mimport\u001b[39m { useAppStore } \u001b[36mfrom\u001b[39m \u001b[32m'../store/useAppStore'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mChevronLeft\u001b[39m\u001b[33m,\u001b[39m \u001b[33mMoreHorizontal\u001b[39m\u001b[33m,\u001b[39m \u001b[33mMic\u001b[39m\u001b[33m,\u001b[39m \u001b[33mPaperclip\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSend\u001b[39m\u001b[33m,\u001b[39m \u001b[33mLayers\u001b[39m\u001b[33m,\u001b[39m \u001b[33mGlobe\u001b[39m\u001b[33m,\u001b[39m \u001b[33mZap\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSearch\u001b[39m\u001b[33m,\u001b[39m \u001b[33mEyeOff\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSliders\u001b[39m\u001b[33m,\u001b[39m \u001b[33mX\u001b[39m\u001b[33m,\u001b[39m \u001b[33mSparkles\u001b[39m\u001b[33m,\u001b[39m \u001b[33mPlus\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'lucide-react-native'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\nCall Stack\n  <global> (src/components/CardDetailView.tsx:6)"]}
+{"_e":"root:init","_t":1783485537403,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783485537404,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783485537407,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783485537706,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783485538144,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783485545382,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783485617670,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783485623201,"id":"1","total":3292,"ms":5531.135462}
+{"_e":"metro:client_log","_t":1783485626003,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783485626006,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783485626006,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783485626006,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783485626006,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783485626006,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783485626150,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783485682980,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783485683208,"id":"3","total":1,"ms":227.236502}
+{"_e":"metro:client_log","_t":1783485685591,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783485685592,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783485685592,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783485685593,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783485685594,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783485685594,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783485685688,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"root:init","_t":1783485861355,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783485861356,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783485861359,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783485861595,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783485861969,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783485870495,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783488046041,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783488051556,"id":"1","total":3286,"ms":5512.051472}
+{"_e":"metro:client_log","_t":1783488056312,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783488056314,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783488056314,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783488056315,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783488056315,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783488056315,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783488056542,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783524138110,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783524139537,"id":"3","total":1,"ms":1422.202719}
+{"_e":"metro:client_log","_t":1783524143030,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783524143034,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783524143037,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783524143037,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783524143038,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783524143038,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783524143252,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"root:init","_t":1783536027624,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783536027625,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783536027628,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783536115342,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783536115343,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783536115345,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783536115817,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783536116444,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783536124632,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783536201454,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783536208068,"id":"1","total":3308,"ms":6613.708663}
+{"_e":"metro:client_log","_t":1783536211080,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783536211082,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783536211083,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783536211083,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783536211084,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783536211088,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783536211258,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783536470439,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783536470810,"id":"3","total":1,"ms":370.622499}
+{"_e":"metro:client_log","_t":1783536472899,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783536472900,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783536472900,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783536472900,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783536472900,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783536472901,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783536473020,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783536878265,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783536878623,"id":"5","total":1,"ms":357.504288}
+{"_e":"metro:client_log","_t":1783536880763,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783536880763,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783536880763,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783536880764,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783536880764,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783536880764,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783536880889,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783537182987,"id":"7","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783537183176,"id":"7","total":1,"ms":188.64476}
+{"_e":"metro:client_log","_t":1783537185918,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783537185918,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783537185918,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783537185918,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783537185918,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783537185918,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783537186057,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783537294581,"id":"8","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783537294774,"id":"8","total":1,"ms":192.138002}
+{"_e":"metro:client_log","_t":1783537296860,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783537296860,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783537296860,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783537296860,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783537296860,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783537296860,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783537296924,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783537777746,"id":"9","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783537780838,"id":"9","total":1,"ms":3091.456463}
+{"_e":"metro:client_log","_t":1783537783667,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783537783668,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783537783729,"level":"error","data":["[Error: Cannot find native module 'ExpoMediaLibraryNext']","\n\nCode: CardDetailView.tsx\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 1 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mMediaLibrary\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-media-library'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 2 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mReact\u001b[39m\u001b[33m,\u001b[39m { useState\u001b[33m,\u001b[39m useRef } \u001b[36mfrom\u001b[39m \u001b[32m\"react\"\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 3 |\u001b[39m \u001b[36mimport\u001b[39m {\n \u001b[90m 4 |\u001b[39m   \u001b[33mStyleSheet\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\nCall Stack\n  <global> (src/components/CardDetailView.tsx:1)"]}
+{"_e":"metro:bundling:started","_t":1783537875116,"id":"c","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783537875600,"id":"c","total":1,"ms":484.018597}
+{"_e":"metro:client_log","_t":1783537877208,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783537877209,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783537877269,"level":"error","data":["[Error: Cannot find native module 'ExpoMediaLibraryNext']","\n\nCode: CardDetailView.tsx\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 1 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mMediaLibrary\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-media-library'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 2 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mReact\u001b[39m\u001b[33m,\u001b[39m { useState\u001b[33m,\u001b[39m useRef } \u001b[36mfrom\u001b[39m \u001b[32m\"react\"\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 3 |\u001b[39m \u001b[36mimport\u001b[39m {\n \u001b[90m 4 |\u001b[39m   \u001b[33mStyleSheet\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\nCall Stack\n  <global> (src/components/CardDetailView.tsx:1)"]}
+{"_e":"metro:bundling:started","_t":1783537931252,"id":"f","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783537931360,"id":"f","message":"src/components/CardDetailView.tsx: Duplicate declaration \"Platform\"\n  14 |   TextInput,\n  15 |   KeyboardAvoidingView,\n> 16 |   Platform,\n     |   ^^^^^^^^\n  17 |   ActivityIndicator,\n  18 |   Alert,\n  19 |   Share,","importStack":null,"filename":null,"targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783538025324,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783538025325,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783538025328,"mode":"development","files":[],"env":{}}
+{"_e":"metro:bundling:started","_t":1783538030777,"id":"h","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783538030869,"id":"h","message":"src/components/CardDetailView.tsx: Duplicate declaration \"Platform\"\n  14 |   TextInput,\n  15 |   KeyboardAvoidingView,\n> 16 |   Platform,\n     |   ^^^^^^^^\n  17 |   ActivityIndicator,\n  18 |   Alert,\n  19 |   Share,","importStack":null,"filename":null,"targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783538101477,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783538101478,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783538101481,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783538101751,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783538102149,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783538108209,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783538116945,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783538119587,"id":"1","message":"src/components/FileManagerView.tsx: Duplicate declaration \"Platform\"\n  13 |   SafeAreaView,\n  14 |   Dimensions,\n> 15 |   Platform,\n     |   ^^^^^^^^\n  16 | } from \"react-native\";\n  17 | import Animated, {\n  18 |   useAnimatedStyle,","importStack":null,"filename":null,"targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783538342684,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783538342685,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783538342688,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783538342914,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783538343250,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783538349320,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783538358166,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783538361277,"id":"1","total":3304,"ms":3111.215069}
+{"_e":"metro:client_log","_t":1783538363294,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783538363296,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783538363296,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783538363296,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783538363296,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783538363297,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783538363428,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783546818823,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783546819353,"id":"3","message":"SyntaxError: /app/ai-spatial-console/src/components/GridOverlay.tsx: Unexpected token (13:0)\n\n  11 |   ActivityIndicator,\n  12 |   Share,\n> 13 | , Platform} from \"react-native\";\n     | ^\n  14 | import { BlurView } from \"expo-blur\";\n  15 | import { LinearGradient } from \"expo-linear-gradient\";\n  16 | import * as FileSystem from \"expo-file-system\";","importStack":null,"filename":"src/components/GridOverlay.tsx","targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783546860667,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783546860669,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783546860674,"mode":"development","files":[],"env":{}}
+{"_e":"metro:bundling:started","_t":1783546876168,"id":"5","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783546876208,"id":"5","message":"SyntaxError: /app/ai-spatial-console/src/components/GridOverlay.tsx: Unexpected token (13:0)\n\n  11 |   ActivityIndicator,\n  12 |   Share,\n> 13 | , Platform} from \"react-native\";\n     | ^\n  14 | import { BlurView } from \"expo-blur\";\n  15 | import { LinearGradient } from \"expo-linear-gradient\";\n  16 | import * as FileSystem from \"expo-file-system\";","importStack":null,"filename":"src/components/GridOverlay.tsx","targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783546973668,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783546973669,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783546973672,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783546974306,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783546975851,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783546985528,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783546989268,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:failed","_t":1783546992962,"id":"1","message":"SyntaxError: /app/ai-spatial-console/src/components/GridOverlay.tsx: Unexpected token (13:0)\n\n  11 |   ActivityIndicator,\n  12 |   Share,\n> 13 | , Platform} from \"react-native\";\n     | ^\n  14 | import { BlurView } from \"expo-blur\";\n  15 | import { LinearGradient } from \"expo-linear-gradient\";\n  16 | import * as FileSystem from \"expo-file-system\";","importStack":null,"filename":"src/components/GridOverlay.tsx","targetModuleName":null,"originModulePath":null}
+{"_e":"root:init","_t":1783547121135,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783547121136,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783547121139,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783547121389,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783547121732,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783547128116,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783547136824,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783547139900,"id":"1","total":3323,"ms":3076.666294}
+{"_e":"metro:client_log","_t":1783547143225,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783547143227,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783547143227,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783547143228,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783547143228,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783547143228,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783547143412,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783547350896,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783547351176,"id":"3","total":1,"ms":279.976098}
+{"_e":"metro:client_log","_t":1783547353588,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783547353594,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783547353595,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783547353595,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783547353595,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783547353596,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783547353658,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783548263936,"id":"4","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783548265204,"id":"4","total":1,"ms":1265.846383}
+{"_e":"metro:client_log","_t":1783548267208,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783548267211,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783548267211,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783548267211,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783548267211,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783548267211,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783548267334,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"root:init","_t":1783549122554,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783549122554,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783549122557,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783549122791,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783549123238,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783549129908,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783549138018,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783549141193,"id":"1","total":3293,"ms":3174.797211}
+{"_e":"metro:client_log","_t":1783549143205,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783549143206,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783549143207,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783549143207,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783549143207,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783549143208,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783549143348,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:client_log","_t":1783549144813,"level":"warn","data":["An error occurred in the <CanvasImpl> component.\n\nConsider adding an error boundary to your tree to customize error handling behavior.\nVisit https://react.dev/link/error-boundaries to learn more about error boundaries.\n"]}
+{"_e":"metro:client_log","_t":1783549144813,"level":"log","data":["THREE.WebGLRenderer: Context Lost."]}
+{"_e":"metro:client_log","_t":1783549144893,"level":"error","data":["[ReferenceError: MeshTransmissionMaterial is not defined]","\n\nCode: PhysicalCard.tsx\n\u001b[0m \u001b[90m 77 |\u001b[39m       \u001b[33m>\u001b[39m\n \u001b[90m 78 |\u001b[39m         {\u001b[90m/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */\u001b[39m}\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m         \u001b[33m<\u001b[39m\u001b[33mMeshTransmissionMaterial\u001b[39m\n \u001b[90m    |\u001b[39m          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m           samples\u001b[33m=\u001b[39m{\u001b[35m16\u001b[39m}\n \u001b[90m 81 |\u001b[39m           resolution\u001b[33m=\u001b[39m{\u001b[35m512\u001b[39m}\n \u001b[90m 82 |\u001b[39m           transmission\u001b[33m=\u001b[39m{\u001b[35m1\u001b[39m}\u001b[0m\nCall Stack\n  PhysicalCard (src/components/PhysicalCard.tsx:79:10)","\n\nCode: ChatDashboard.tsx\n\u001b[0m \u001b[90m 82 |\u001b[39m         {activeModels\u001b[33m.\u001b[39mmap((model\u001b[33m,\u001b[39m index) \u001b[33m=>\u001b[39m (\n \u001b[90m 83 |\u001b[39m           model \u001b[33m?\u001b[39m (\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 84 |\u001b[39m             \u001b[33m<\u001b[39m\u001b[33mPhysicalCard\u001b[39m\n \u001b[90m    |\u001b[39m             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 85 |\u001b[39m               key\u001b[33m=\u001b[39m{model\u001b[33m.\u001b[39mid}\n \u001b[90m 86 |\u001b[39m               model\u001b[33m=\u001b[39m{model \u001b[36mas\u001b[39m any}\n \u001b[90m 87 |\u001b[39m               position\u001b[33m=\u001b[39m{gridPositions[index] \u001b[33m||\u001b[39m [\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[33m-\u001b[39m\u001b[35m10\u001b[39m]}\u001b[0m\nCall Stack\n  activeModels.map$argument_0 (src/components/ChatDashboard.tsx:84:13)\n  ChatDashboard (src/components/ChatDashboard.tsx:82:23)\n  App (App.tsx:39:9)"]}
+{"_e":"metro:client_log","_t":1783549144929,"level":"error","data":["[ReferenceError: MeshTransmissionMaterial is not defined]","\n\nCode: PhysicalCard.tsx\n\u001b[0m \u001b[90m 77 |\u001b[39m       \u001b[33m>\u001b[39m\n \u001b[90m 78 |\u001b[39m         {\u001b[90m/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */\u001b[39m}\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m         \u001b[33m<\u001b[39m\u001b[33mMeshTransmissionMaterial\u001b[39m\n \u001b[90m    |\u001b[39m          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m           samples\u001b[33m=\u001b[39m{\u001b[35m16\u001b[39m}\n \u001b[90m 81 |\u001b[39m           resolution\u001b[33m=\u001b[39m{\u001b[35m512\u001b[39m}\n \u001b[90m 82 |\u001b[39m           transmission\u001b[33m=\u001b[39m{\u001b[35m1\u001b[39m}\u001b[0m\nCall Stack\n  PhysicalCard (src/components/PhysicalCard.tsx:79:10)","\n\nCode: ChatDashboard.tsx\n\u001b[0m \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   \u001b[36mreturn\u001b[39m (\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 54 |\u001b[39m     \u001b[33m<\u001b[39m\u001b[33mCanvas\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 55 |\u001b[39m       camera\u001b[33m=\u001b[39m{{ position\u001b[33m:\u001b[39m [\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m10\u001b[39m]\u001b[33m,\u001b[39m fov\u001b[33m:\u001b[39m \u001b[35m45\u001b[39m }}\n \u001b[90m 56 |\u001b[39m       gl\u001b[33m=\u001b[39m{{ alpha\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m\u001b[33m,\u001b[39m antialias\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m }}\n \u001b[90m 57 |\u001b[39m       style\u001b[33m=\u001b[39m{{ flex\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m }}\u001b[0m\nCall Stack\n  ChatDashboard (src/components/ChatDashboard.tsx:54:5)\n  App (App.tsx:39:9)"]}
+{"_e":"root:init","_t":1783549270477,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783549270478,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783549270481,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783549270720,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783549271076,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783549277387,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783549285938,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783549288807,"id":"1","total":3306,"ms":2868.581726}
+{"_e":"metro:client_log","_t":1783549290851,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783549290853,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783549290853,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783549290853,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783549290854,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783549290854,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783549290984,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:client_log","_t":1783549292011,"level":"warn","data":["An error occurred in the <CanvasImpl> component.\n\nConsider adding an error boundary to your tree to customize error handling behavior.\nVisit https://react.dev/link/error-boundaries to learn more about error boundaries.\n"]}
+{"_e":"metro:client_log","_t":1783549292011,"level":"log","data":["THREE.WebGLRenderer: Context Lost."]}
+{"_e":"metro:client_log","_t":1783549292091,"level":"error","data":["[ReferenceError: MeshTransmissionMaterial is not defined]","\n\nCode: PhysicalCard.tsx\n\u001b[0m \u001b[90m 77 |\u001b[39m       \u001b[33m>\u001b[39m\n \u001b[90m 78 |\u001b[39m         {\u001b[90m/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */\u001b[39m}\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m         \u001b[33m<\u001b[39m\u001b[33mMeshTransmissionMaterial\u001b[39m\n \u001b[90m    |\u001b[39m          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m           samples\u001b[33m=\u001b[39m{\u001b[35m16\u001b[39m}\n \u001b[90m 81 |\u001b[39m           resolution\u001b[33m=\u001b[39m{\u001b[35m512\u001b[39m}\n \u001b[90m 82 |\u001b[39m           transmission\u001b[33m=\u001b[39m{\u001b[35m1\u001b[39m}\u001b[0m\nCall Stack\n  PhysicalCard (src/components/PhysicalCard.tsx:79:10)","\n\nCode: ChatDashboard.tsx\n\u001b[0m \u001b[90m 82 |\u001b[39m         {activeModels\u001b[33m.\u001b[39mmap((model\u001b[33m,\u001b[39m index) \u001b[33m=>\u001b[39m (\n \u001b[90m 83 |\u001b[39m           model \u001b[33m?\u001b[39m (\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 84 |\u001b[39m             \u001b[33m<\u001b[39m\u001b[33mPhysicalCard\u001b[39m\n \u001b[90m    |\u001b[39m             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 85 |\u001b[39m               key\u001b[33m=\u001b[39m{model\u001b[33m.\u001b[39mid}\n \u001b[90m 86 |\u001b[39m               model\u001b[33m=\u001b[39m{model \u001b[36mas\u001b[39m any}\n \u001b[90m 87 |\u001b[39m               position\u001b[33m=\u001b[39m{gridPositions[index] \u001b[33m||\u001b[39m [\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[33m-\u001b[39m\u001b[35m10\u001b[39m]}\u001b[0m\nCall Stack\n  activeModels.map$argument_0 (src/components/ChatDashboard.tsx:84:13)\n  ChatDashboard (src/components/ChatDashboard.tsx:82:23)\n  App (App.tsx:39:9)"]}
+{"_e":"metro:client_log","_t":1783549292124,"level":"error","data":["[ReferenceError: MeshTransmissionMaterial is not defined]","\n\nCode: PhysicalCard.tsx\n\u001b[0m \u001b[90m 77 |\u001b[39m       \u001b[33m>\u001b[39m\n \u001b[90m 78 |\u001b[39m         {\u001b[90m/* Safe fallback for React Native Web to prevent WebGL shader compilation errors from advanced refraction */\u001b[39m}\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 79 |\u001b[39m         \u001b[33m<\u001b[39m\u001b[33mMeshTransmissionMaterial\u001b[39m\n \u001b[90m    |\u001b[39m          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 80 |\u001b[39m           samples\u001b[33m=\u001b[39m{\u001b[35m16\u001b[39m}\n \u001b[90m 81 |\u001b[39m           resolution\u001b[33m=\u001b[39m{\u001b[35m512\u001b[39m}\n \u001b[90m 82 |\u001b[39m           transmission\u001b[33m=\u001b[39m{\u001b[35m1\u001b[39m}\u001b[0m\nCall Stack\n  PhysicalCard (src/components/PhysicalCard.tsx:79:10)","\n\nCode: ChatDashboard.tsx\n\u001b[0m \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   \u001b[36mreturn\u001b[39m (\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 54 |\u001b[39m     \u001b[33m<\u001b[39m\u001b[33mCanvas\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 55 |\u001b[39m       camera\u001b[33m=\u001b[39m{{ position\u001b[33m:\u001b[39m [\u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m \u001b[35m10\u001b[39m]\u001b[33m,\u001b[39m fov\u001b[33m:\u001b[39m \u001b[35m45\u001b[39m }}\n \u001b[90m 56 |\u001b[39m       gl\u001b[33m=\u001b[39m{{ alpha\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m\u001b[33m,\u001b[39m antialias\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m }}\n \u001b[90m 57 |\u001b[39m       style\u001b[33m=\u001b[39m{{ flex\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m }}\u001b[0m\nCall Stack\n  ChatDashboard (src/components/ChatDashboard.tsx:54:5)\n  App (App.tsx:39:9)"]}
+{"_e":"root:init","_t":1783549484623,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783549484624,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783549484627,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783549484871,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783549485229,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783549491558,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783549500092,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783549503007,"id":"1","total":3323,"ms":2914.861705}
+{"_e":"metro:client_log","_t":1783549505154,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783549505155,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783549505158,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783549505158,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783549505159,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783549505159,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783549505315,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"metro:bundling:started","_t":1783549761834,"id":"3","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783549762045,"id":"3","total":1,"ms":211.126619}
+{"_e":"metro:client_log","_t":1783549764278,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783549764279,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783549764279,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783549764279,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783549764279,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783549764279,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783549764351,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"root:init","_t":1783552221069,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783552221071,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783552221074,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783552221721,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783552222633,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783552231361,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1783552334892,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783552334893,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783552334895,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783552335114,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783552335440,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783552341499,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"root:init","_t":1783554210933,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783554210934,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783554210937,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783554349188,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783554349189,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783554349192,"mode":"development","files":[],"env":{}}
+{"_e":"devserver:start","_t":1783554349457,"mode":"development","web":true,"baseUrl":"","asyncRoutes":false,"routerRoot":"../../../app","serverComponents":false,"serverActions":false,"serverRendering":false,"apiRoutes":false,"exporting":false}
+{"_e":"metro:config","_t":1783554349821,"serverRoot":"../../..","projectRoot":"../../..","exporting":false,"flags":{"autolinkingModuleResolution":false,"serverActions":false,"serverComponents":false,"reactCompiler":false,"optimizeGraph":false,"treeshaking":false,"logbox":false}}
+{"_e":"metro:instantiate","_t":1783554355868,"atlas":false,"workers":3,"host":"::","port":8081}
+{"_e":"metro:bundling:started","_t":1783554763662,"id":"1","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783554768939,"id":"1","total":3311,"ms":5276.385738}
+{"_e":"metro:client_log","_t":1783554771670,"level":"info","data":["%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools","font-weight:bold"]}
+{"_e":"metro:client_log","_t":1783554771671,"level":"warn","data":["\"shadow*\" style props are deprecated. Use \"boxShadow\"."]}
+{"_e":"metro:client_log","_t":1783554771671,"level":"warn","data":["\"textShadow*\" style props are deprecated. Use \"textShadow\"."]}
+{"_e":"metro:client_log","_t":1783554771671,"level":"warn","data":["[expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality."]}
+{"_e":"metro:client_log","_t":1783554771672,"level":"log","data":["Running application \"main\" with appParams:\n","{\"hydrate\": undefined, \"rootTag\": \"#root\"}","\nDevelopment-level warnings: ON.\nPerformance optimizations: OFF."]}
+{"_e":"metro:client_log","_t":1783554771672,"level":"warn","data":["props.pointerEvents is deprecated. Use style.pointerEvents"]}
+{"_e":"metro:client_log","_t":1783554771733,"level":"warn","data":["THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."]}
+{"_e":"root:init","_t":1783555226419,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783555226420,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783555226423,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783555360906,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783555360907,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783555360910,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783555676324,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783555676324,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783555676327,"mode":"development","files":[],"env":{}}
+{"_e":"root:init","_t":1783556203191,"format":"v0-jsonl","version":"57.0.4"}
+{"_e":"env:mode","_t":1783556203192,"nodeEnv":"development","babelEnv":"development","mode":"development"}
+{"_e":"env:load","_t":1783556203195,"mode":"development","files":[],"env":{}}
+{"_e":"metro:bundling:started","_t":1783556209928,"id":"2","platform":"web","environment":null,"entry":"index.ts"}
+{"_e":"metro:bundling:done","_t":1783556210151,"id":"2","total":1,"ms":223.304672}

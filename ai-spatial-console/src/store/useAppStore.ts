@@ -3,15 +3,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type SubscriptionTier = 'free' | 'pro' | 'elite';
-
-export type ThemeType = 'image' | 'video';
-export interface Theme {
-    id: string;
-    name: string;
-    uri: string | any;
-    type: ThemeType;
-}
-
 export type ModelCategory = 'general' | 'image' | 'video' | 'audio' | 'coding';
 export type GridLayout = '1x1' | '2x2' | '3x3';
 
@@ -76,9 +67,7 @@ export interface AppState {
   activeLayout: GridLayout;
   setActiveLayout: (layout: GridLayout) => void;
   currentThemeId: string;
-  themes: Theme[];
   setCurrentThemeId: (id: string) => void;
-  addTheme: (theme: Theme) => void;
 
   // Models (Partially persisted, e.g., active models)
   availableModels: ModelProvider[];
@@ -108,8 +97,6 @@ export interface AppState {
   isUpgradeOpen: boolean;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
-  marketCategory: string;
-  setMarketCategory: (cat: string) => void;
 
   pendingContextFiles: StoredFile[];
   pendingSourceFile: StoredFile | null;
@@ -235,33 +222,8 @@ export const useAppStore = create<AppState>()(
       activeLayout: '2x2',
       setActiveLayout: (layout) => set({ activeLayout: layout }),
 
-      themes: [
-    { id: 'video-cyber', name: 'Cyberpunk (Pro)', uri: 'https://cdn.pixabay.com/video/2019/11/14/29168-373809627_tiny.mp4', type: 'video' },
-    { id: 'video-nebula', name: 'Nebula (Elite)', uri: 'https://cdn.pixabay.com/video/2021/04/16/71333-538561730_tiny.mp4', type: 'video' },
-
-    { id: 'dark-obsidian', name: 'Obsidian', uri: 'https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2940&auto=format&fit=crop', type: 'image' },
-    { id: 'slate-frost', name: 'Slate Frost', uri: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2940&auto=format&fit=crop', type: 'image' },
-    { id: 'neon-dusk', name: 'Neon Dusk', uri: 'https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=2940&auto=format&fit=crop', type: 'image' },
-    { id: 'alley3', name: 'Alley 3', uri: require('../../assets/themes/alley3.jpg'), type: 'image' },
-    { id: 'alley4', name: 'Alley 4', uri: require('../../assets/themes/alley4.jpg'), type: 'image' },
-    { id: 'blade', name: 'Blade', uri: require('../../assets/themes/blade.jpg'), type: 'image' },
-    { id: 'cabin', name: 'Cabin', uri: require('../../assets/themes/cabin.jpg'), type: 'image' },
-    { id: 'deck', name: 'Deck', uri: require('../../assets/themes/deck.jpg'), type: 'image' },
-    { id: 'dunehall', name: 'Dune Hall', uri: require('../../assets/themes/dunehall.jpg'), type: 'image' },
-    { id: 'garden', name: 'Garden', uri: require('../../assets/themes/garden.jpg'), type: 'image' },
-    { id: 'neoncity', name: 'Neon City', uri: require('../../assets/themes/neoncity.jpg'), type: 'image' },
-    { id: 'observatory', name: 'Observatory', uri: require('../../assets/themes/observatory.jpg'), type: 'image' },
-    { id: 'ocean', name: 'Ocean', uri: require('../../assets/themes/ocean.jpg'), type: 'image' },
-    { id: 'rainfall', name: 'Rainfall', uri: require('../../assets/themes/rainfall.jpg'), type: 'image' },
-    { id: 'sanctuary', name: 'Sanctuary', uri: require('../../assets/themes/sanctuary.jpg'), type: 'image' },
-    { id: 'starbridge', name: 'Starbridge', uri: require('../../assets/themes/starbridge.jpg'), type: 'image' },
-    { id: 'transit', name: 'Transit', uri: require('../../assets/themes/transit.jpg'), type: 'image' },
-    { id: 'twilight', name: 'Twilight', uri: require('../../assets/themes/twilight.jpg'), type: 'image' },
-    { id: 'twinsuns', name: 'Twin Suns', uri: require('../../assets/themes/twinsuns.jpg'), type: 'image' },
-  ],
-  currentThemeId: 'dark-obsidian',
+      currentThemeId: 'dark-obsidian',
       setCurrentThemeId: (id) => set({ currentThemeId: id }),
-  addTheme: (theme) => set((state) => ({ themes: [...state.themes, theme] })),
 
       availableModels: INITIAL_MODELS,
       activeModelIds: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'],
@@ -356,8 +318,6 @@ export const useAppStore = create<AppState>()(
       setUpgradeOpen: (isOpen) => set({ isUpgradeOpen: isOpen }),
       isMarketplaceOpen: false,
       setMarketplaceOpen: (isOpen) => set({ isMarketplaceOpen: isOpen }),
-      marketCategory: 'All',
-      setMarketCategory: (cat) => set({ marketCategory: cat }),
 
       pendingContextFiles: [],
       pendingSourceFile: null,

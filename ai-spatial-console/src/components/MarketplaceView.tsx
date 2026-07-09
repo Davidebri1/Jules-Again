@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
 import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from 'lucide-react-native';
 
 const MOCK_ARTIFACTS = [
-  { id: '1', title: 'Cyberpunk Cityscape', creator: '@neon_dreams', likes: 1205, type: 'image', uri: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop' },
-  { id: '2', title: 'React Dashboard Boilerplate', creator: '@frontend_ninja', likes: 856, type: 'code', uri: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop' },
-  { id: '3', title: 'Cinematic Trailer Audio', creator: '@hans_zimmer_ai', likes: 3402, type: 'audio', uri: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop' },
-  { id: '4', title: 'Quantum Computing Explanation', creator: '@science_bot', likes: 412, type: 'text', uri: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop' },
-  { id: '5', title: '3D Robot Walk Cycle', creator: '@animator_x', likes: 2100, type: 'video', uri: 'https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=800&auto=format&fit=crop' },
-  { id: '6', title: 'Dark Mode SaaS UI', creator: '@ui_ux_god', likes: 1540, type: 'code', uri: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=800&auto=format&fit=crop' },
+  { id: '1', title: 'Cyberpunk Cityscape', creator: '@neon_dreams', likes: 1205, type: 'image' },
+  { id: '2', title: 'React Dashboard Boilerplate', creator: '@frontend_ninja', likes: 856, type: 'code' },
+  { id: '3', title: 'Cinematic Trailer Audio', creator: '@hans_zimmer_ai', likes: 3402, type: 'audio' },
+  { id: '4', title: 'Quantum Computing Explanation', creator: '@science_bot', likes: 412, type: 'text' },
+  { id: '5', title: '3D Robot Walk Cycle', creator: '@animator_x', likes: 2100, type: 'video' },
+  { id: '6', title: 'Dark Mode SaaS UI', creator: '@ui_ux_god', likes: 1540, type: 'code' },
 ];
 
 export const MarketplaceView: React.FC = () => {
-  const { isMarketplaceOpen, setMarketplaceOpen, marketCategory, setMarketCategory } = useAppStore();
+  const { isMarketplaceOpen, setMarketplaceOpen } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
-
+  const [activeCategory, setActiveCategory] = useState('All');
 
   if (!isMarketplaceOpen) return null;
 
-  const categories = ['All', 'general', 'image', 'video', 'audio', 'coding'];
+  const categories = ['All', 'Images', 'Code', 'Audio', 'Video', 'Text'];
 
   return (
     <View style={styles.container}>
@@ -50,10 +50,10 @@ export const MarketplaceView: React.FC = () => {
             {categories.map(cat => (
               <TouchableOpacity
                 key={cat}
-                style={[styles.categoryBtn, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryBtnActive]}
-                onPress={() => setMarketCategory(cat)}
+                style={[styles.categoryBtn, activeCategory === cat && styles.categoryBtnActive]}
+                onPress={() => setActiveCategory(cat)}
               >
-                <Text style={[styles.categoryText, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryTextActive]}>{cat === 'All' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}</Text>
+                <Text style={[styles.categoryText, activeCategory === cat && styles.categoryTextActive]}>{cat}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -73,16 +73,16 @@ export const MarketplaceView: React.FC = () => {
                 <Text style={styles.artifactCreator}>{artifact.creator}</Text>
 
                 <View style={styles.artifactActions}>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Liked', 'You liked this artifact!')}>
+                  <TouchableOpacity style={styles.actionBtn}>
                     <Heart color="#fff" size={16} />
                     <Text style={styles.actionText}>{artifact.likes}</Text>
                   </TouchableOpacity>
 
                   <View style={{flexDirection: 'row', gap: 10}}>
-                    <TouchableOpacity style={styles.iconBtn} onPress={() => Alert.alert('Download', 'Downloading artifact...')}>
+                    <TouchableOpacity style={styles.iconBtn}>
                       <Download color="#fff" size={16} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.iconBtn, { backgroundColor: 'rgba(66, 133, 244, 0.3)', borderColor: '#4285F4' }]} onPress={() => Alert.alert('External Link', 'Opening artifact page...')}>
+                    <TouchableOpacity style={[styles.iconBtn, { backgroundColor: 'rgba(66, 133, 244, 0.3)', borderColor: '#4285F4' }]}>
                       <ArrowUpRight color="#4285F4" size={16} />
                     </TouchableOpacity>
                   </View>
@@ -93,7 +93,7 @@ export const MarketplaceView: React.FC = () => {
         </ScrollView>
 
         {/* Floating Upload Button */}
-        <TouchableOpacity style={styles.uploadBtn} onPress={() => Alert.alert('Publish', 'Opening artifact publisher...')}>
+        <TouchableOpacity style={styles.uploadBtn}>
           <Text style={styles.uploadBtnText}>+ PUBLISH ARTIFACT</Text>
         </TouchableOpacity>
 
@@ -105,7 +105,7 @@ export const MarketplaceView: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#0a0a0c', // Solid dark background
+    backgroundColor: 'rgba(10, 10, 12, 0.95)', // Very dark frosted glass feel
     zIndex: 200,
   },
   safeArea: {

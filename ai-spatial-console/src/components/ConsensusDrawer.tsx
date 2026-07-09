@@ -52,7 +52,8 @@ export const ConsensusDrawer: React.FC = () => {
 
          {/* Centered Consensus Summary */}
          <View style={styles.summaryContainer}>
-            <Text style={[styles.summaryText, { color: '#4285F4' }]}>
+            <Text style={styles.summaryTitle}>SYNTHESIZED CONSENSUS</Text>
+            <Text style={styles.summaryText}>
                {total === 0
                   ? "Select models to compute consensus."
                   : "Based on the aggregated responses, the overarching conclusion is that Spatial Computing represents a paradigm shift in human-computer interaction, prioritizing physical heuristics over flat digital planes."}
