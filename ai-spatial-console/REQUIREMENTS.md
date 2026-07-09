@@ -37,3 +37,18 @@ Industry-Leading multi chat app to enhance the average user's day to day life by
 * No clipart, no flat design, no "web app" utility feel.
 * Theme switcher featuring premium illustrations full-bleed (no cropping).
 * Fluid, subtle, physical animations.
+
+## Market Offerings & Gating
+* **Model Offerings:** Must encompass 'general', 'image', 'video', 'audio', and 'coding' categories, each containing at least 6 models.
+* **Free Tier Rules:** The 'general' category must specifically include at least 6 free models.
+* **Premium Assets:** Live video wallpapers and certain themes must be gated behind Pro or Elite subscriptions.
+
+## Subscription Tiers & Credits
+* **Free:** Access to basic models, standard UI, standard backgrounds. Limited messages.
+* **Pro:** Access to advanced models, premium themes (including video), increased limits.
+* **Elite:** Access to cutting-edge models (e.g. video generation, complex reasoning) and top-tier capabilities.
+
+## Technical Architecture & State
+* **Paradigm:** True native mobile app (no PWA or web app paradigms).
+* **State Management:** Application state (row selection, layouts, global settings) must persist account-wide using Zustand's persist middleware integrated with AsyncStorage.
+* **Security:** API keys must be securely loaded via environment variables (e.g., EXPO_PUBLIC_GROQ_API_KEY).

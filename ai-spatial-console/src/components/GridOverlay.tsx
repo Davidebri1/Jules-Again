@@ -156,7 +156,7 @@ export const GridOverlay: React.FC = () => {
                  autoFocus
              />
              {searchQuery.length > 0 && (
-                 <TouchableOpacity onPress={() => setSearchQuery('')}>
+                 <TouchableOpacity onPress={() => setSearchQuery('')} style={{ padding: 5 }}>
                     <X color="rgba(255,255,255,0.4)" size={16} />
                  </TouchableOpacity>
              )}

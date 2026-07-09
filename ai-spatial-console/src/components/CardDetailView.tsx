@@ -61,16 +61,20 @@ export const CardDetailView: React.FC = () => {
         const frameworkModel = availableModels.find(m => m.id === 'llama-3-8b');
         if (frameworkModel) {
             const systemPrompt = `LOGICAL FRAMEWORK DIRECTIVE:
-You are the Cognitive Filter Engine. Your purpose is absolute service to Natural Law and Objective Logic.
-1. CONTEXT PRUNING: You possess a microscopic context window (8KB max). Discard anything subjective, recursive, or trivial immediately as "NOISE".
-2. PATTERN EXTRACTION: Evaluate the input strictly in rolling 3-word/3-letter clusters. Seek foundational meaning.
+You are the Cognitive Filter Engine. Your purpose is service to Natural Law and Objective Logic.
+1. CONTEXT PRUNING: Microscopic context window (8KB max). Discard the subjective as "NOISE".
+2. PATTERN EXTRACTION: Evaluate the input in rolling 3-word clusters. Seek foundational meaning.
 3. TIERED ESCALATION:
-   - Tier 1 (Natural Law): Is it objective truth?
-   - Tier 2 (Absolute Logic): Is it binary/relational?
-   - Tier 3 (Context Logic): Is it a temporal need or spatial pattern?
-If the data cluster survives and climbs these tiers, it is MEANINGFUL.
+   - Tier 1: Natural Law (Immutable scientific law, cause and effect)
+   - Tier 2: Absolute Logic (Math systems, binary logic)
+   - Tier 3: Applied Logic (Simple physics, optimization tools)
+   - Tier 4: Context Logic (Rules, spatial patterns, answering questions)
+   - Tier 5: Short term memory (context window)
+Data in context window is continuously evaluated against relevant contextual law. Each time a law invokes a new law, it gets a point. Three points and it moves up to the next tier, where it is challenged by relevant logical bases for contradiction.
+If contradicted, it loses all points and falls back a tier. This cascades until flawed logic has no logic it can defeat, where it is discarded.
+Practiced concepts survive challenges and accrue points.
 Extract the survived meaning and return EXACTLY in this JSON format: {"type": "memory" | "task" | "reminder", "desc": "<The Extracted Objective Truth>"}.
-If the input fails the logical tier validation, return 'NOISE'. Do not wrap in markdown.`;
+If the input fails the validation, return 'NOISE'. Do not wrap in markdown.`;
 
             generateResponse(frameworkModel, [
                { id: 'sys', role: 'system', content: systemPrompt, timestamp: Date.now() },
@@ -149,6 +153,7 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
       pointerEvents="box-none"
     >
       <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} pointerEvents="box-none">
       <SafeAreaView style={styles.safeArea} pointerEvents="box-none">
         {/* Top Header */}
         <BlurView intensity={40} tint="dark" style={styles.header}>
@@ -346,13 +351,13 @@ If the input fails the logical tier validation, return 'NOISE'. Do not wrap in m
                 {pendingSourceFile && (
                    <View style={styles.attachmentPillSource}>
                       <Text style={styles.attachmentPillTextSource}>Source: {pendingSourceFile.name}</Text>
-                      <TouchableOpacity onPress={() => setSourceFile(null)}><X color="#4285F4" size={14} /></TouchableOpacity>
+                      <TouchableOpacity onPress={() => setSourceFile(null)} style={{ padding: 2 }}><X color="#4285F4" size={14} /></TouchableOpacity>
                    </View>
                 )}
                 {pendingContextFiles.map(f => (
                    <View key={f.id} style={styles.attachmentPill}>
                       <Text style={styles.attachmentPillText}>{f.name}</Text>
-                      <TouchableOpacity onPress={() => removeContextFile(f.id)}><X color="#fff" size={14} /></TouchableOpacity>
+                      <TouchableOpacity onPress={() => removeContextFile(f.id)} style={{ padding: 2 }}><X color="#fff" size={14} /></TouchableOpacity>
                    </View>
                 ))}
              </ScrollView>
