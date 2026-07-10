@@ -22,6 +22,7 @@ import {
   Globe,
   Mic,
   Send,
+  Grid,
   X,
   EyeOff,
   Plus,
@@ -38,6 +39,7 @@ export const GridOverlay: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isWebEnabled, setIsWebEnabled] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isGridTrayOpen, setIsGridTrayOpen] = useState(false);
   const {
     activeLayout,
     setActiveLayout,
@@ -61,7 +63,7 @@ export const GridOverlay: React.FC = () => {
     selectedTab,
     setSelectedTab,
     availableModels,
-    activeModelIds,
+    activeModelIdsByCategory,
     toggleActiveModel,
     setSettingsOpen,
     setConsensusOpen,
@@ -81,7 +83,7 @@ export const GridOverlay: React.FC = () => {
 
   const handleSendGlobal = async () => {
     if (!inputText.trim() || isGenerating) return;
-    if (activeModelIds.length === 0) {
+    if ((activeModelIdsByCategory[selectedTab] || []).length === 0) {
       Alert.alert(
         "No Models Selected",
         "Please select at least one model to message.",
@@ -90,7 +92,7 @@ export const GridOverlay: React.FC = () => {
     }
 
     // 1. Filter Active Models by Current Tab
-    const activeModels = activeModelIds
+    const activeModels = (activeModelIdsByCategory[selectedTab] || [])
       .map((id) => availableModels.find((m) => m.id === id))
       .filter(
         (m): m is import("../store/useAppStore").ModelProvider =>
@@ -217,21 +219,34 @@ export const GridOverlay: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.gridSelector}>
-          {(["1x1", "2x2", "3x3"] as GridLayout[]).map((layout, i) => (
-            <TouchableOpacity
-              key={layout}
-              style={[
-                styles.gridButton,
-                activeLayout === layout && styles.gridButtonActive,
-              ]}
-              onPress={() => handleLayoutChange(layout)}
-            >
-              <Text style={styles.gridButtonText}>
-                {i === 0 ? "1x1" : i === 1 ? "2x2" : "3x3"}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => setIsGridTrayOpen(!isGridTrayOpen)}
+          >
+            <Grid color={isGridTrayOpen ? "#4285F4" : "#fff"} size={20} />
+          </TouchableOpacity>
+          {isGridTrayOpen && (
+            <View style={[styles.gridSelector, { marginLeft: 8 }]}>
+              {(["1x1", "2x2", "3x3"] as GridLayout[]).map((layout, i) => (
+                <TouchableOpacity
+                  key={layout}
+                  style={[
+                    styles.gridButton,
+                    activeLayout === layout && styles.gridButtonActive,
+                  ]}
+                  onPress={() => {
+                      handleLayoutChange(layout);
+                      setIsGridTrayOpen(false);
+                  }}
+                >
+                  <Text style={styles.gridButtonText}>
+                    {i === 0 ? "1" : i === 1 ? "2" : "3"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         <TouchableOpacity
@@ -328,7 +343,7 @@ export const GridOverlay: React.FC = () => {
         <View style={styles.modelTrayContainer}>
           <View style={styles.modelTrayScroll}>
             {displayedModels.map((model) => {
-              const isActive = activeModelIds.includes(model.id);
+              const isActive = (activeModelIdsByCategory[selectedTab] || []).includes(model.id);
               let borderColor = "rgba(255,255,255,0.3)";
               if (model.tier === "pro") borderColor = "#4285F4"; // Blue for pro
               if (model.tier === "elite") borderColor = "#d97757"; // Orange for elite
@@ -404,7 +419,7 @@ export const GridOverlay: React.FC = () => {
             <TouchableOpacity
               style={styles.newConvoBtn}
               onPress={() =>
-                activeModelIds.forEach((id) => archiveConversation(id))
+                (activeModelIdsByCategory[selectedTab] || []).forEach((id) => archiveConversation(id))
               }
             >
               <Plus color="#000" size={20} />

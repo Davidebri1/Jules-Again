@@ -82,7 +82,7 @@ export interface AppState {
 
   // Models (Partially persisted, e.g., active models)
   availableModels: ModelProvider[];
-  activeModelIds: string[];
+  activeModelIdsByCategory: Record<ModelCategory, string[]>;
   toggleActiveModel: (modelId: string) => void;
   selectedTab: ModelCategory;
   setSelectedTab: (tab: ModelCategory) => void;
@@ -264,10 +264,12 @@ export const useAppStore = create<AppState>()(
   addTheme: (theme) => set((state) => ({ themes: [...state.themes, theme] })),
 
       availableModels: INITIAL_MODELS,
-      activeModelIds: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'],
+      activeModelIdsByCategory: { general: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'], image: [], video: [], audio: [], coding: [] },
       toggleActiveModel: (id) => set((state) => {
-        if (state.activeModelIds.includes(id)) {
-          return { activeModelIds: state.activeModelIds.filter(m => m !== id) };
+        const cat = state.selectedTab;
+        const currentActive = state.activeModelIdsByCategory[cat] || [];
+        if (currentActive.includes(id)) {
+          return { activeModelIdsByCategory: { ...state.activeModelIdsByCategory, [cat]: currentActive.filter(m => m !== id) } };
         }
         const model = state.availableModels.find(m => m.id === id);
         const userTier = state.userProfile.tier;
@@ -281,7 +283,7 @@ export const useAppStore = create<AppState>()(
               return { isUpgradeOpen: true };
            }
         }
-        return { activeModelIds: [...state.activeModelIds, id] };
+        return { activeModelIdsByCategory: { ...state.activeModelIdsByCategory, [cat]: [...currentActive, id] } };
       }),
 
       selectedTab: 'general',
@@ -389,7 +391,7 @@ export const useAppStore = create<AppState>()(
          isAuthenticated: false,
          accountId: null,
          userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
-         activeModelIds: [],
+         activeModelIdsByCategory: { general: [], image: [], video: [], audio: [], coding: [] },
          conversations: {},
          archivedConversations: [],
          pendingContextFiles: [],
@@ -414,7 +416,7 @@ export const useAppStore = create<AppState>()(
         isPrivateMode: state.isPrivateMode, isSmartGenEnabled: state.isSmartGenEnabled,
         files: state.isPrivateMode ? [] : state.files,
         starredFiles: state.starredFiles,
-        activeModelIds: state.activeModelIds,
+        activeModelIdsByCategory: state.activeModelIdsByCategory,
         archivedConversations: state.isPrivateMode ? [] : state.archivedConversations,
         conversations: state.isPrivateMode ? {} : state.conversations,
       }),

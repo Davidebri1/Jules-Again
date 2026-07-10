@@ -6,11 +6,11 @@ import { X } from 'lucide-react-native';
 const { width } = Dimensions.get('window');
 
 export const ConsensusDrawer: React.FC = () => {
-  const { isConsensusOpen, setConsensusOpen, activeModelIds, availableModels } = useAppStore();
+  const { isConsensusOpen, setConsensusOpen, activeModelIdsByCategory, selectedTab, availableModels } = useAppStore();
 
   const activeModels = useMemo(() => {
-    return activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(Boolean);
-  }, [activeModelIds, availableModels]);
+    return (activeModelIdsByCategory[selectedTab] || []).map(id => availableModels.find(m => m.id === id)).filter(Boolean);
+  }, [activeModelIdsByCategory, selectedTab, availableModels]);
 
   if (!isConsensusOpen) return null;
 
