@@ -1,272 +1,62 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput, Image } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
 import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from 'lucide-react-native';
 
-const MOCK_ARTIFACTS = [
-  { id: '1', title: 'Cyberpunk Cityscape', creator: '@neon_dreams', likes: 1205, type: 'image', uri: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop' },
-  { id: '2', title: 'React Dashboard Boilerplate', creator: '@frontend_ninja', likes: 856, type: 'code', uri: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop' },
-  { id: '3', title: 'Cinematic Trailer Audio', creator: '@hans_zimmer_ai', likes: 3402, type: 'audio', uri: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop' },
-  { id: '4', title: 'Quantum Computing Explanation', creator: '@science_bot', likes: 412, type: 'text', uri: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop' },
-  { id: '5', title: '3D Robot Walk Cycle', creator: '@animator_x', likes: 2100, type: 'video', uri: 'https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=800&auto=format&fit=crop' },
-  { id: '6', title: 'Dark Mode SaaS UI', creator: '@ui_ux_god', likes: 1540, type: 'code', uri: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=800&auto=format&fit=crop' },
-];
-
 export const MarketplaceView: React.FC = () => {
-  const { isMarketplaceOpen, setMarketplaceOpen, marketCategory, setMarketCategory } = useAppStore();
-  const [searchQuery, setSearchQuery] = useState('');
-
+  const { isMarketplaceOpen, setMarketplaceOpen, selectedTab } = useAppStore();
+  const [query, setQuery] = useState('');
 
   if (!isMarketplaceOpen) return null;
 
-  const categories = ['All', 'general', 'image', 'video', 'audio', 'coding'];
-
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-
-        {/* Header */}
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>DISCOVER & MARKETPLACE</Text>
-          <TouchableOpacity onPress={() => setMarketplaceOpen(false)} style={styles.closeBtn}>
-            <X color="#fff" size={24} />
-          </TouchableOpacity>
+           <Text style={styles.title}>MARKETPLACE</Text>
+           <TouchableOpacity onPress={() => setMarketplaceOpen(false)} style={styles.closeBtn}><X color="#fff" size={24} /></TouchableOpacity>
         </View>
 
-        {/* Search & Categories */}
-        <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Search color="rgba(255,255,255,0.5)" size={20} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search artifacts, prompts, and code..."
-              placeholderTextColor="rgba(255,255,255,0.5)"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
-            {categories.map(cat => (
-              <TouchableOpacity
-                key={cat}
-                style={[styles.categoryBtn, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryBtnActive]}
-                onPress={() => setMarketCategory(cat)}
-              >
-                <Text style={[styles.categoryText, marketCategory.toLowerCase() === cat.toLowerCase() && styles.categoryTextActive]}>{cat === 'All' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+        <View style={styles.searchRow}>
+           <View style={styles.searchBar}>
+              <Search color="#636366" size={20} />
+              <TextInput style={styles.input} placeholder="Search prompts..." placeholderTextColor="#636366" value={query} onChangeText={setQuery} />
+           </View>
         </View>
 
-        {/* Grid/Masonry layout for Artifacts */}
-        <ScrollView style={styles.gridScroll} contentContainerStyle={styles.gridContent}>
-          {MOCK_ARTIFACTS.map(artifact => (
-            <View key={artifact.id} style={styles.artifactCard}>
-              <View style={styles.artifactPreview}>
-                <Text style={styles.artifactTypeLabel}>{artifact.type.toUpperCase()}</Text>
-                {/* Placeholder for actual 3D/Image preview */}
-                <Sparkles color="rgba(255,255,255,0.2)" size={48} />
+        <ScrollView contentContainerStyle={styles.grid}>
+           {[1,2,3,4,5,6].map(i => (
+              <View key={i} style={styles.item}>
+                 <View style={styles.preview}><Sparkles color="#4285F4" size={32} /></View>
+                 <View style={styles.info}>
+                    <Text style={styles.itemTitle}>Spatial Artifact #{i}</Text>
+                    <View style={styles.meta}>
+                       <TouchableOpacity style={styles.action}><Heart color="#fff" size={14} /><Text style={styles.metaText}>1.2k</Text></TouchableOpacity>
+                       <TouchableOpacity style={styles.action}><Download color="#fff" size={14} /></TouchableOpacity>
+                    </View>
+                 </View>
               </View>
-              <View style={styles.artifactInfo}>
-                <Text style={styles.artifactTitle} numberOfLines={1}>{artifact.title}</Text>
-                <Text style={styles.artifactCreator}>{artifact.creator}</Text>
-
-                <View style={styles.artifactActions}>
-                  <TouchableOpacity style={styles.actionBtn} onPress={() => Alert.alert('Liked', 'You liked this artifact!')}>
-                    <Heart color="#fff" size={16} />
-                    <Text style={styles.actionText}>{artifact.likes}</Text>
-                  </TouchableOpacity>
-
-                  <View style={{flexDirection: 'row', gap: 10}}>
-                    <TouchableOpacity style={styles.iconBtn} onPress={() => Alert.alert('Download', 'Downloading artifact...')}>
-                      <Download color="#fff" size={16} />
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[styles.iconBtn, { backgroundColor: 'rgba(66, 133, 244, 0.3)', borderColor: '#4285F4' }]} onPress={() => Alert.alert('External Link', 'Opening artifact page...')}>
-                      <ArrowUpRight color="#4285F4" size={16} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
-          ))}
+           ))}
         </ScrollView>
-
-        {/* Floating Upload Button */}
-        <TouchableOpacity style={styles.uploadBtn} onPress={() => Alert.alert('Publish', 'Opening artifact publisher...')}>
-          <Text style={styles.uploadBtnText}>+ PUBLISH ARTIFACT</Text>
-        </TouchableOpacity>
-
       </SafeAreaView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: '#0a0a0c', // Solid dark background
-    zIndex: 200,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 15,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: '800',
-    letterSpacing: 2,
-  },
-  closeBtn: {
-    padding: 8,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 20,
-  },
-  searchSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    height: 50,
-    marginBottom: 15,
-  },
-  searchInput: {
-    flex: 1,
-    color: '#fff',
-    fontSize: 16,
-    marginLeft: 10,
-  },
-  categoryScroll: {
-    gap: 10,
-  },
-  categoryBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  categoryBtnActive: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  categoryText: {
-    color: 'rgba(255,255,255,0.5)',
-    fontWeight: '600',
-  },
-  categoryTextActive: {
-    color: '#fff',
-  },
-  gridScroll: {
-    flex: 1,
-  },
-  gridContent: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 15,
-    paddingBottom: 100,
-    justifyContent: 'space-between',
-  },
-  artifactCard: {
-    width: '48%', // Approx half screen minus padding
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    borderRadius: 16,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    overflow: 'hidden',
-  },
-  artifactPreview: {
-    height: 140,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  artifactTypeLabel: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    fontSize: 10,
-    fontWeight: '800',
-    color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
-  },
-  artifactInfo: {
-    padding: 12,
-  },
-  artifactTitle: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  artifactCreator: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 12,
-    marginBottom: 12,
-  },
-  artifactActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  actionBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  iconBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  uploadBtn: {
-    position: 'absolute',
-    bottom: 30,
-    alignSelf: 'center',
-    backgroundColor: '#fff',
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 30,
-    shadowColor: '#fff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-  },
-  uploadBtnText: {
-    color: '#000',
-    fontWeight: '800',
-    letterSpacing: 1,
-  }
+  container: { ...StyleSheet.absoluteFill, backgroundColor: '#0a0a0c', zIndex: 700 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#1c1c1e' },
+  title: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  closeBtn: { backgroundColor: '#1c1c1e', padding: 10, borderRadius: 20 },
+  searchRow: { padding: 20 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#161618', borderRadius: 12, paddingHorizontal: 15, height: 50 },
+  input: { flex: 1, color: '#fff', marginLeft: 12 },
+  grid: { padding: 15, flexDirection: 'row', flexWrap: 'wrap', gap: 15 },
+  item: { width: '47%', backgroundColor: '#161618', borderRadius: 16, overflow: 'hidden', borderWidth: 1, borderColor: '#1c1c1e' },
+  preview: { height: 120, backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' },
+  info: { padding: 12 },
+  itemTitle: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+  meta: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
+  action: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  metaText: { color: '#fff', fontSize: 11 }
 });

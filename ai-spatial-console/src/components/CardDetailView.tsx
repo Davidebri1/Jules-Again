@@ -1,74 +1,17 @@
-import React, { useState, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  ScrollView,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-  Alert,
-  Share,
-} from "react-native";
-
-let MediaLibrary: any;
-if (Platform.OS !== 'web') {
-  MediaLibrary = require('expo-media-library');
-}
-
-import { BlurView } from "expo-blur";
+import React, { useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import * as FileSystem from "expo-file-system";
 import Markdown from "react-native-markdown-display";
 import { useAppStore } from "../store/useAppStore";
-import {
-  ChevronLeft,
-  MoreHorizontal,
-  Mic,
-  Paperclip,
-  Send,
-  Layers,
-  Globe,
-  Zap,
-  Search,
-  EyeOff,
-  Sliders,
-  X,
-  Sparkles,
-  Plus,
-} from "lucide-react-native";
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Globe, Zap, Sparkles, Terminal, LayoutTemplate, Search } from "lucide-react-native";
 import { generateResponse } from "../utils/api";
 
 export const CardDetailView: React.FC = () => {
-  const {
-    focusedModelId,
-    setFocusedModelId,
-    availableModels,
-    conversations,
-    addMessage,
-    setSmartGenOpen,
-    isSmartGenEnabled,
-    isPrivateMode,
-    setPrivateMode,
-    setFileManagerOpen,
-    pendingContextFiles,
-    pendingSourceFile,
-    setSourceFile,
-    removeContextFile,
-    userProfile,
-    deductMessage,
-    deductCredits,
-    setUpgradeOpen,
-  } = useAppStore();
-
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, userProfile, deductMessage, deductCredits, setUpgradeOpen, selectedTab } = useAppStore();
   const [inputText, setInputText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeepResearch, setIsDeepResearch] = useState(false);
   const [isWebEnabled, setIsWebEnabled] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
 
   const model = availableModels.find((m) => m.id === focusedModelId);
   const conversation = focusedModelId ? conversations[focusedModelId] : null;
@@ -79,151 +22,101 @@ export const CardDetailView: React.FC = () => {
   const handleSend = async () => {
     if (!inputText.trim() || isGenerating) return;
 
-    let cost = model.baseCreditCost;
-    if (model.category === "general" && userProfile.tier !== "free") cost = 0;
-
-    if (model.category === "general") {
-      if (!deductMessage()) {
-        Alert.alert("Limit Reached", "Upgrade for unlimited messaging.");
-        setUpgradeOpen(true);
-        return;
-      }
+    if (selectedTab === "general") {
+       if (!deductMessage()) { setUpgradeOpen(true); return; }
     } else {
-      if (!deductCredits(cost)) {
-        setUpgradeOpen(true);
-        return;
-      }
+       if (!deductCredits(model.baseCreditCost)) { setUpgradeOpen(true); return; }
     }
 
-    let userMessage = inputText.trim();
+    let userMsg = inputText.trim();
     setInputText("");
-
-    let injectedPrefix = "";
-    if (isDeepResearch) injectedPrefix += "[Deep Research] ";
-    else if (isWebEnabled) injectedPrefix += "[Web Search] ";
-    if (isPrivateMode) injectedPrefix += "[Private] ";
-
-    const fullMessage = injectedPrefix ? `${injectedPrefix}\n\n${userMessage}` : userMessage;
-    addMessage(model.id, "user", fullMessage);
-
-    if (isSmartGenEnabled && !isPrivateMode && userMessage.length > 10) {
-      const frameworkModel = availableModels.find((m) => m.id === "llama-3-8b");
-      if (frameworkModel) {
-        const sysPrompt = "LOGICAL FRAMEWORK: Extract meaning as JSON or return NOISE.";
-        generateResponse(frameworkModel, [
-           { role: 'system', content: sysPrompt, id: 'sys', timestamp: Date.now() },
-           { role: 'user', content: userMessage, id: 'usr', timestamp: Date.now() }
-        ]).catch(() => {});
-      }
-    }
-
+    addMessage(model.id, "user", userMsg);
     setIsGenerating(true);
+
     try {
-      const response = await generateResponse(model, [...messages, { role: 'user', content: fullMessage, id: 'new', timestamp: Date.now() }]);
-      addMessage(model.id, "assistant", response);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsGenerating(false);
-    }
+      const res = await generateResponse(model, [...messages, { role: 'user', content: userMsg, id: 'new', timestamp: Date.now() }]);
+      addMessage(model.id, "assistant", res);
+    } catch (e) { console.error(e); } finally { setIsGenerating(false); }
+  };
+
+  const showSpecialSuite = () => {
+     if (model.provider === 'openai' && selectedTab === 'coding') return <View style={styles.suitePill}><Terminal color="#10a37f" size={14} /><Text style={styles.suiteText}>Python Sandbox Enabled</Text></View>;
+     if (model.provider === 'anthropic' && selectedTab === 'coding') return <View style={styles.suitePill}><LayoutTemplate color="#d97757" size={14} /><Text style={styles.suiteText}>Claude Canvas Active</Text></View>;
+     if (model.provider === 'xai') return <View style={styles.suitePill}><Search color="#fff" size={14} /><Text style={styles.suiteText}>Real-time X Search</Text></View>;
+     return null;
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => setFocusedModelId(null)} style={styles.iconButton}>
-              <ChevronLeft color="#fff" size={24} />
-            </TouchableOpacity>
-            <View style={styles.titleContainer}>
-              <Text style={styles.title}>{model.name}</Text>
-              <Text style={styles.subtitle}>{model.provider.toUpperCase()} • {model.tier.toUpperCase()}</Text>
-            </View>
-            <TouchableOpacity style={styles.iconButton}>
-               <MoreHorizontal color="#fff" size={24} />
-            </TouchableOpacity>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => setFocusedModelId(null)} style={styles.iconButton}><ChevronLeft color="#fff" size={24} /></TouchableOpacity>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{model.name}</Text>
+            {showSpecialSuite()}
           </View>
+          <TouchableOpacity style={styles.iconButton}><MoreHorizontal color="#fff" size={24} /></TouchableOpacity>
+        </View>
 
-          <ScrollView style={styles.chatArea} contentContainerStyle={styles.chatContent}>
-             {messages.length === 0 && (
-                <View style={{alignItems: 'center', marginTop: 100, opacity: 0.5}}>
-                   <Sparkles color="#fff" size={48} />
-                   <Text style={{color: '#fff', marginTop: 10}}>Start a conversation</Text>
-                </View>
-             )}
-             {messages.map((msg, idx) => (
-                <View key={idx} style={[styles.messageWrapper, msg.role === 'user' ? styles.messageUser : styles.messageAssistant]}>
-                   <View style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}>
-                      {msg.role === 'assistant' ? <Markdown style={markdownStyles}>{msg.content}</Markdown> : <Text style={styles.userText}>{msg.content}</Text>}
-                   </View>
-                </View>
-             ))}
-             {isGenerating && <ActivityIndicator color="#fff" size="small" style={{marginTop: 10}} />}
-          </ScrollView>
+        <ScrollView style={styles.chatArea} contentContainerStyle={styles.chatContent}>
+           {messages.map((msg, idx) => (
+              <TouchableOpacity key={idx} onLongPress={() => Alert.alert("Options", "Message Actions", [{text: "Copy"}, {text: "Remix"}, {text: "Delete"}])} delayLongPress={500}>
+                 <View style={[styles.messageWrapper, msg.role === 'user' ? styles.messageUser : styles.messageAssistant]}>
+                    <View style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}>
+                       {msg.role === 'assistant' ? <Markdown style={markdownStyles}>{msg.content}</Markdown> : <Text style={styles.userText}>{msg.content}</Text>}
+                    </View>
+                 </View>
+              </TouchableOpacity>
+           ))}
+           {isGenerating && <ActivityIndicator color="#fff" size="small" style={{marginTop: 10}} />}
+        </ScrollView>
 
-          <View style={styles.inputArea}>
-             <View style={styles.optionsRow}>
-                <TouchableOpacity style={[styles.optionPill, isDeepResearch && styles.activePill]} onPress={() => setIsDeepResearch(!isDeepResearch)}>
-                   <Zap color={isDeepResearch ? "#4285F4" : "#fff"} size={14} />
-                   <Text style={[styles.optionText, isDeepResearch && styles.activeText]}>Research</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.optionPill, isWebEnabled && styles.activePill]} onPress={() => setIsWebEnabled(!isWebEnabled)}>
-                   <Globe color={isWebEnabled ? "#4285F4" : "#fff"} size={14} />
-                   <Text style={[styles.optionText, isWebEnabled && styles.activeText]}>Web</Text>
-                </TouchableOpacity>
-             </View>
+        <View style={styles.inputArea}>
+           <View style={styles.optionsRow}>
+              <TouchableOpacity style={[styles.optionPill, isDeepResearch && styles.activePill]} onPress={() => setIsDeepResearch(!isDeepResearch)}>
+                 <Zap color={isDeepResearch ? "#4285F4" : "#fff"} size={14} /><Text style={[styles.optionText, isDeepResearch && styles.activeText]}>Research</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.optionPill, isWebEnabled && styles.activePill]} onPress={() => setIsWebEnabled(!isWebEnabled)}>
+                 <Globe color={isWebEnabled ? "#4285F4" : "#fff"} size={14} /><Text style={[styles.optionText, isWebEnabled && styles.activeText]}>Web</Text>
+              </TouchableOpacity>
+           </View>
 
-             <LinearGradient colors={["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]} style={styles.inputBox}>
-                <TouchableOpacity style={styles.actionButton} onPress={() => setFileManagerOpen(true)}>
-                   <Paperclip color="rgba(255,255,255,0.7)" size={20} />
-                </TouchableOpacity>
-                <TextInput
-                   style={styles.input}
-                   placeholder="Message..."
-                   placeholderTextColor="rgba(255,255,255,0.4)"
-                   value={inputText}
-                   onChangeText={setInputText}
-                   multiline
-                />
-                <TouchableOpacity style={[styles.actionButton, styles.sendButton]} onPress={handleSend}>
-                   <Send color="#000" size={18} />
-                </TouchableOpacity>
-             </LinearGradient>
-          </View>
-        </SafeAreaView>
-      </BlurView>
+           <View style={styles.inputBox}>
+              <TouchableOpacity style={styles.actionButton}><Paperclip color="#8e8e93" size={20} /></TouchableOpacity>
+              <TextInput style={styles.input} placeholder="Message..." placeholderTextColor="#636366" value={inputText} onChangeText={setInputText} multiline />
+              <TouchableOpacity style={[styles.actionButton, styles.sendButton]} onPress={handleSend}><Send color="#000" size={18} /></TouchableOpacity>
+           </View>
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: "#0a0a0c" },
   safeArea: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.1)" },
-  iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.05)", justifyContent: "center", alignItems: "center" },
+  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 15, borderBottomWidth: 1, borderBottomColor: "#1c1c1e" },
+  iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#1c1c1e", justifyContent: "center", alignItems: "center" },
   titleContainer: { alignItems: "center" },
   title: { color: "#fff", fontSize: 18, fontWeight: "700" },
-  subtitle: { color: "rgba(255,255,255,0.5)", fontSize: 12 },
+  suitePill: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4, backgroundColor: '#1c1c1e', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
+  suiteText: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
   chatArea: { flex: 1 },
   chatContent: { padding: 20, gap: 20 },
-  messageWrapper: { flexDirection: "row", width: "100%" },
+  messageWrapper: { flexDirection: "row", width: "100%", marginBottom: 15 },
   messageUser: { justifyContent: "flex-end" },
   messageAssistant: { justifyContent: "flex-start" },
   messageBubble: { maxWidth: "85%", padding: 15, borderRadius: 20 },
-  bubbleUser: { backgroundColor: "rgba(255,255,255,0.15)", borderBottomRightRadius: 5 },
-  bubbleAssistant: { backgroundColor: "rgba(0,0,0,0.6)", borderWidth: 1, borderColor: "rgba(255,255,255,0.1)", borderBottomLeftRadius: 5 },
+  bubbleUser: { backgroundColor: "#1c1c1e", borderBottomRightRadius: 5 },
+  bubbleAssistant: { backgroundColor: "#000", borderWidth: 1, borderColor: "#1c1c1e", borderBottomLeftRadius: 5 },
   userText: { color: "#fff", fontSize: 16 },
-  inputArea: { padding: 15, paddingBottom: 30 },
+  inputArea: { padding: 15, paddingBottom: 30, backgroundColor: '#0a0a0c', borderTopWidth: 1, borderTopColor: '#1c1c1e' },
   optionsRow: { flexDirection: "row", gap: 10, marginBottom: 10 },
-  optionPill: { flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, gap: 6 },
+  optionPill: { flexDirection: "row", alignItems: "center", backgroundColor: "#1c1c1e", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, gap: 6 },
   optionText: { color: "#fff", fontSize: 12 },
-  activePill: { backgroundColor: "rgba(66, 133, 244, 0.2)", borderColor: "#4285F4", borderWidth: 1 },
+  activePill: { backgroundColor: "#1a2633", borderColor: "#4285F4", borderWidth: 1 },
   activeText: { color: "#4285F4" },
-  inputBox: { flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 30, paddingHorizontal: 10 },
+  inputBox: { flexDirection: "row", alignItems: "center", backgroundColor: "#1c1c1e", borderRadius: 30, paddingHorizontal: 10 },
   input: { flex: 1, color: "#fff", fontSize: 16, marginLeft: 10, maxHeight: 100, minHeight: 40 },
   actionButton: { padding: 10 },
   sendButton: { backgroundColor: "#fff", borderRadius: 20, marginLeft: 5 }
@@ -231,6 +124,6 @@ const styles = StyleSheet.create({
 
 const markdownStyles = StyleSheet.create({
   body: { color: "#fff", fontSize: 16 },
-  code_inline: { backgroundColor: "rgba(255,255,255,0.1)", color: "#4285F4" },
+  code_inline: { backgroundColor: "#1c1c1e", color: "#4285F4" },
   code_block: { backgroundColor: "#000", padding: 10, borderRadius: 8, color: "#4285F4" }
 });
