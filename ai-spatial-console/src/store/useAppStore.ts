@@ -68,8 +68,9 @@ interface AppState {
   addTheme: (theme: any) => void;
 
   availableModels: ModelProvider[];
-  activeModelIdsByCategory: Record<ModelCategory, string[]>;
-  toggleActiveModel: (modelId: string) => void;
+  activeModelIdsByTab: Record<ModelCategory, string[]>;
+  toggleActiveModel: (id: string) => void;
+
   selectedTab: ModelCategory;
   setSelectedTab: (tab: ModelCategory) => void;
 
@@ -254,12 +255,14 @@ export const useAppStore = create<AppState>()(
       addTheme: (theme) => set((state) => ({ themes: [...state.themes, theme] })),
 
       availableModels: INITIAL_MODELS,
-      activeModelIdsByCategory: { general: ['gpt-4o', 'claude-3-5-sonnet', 'gemini-1-5-pro', 'llama-3-8b'], image: [], video: [], audio: [], coding: [] },
+      activeModelIdsByTab: { general: ['gpt-4o'], image: [], video: [], music: [], coding: [] },
+
       toggleActiveModel: (id) => set((state) => {
-        const cat = state.selectedTab;
-        const currentActive = state.activeModelIdsByCategory[cat] || [];
+        const { selectedTab, activeModelIdsByTab, userProfile } = state;
+        const currentActive = activeModelIdsByTab[selectedTab];
+
         if (currentActive.includes(id)) {
-          return { activeModelIdsByCategory: { ...state.activeModelIdsByCategory, [cat]: currentActive.filter(m => m !== id) } };
+          return { activeModelIdsByTab: { ...activeModelIdsByTab, [selectedTab]: currentActive.filter(m => m !== id) } };
         }
 
         const model = state.availableModels.find(m => m.id === id);
@@ -271,7 +274,8 @@ export const useAppStore = create<AppState>()(
            if (model.tier === 'elite' && userProfile.tier !== 'elite') return { isUpgradeOpen: true };
            if (model.tier === 'pro' && userProfile.tier === 'free') return { isUpgradeOpen: true };
         }
-        return { activeModelIdsByCategory: { ...state.activeModelIdsByCategory, [cat]: [...currentActive, id] } };
+
+        return { activeModelIdsByTab: { ...activeModelIdsByTab, [selectedTab]: [...currentActive, id] } };
       }),
 
       selectedTab: 'general',
@@ -358,8 +362,8 @@ export const useAppStore = create<AppState>()(
       logout: () => set({
          isAuthenticated: false,
          accountId: null,
-         userProfile: { tier: 'free', credits: 150, monthlyLimit: 150, messageCount: 0, messageLimit: 50 },
-         activeModelIdsByCategory: { general: [], image: [], video: [], audio: [], coding: [] },
+         userProfile: { tier: 'free', credits: 150, messageCount: 0, lastDailyReset: Date.now() },
+         activeModelIdsByTab: { general: [], image: [], video: [], music: [], coding: [] },
          conversations: {},
          archivedConversations: [],
          pendingContextFiles: [],
@@ -384,7 +388,7 @@ export const useAppStore = create<AppState>()(
         isSmartGenEnabled: state.isSmartGenEnabled,
         files: state.isPrivateMode ? [] : state.files,
         starredFiles: state.starredFiles,
-        activeModelIdsByCategory: state.activeModelIdsByCategory,
+        activeModelIdsByTab: state.activeModelIdsByTab,
         archivedConversations: state.isPrivateMode ? [] : state.archivedConversations,
         conversations: state.isPrivateMode ? {} : state.conversations,
       }),
