@@ -8,7 +8,7 @@ import { SpatialAsset } from './SpatialAsset';
 import { useAppStore } from '../store/useAppStore';
 
 export const ChatDashboard: React.FC = () => {
-  const activeModelIds = useAppStore((state) => state.activeModelIds);
+  const activeModelIds = useAppStore((state) => (state.activeModelIdsByCategory[state.selectedTab] || []));
   const availableModels = useAppStore((state) => state.availableModels);
   const selectedTab = useAppStore((state) => state.selectedTab);
   const files = useAppStore((state) => state.files);

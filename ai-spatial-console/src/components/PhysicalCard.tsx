@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
+import { RoundedBox, Text, MeshTransmissionMaterial, Html } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import * as THREE from 'three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
@@ -15,6 +15,7 @@ interface PhysicalCardProps {
 export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isActive = true }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [pressed, setPressed] = useState(false);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const setFocusedModelId = useAppStore((state) => state.setFocusedModelId);
   const activeLayout = useAppStore((state) => state.activeLayout);
@@ -106,8 +107,32 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         <meshStandardMaterial attach="material" color="#ffffff" roughness={0.5} metalness={0.5} />
       </Text>
 
+      {/* Description Html Overlay */}
+      <Html position={[0, 1.1, 0.11]} transform center>
+         <div
+           style={{
+             color: '#dddddd',
+             fontSize: '10px',
+             fontFamily: 'sans-serif',
+             background: 'rgba(0,0,0,0.5)',
+             padding: '4px 8px',
+             borderRadius: '8px',
+             cursor: 'pointer',
+             maxWidth: '120px',
+             textAlign: 'center',
+             whiteSpace: isDescExpanded ? 'normal' : 'nowrap',
+             overflow: isDescExpanded ? 'visible' : 'hidden',
+             textOverflow: isDescExpanded ? 'clip' : 'ellipsis',
+             userSelect: 'none'
+           }}
+           onPointerDown={(e) => { e.stopPropagation(); setIsDescExpanded(!isDescExpanded); }}
+         >
+           {model.description}
+         </div>
+      </Html>
+
       <Text
-        position={[0, 1.1, 0.11]}
+        position={[0, 0.7, 0.11]}
         fontSize={0.15}
         color="#dddddd"
         anchorX="center"
