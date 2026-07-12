@@ -11,46 +11,37 @@ import { AuthOverlay } from './src/components/AuthOverlay';
 import { MarketplaceView } from './src/components/MarketplaceView';
 import { UpgradePage } from './src/components/UpgradePage';
 import { HistoryDrawer } from './src/components/HistoryDrawer';
-import { Video, ResizeMode } from 'expo-av';
 import { useAppStore } from './src/store/useAppStore';
 
 export default function App() {
   const { focusedModelId, currentThemeId, themes } = useAppStore();
-
-  const currentTheme = themes ? themes.find(t => t.id === currentThemeId) || themes[0] : null;
+  const currentTheme = themes.find(t => t.id === currentThemeId) || themes[0];
 
   return (
     <View style={styles.container}>
-      {currentTheme && currentTheme.type === 'video' ? (
-        <Video
-          source={{ uri: currentTheme.uri }}
-          style={StyleSheet.absoluteFill}
-          resizeMode={ResizeMode.COVER}
-          shouldPlay
-          isLooping
-          isMuted
-        />
-      ) : (
-        <ImageBackground source={typeof currentTheme?.uri === "string" ? { uri: currentTheme?.uri } : currentTheme?.uri} style={StyleSheet.absoluteFill} resizeMode="cover" />
-      )}
+      {/* Opaque black background handles letterboxing for contain mode */}
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }]} />
 
-      {/* 3D Spatial Canvas (Always in background, transparent to show image) */}
+      <ImageBackground
+         source={typeof currentTheme?.uri === "string" ? { uri: currentTheme?.uri } : currentTheme?.uri}
+         style={StyleSheet.absoluteFill}
+         resizeMode="contain"
+      />
+
       <View style={styles.canvasContainer}>
         <ChatDashboard />
       </View>
 
-      {/* 2D UI Overlay Switcher (Crisp native text and inputs) */}
       <View style={styles.overlayContainer} pointerEvents="box-none">
          {focusedModelId ? <CardDetailView /> : <GridOverlay />}
       </View>
 
-      {/* Absolute Full Screen Drawers/Panels */}
       <HistoryDrawer />
       <SettingsPanel />
       <ConsensusDrawer />
       <SmartGenSuiteView />
-        <FileManagerView />
-        <AuthOverlay />
+      <FileManagerView />
+      <AuthOverlay />
       <MarketplaceView />
       <UpgradePage />
 
@@ -60,14 +51,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  canvasContainer: {
-    ...StyleSheet.absoluteFill,
-  },
-  overlayContainer: {
-    ...StyleSheet.absoluteFill,
-  }
+  container: { flex: 1 },
+  canvasContainer: { ...StyleSheet.absoluteFill },
+  overlayContainer: { ...StyleSheet.absoluteFill }
 });

@@ -8,11 +8,8 @@ import { Platform,
   SafeAreaView,
   TextInput,
   Alert,
-  ActivityIndicator,
-  Share} from "react-native";
-import { BlurView } from "expo-blur";
+  ActivityIndicator} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import * as FileSystem from "expo-file-system";
 import { useAppStore, GridLayout, ModelCategory } from "../store/useAppStore";
 import {
   Settings,
@@ -28,6 +25,7 @@ import {
   Plus,
   Paperclip,
   Search,
+  LayoutGrid,
 } from "lucide-react-native";
 
 import { generateResponse } from "../utils/api";
@@ -45,7 +43,6 @@ export const GridOverlay: React.FC = () => {
     setActiveLayout,
     userProfile,
     deductCredits,
-    refundCredits,
     deductMessage,
     setUpgradeOpen,
     addMessage,
@@ -54,7 +51,6 @@ export const GridOverlay: React.FC = () => {
     pendingSourceFile,
     removeContextFile,
     setSourceFile,
-    clearPendingAttachments,
     setAuthOpen,
     isPrivateMode,
     setPrivateMode,
@@ -71,13 +67,18 @@ export const GridOverlay: React.FC = () => {
     setMarketplaceOpen,
   } = useAppStore();
 
-  const handleLayoutChange = (layout: GridLayout) => setActiveLayout(layout);
+  const activeModelIds = activeModelIdsByTab[selectedTab] || [];
+
+  const handleLayoutChange = (layout: GridLayout) => {
+    setActiveLayout(layout);
+    setIsLayoutTrayOpen(false);
+  };
 
   const categories: { id: ModelCategory; label: string }[] = [
     { id: "general", label: "General" },
     { id: "image", label: "Image" },
     { id: "video", label: "Video" },
-    { id: "audio", label: "Audio" },
+    { id: "music", label: "Music" },
     { id: "coding", label: "Coding" },
   ];
 
@@ -94,42 +95,18 @@ export const GridOverlay: React.FC = () => {
     // 1. Filter Active Models by Current Tab
     const activeModels = (activeModelIdsByCategory[selectedTab] || [])
       .map((id) => availableModels.find((m) => m.id === id))
-      .filter(
-        (m): m is import("../store/useAppStore").ModelProvider =>
-          m !== undefined && m.category === selectedTab,
-      );
+      .filter((m): m is any => m !== undefined);
 
-    if (activeModels.length === 0) {
-      Alert.alert(
-        "No Models Selected",
-        "Please select at least one model in this tab to message.",
-      );
-      return;
-    }
-
-    // 2. Validate Balance & Message Limits based on Tab
     if (selectedTab === "general") {
-      // General tab uses Message Limits
-      if (userProfile.tier === "free" && !deductMessage()) {
-        Alert.alert(
-          "Message Limit Reached",
-          "Please upgrade to Pro or Elite for unlimited general messaging.",
-        );
+      if (!deductMessage()) {
+        Alert.alert("Limit Reached", "Free users get 10 messages/day. Upgrade for more.");
         setUpgradeOpen(true);
         return;
       }
-      // Pro/Elite have unlimited general messaging
     } else {
-      // Media tabs use Credits
-      const totalCost = activeModels.reduce(
-        (sum, model) => sum + model.baseCreditCost,
-        0,
-      );
+      const totalCost = activeModels.reduce((sum, m) => sum + m.baseCreditCost, 0);
       if (!deductCredits(totalCost)) {
-        Alert.alert(
-          "Insufficient Credits",
-          "You do not have enough credits to generate this.",
-        );
+        Alert.alert("Insufficient Credits", "You need credits for this tab.");
         setUpgradeOpen(true);
         return;
       }
@@ -137,84 +114,34 @@ export const GridOverlay: React.FC = () => {
 
     let userMessage = inputText.trim();
     setInputText("");
-
-    // --- Inject Context ---
-    let injectedPrefix = "";
-    if (isWebEnabled) injectedPrefix += "[Web Search Enabled] ";
-    if (isPrivateMode) injectedPrefix += "[Private/Incognito Session] ";
-    if (pendingContextFiles.length > 0) {
-       injectedPrefix += `[Context Files: ${pendingContextFiles.map(f => f.name).join(', ')}] `;
-    }
-    if (pendingSourceFile) {
-       injectedPrefix += `[Source Context: ${pendingSourceFile.name}] `;
-    }
-    const fullMessage = injectedPrefix ? `${injectedPrefix}\n\n${userMessage}` : userMessage;
+    const fullMessage = userMessage;
     setIsGenerating(true);
-    clearPendingAttachments();
 
-    // 3. Dispatch in Parallel
-    await Promise.allSettled(
+    await Promise.all(
       activeModels.map(async (model) => {
-        // Save to store immediately
-        addMessage(model.id, "user", userMessage);
-
-        const convo = conversations[model.id];
-        const msgs = convo ? convo.messages : [];
-        const apiMessages = [
-          ...msgs,
-          {
-            id: "temp",
-            role: "user" as const,
-            content: fullMessage,
-            timestamp: Date.now(),
-          },
-        ];
-
-        try {
-          const responseContent = await generateResponse(model, apiMessages);
-          addMessage(model.id, "assistant", responseContent);
-        } catch (e) {
-          // Refund cost of this specific model on failure
-          let refundAmt = model.baseCreditCost;
-          if (model.category === "general" && userProfile.tier !== "free")
-            refundAmt = 0;
-          refundCredits(refundAmt);
-          addMessage(model.id, "assistant", "Network Error: Credits Refunded.");
-        }
-      }),
+        addMessage(model.id, "user", fullMessage);
+        const history = conversations[model.id]?.messages || [];
+        const res = await generateResponse(model, [...history, { role: 'user', content: fullMessage, id: 'new', timestamp: Date.now() }]);
+        addMessage(model.id, "assistant", res);
+      })
     );
 
     setIsGenerating(false);
   };
 
-  // Filter models based on the currently selected tab/category
   const displayedModels = useMemo(() => {
     return availableModels.filter((m) => m.category === selectedTab);
   }, [availableModels, selectedTab]);
 
   return (
     <SafeAreaView style={styles.overlay} pointerEvents="box-none">
-      {/* Top Bar: Brand, Layout, Profile */}
-      <BlurView intensity={20} tint="dark" style={styles.topBar}>
-        {/* Specular edge light */}
-        <View style={styles.specularTopEdge} />
+      {/* Top Bar - OPAQUE */}
+      <View style={styles.topBar}>
         <View style={{ flexDirection: "row", gap: 10 }}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setSettingsOpen(true)}
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
             <Settings color="#fff" size={20} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setIsSearchOpen(!isSearchOpen)}
-          >
-            <Search color={isSearchOpen ? "#4285F4" : "#fff"} size={20} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setHistoryOpen(true)}
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={() => setHistoryOpen(true)}>
             <Clock color="#fff" size={20} />
           </TouchableOpacity>
         </View>
@@ -249,99 +176,35 @@ export const GridOverlay: React.FC = () => {
           )}
         </View>
 
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => setMarketplaceOpen(true)}
-        >
-          <Globe color="#fff" size={20} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.iconButton}
-          onPress={() => setAuthOpen(true)}
-        >
-          <User color="#fff" size={20} />
-        </TouchableOpacity>
-      </BlurView>
-
-      {isSearchOpen && (
-        <View style={styles.searchContainer}>
-          <Search color="rgba(255,255,255,0.4)" size={16} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search conversations, files, memories..."
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery("")}>
-              <X color="rgba(255,255,255,0.4)" size={16} />
-            </TouchableOpacity>
-          )}
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => setMarketplaceOpen(true)}>
+            <Globe color="#fff" size={20} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => setAuthOpen(true)}>
+            <User color="#fff" size={20} />
+          </TouchableOpacity>
         </View>
-      )}
+      </View>
 
-      {/* Tabs and Model Selector Tray */}
-      <BlurView intensity={30} tint="dark" style={styles.bottomSection}>
-        {/* Specular edge light */}
-        <View style={styles.specularTopEdge} />
+      <View style={styles.bottomSection}>
         {/* Category Tabs */}
         <View style={styles.tabsContainer}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.tabsScroll}
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
             {categories.map((cat) => (
               <TouchableOpacity
                 key={cat.id}
-                style={[
-                  styles.tabButton,
-                  selectedTab === cat.id && styles.tabButtonActive,
-                ]}
+                style={[styles.tabButton, selectedTab === cat.id && styles.tabButtonActive]}
                 onPress={() => setSelectedTab(cat.id)}
               >
-                <Text
-                  style={[
-                    styles.tabText,
-                    selectedTab === cat.id && styles.tabTextActive,
-                  ]}
-                >
-                  {cat.label}
-                </Text>
+                <Text style={[styles.tabText, selectedTab === cat.id && styles.tabTextActive]}>{cat.label}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* Model Selector Tray (Dynamic based on selected tab) */}
-        {selectedTab !== "general" && (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              marginBottom: 10,
-            }}
-          >
-            <TouchableOpacity
-              style={styles.marketPill}
-              onPress={() => {
-                useAppStore.getState().setMarketCategory(selectedTab);
-                setMarketplaceOpen(true);
-              }}
-            >
-              <Globe color="#fff" size={12} />
-              <Text style={styles.marketPillText}>
-                Browse{" "}
-                {selectedTab.charAt(0).toUpperCase() + selectedTab.slice(1)}{" "}
-                Market
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        {/* Model Tray - One Row, Scrollable, Opaque */}
         <View style={styles.modelTrayContainer}>
-          <View style={styles.modelTrayScroll}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
             {displayedModels.map((model) => {
               const isActive = (activeModelIdsByCategory[selectedTab] || []).includes(model.id);
               let borderColor = "rgba(255,255,255,0.3)";
@@ -352,40 +215,24 @@ export const GridOverlay: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={model.id}
-                  style={[
-                    styles.modelBubble,
-                    {
-                      borderColor,
-                      backgroundColor: isActive
-                        ? borderColor
-                        : "rgba(0,0,0,0.5)",
-                    },
-                  ]}
+                  style={[styles.modelBubble, { borderColor: color, backgroundColor: isActive ? color : "#1a1a1c" }]}
                   onPress={() => toggleActiveModel(model.id)}
                 >
-                  <Text
-                    style={[
-                      styles.modelBubbleText,
-                      { color: isActive ? "#000" : "#fff" },
-                    ]}
-                  >
+                  <View style={[styles.toggleLight, { backgroundColor: isActive ? "#fff" : "#444" }]} />
+                  <Text style={[styles.modelBubbleText, { color: isActive ? "#000" : "#fff" }]}>
                     {model.name.substring(0, 6).toUpperCase()}
                   </Text>
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
         </View>
 
-        {/* Collide / Chat Stub */}
+        {/* Action Row */}
         <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={styles.collideButton}
-            onPress={() => setConsensusOpen(true)}
-          >
-            <Sparkles color="#fff" size={20} style={{ marginRight: 8 }} />
-            <Text style={styles.collideText}>COLLIDE</Text>
-          </TouchableOpacity>
+           <TouchableOpacity style={styles.collideButton} onPress={() => setConsensusOpen(true)}>
+              <Sparkles color="orange" size={20} />
+           </TouchableOpacity>
 
           {(pendingContextFiles.length > 0 || pendingSourceFile) && (
             <ScrollView
@@ -439,322 +286,46 @@ export const GridOverlay: React.FC = () => {
                 <Paperclip color="rgba(255,255,255,0.7)" size={16} />
               </TouchableOpacity>
               <TextInput
-                style={styles.inputTextMock}
-                placeholder={
-                  isPrivateMode
-                    ? "Private Message..."
-                    : "Message Active Models..."
-                }
-                placeholderTextColor="rgba(255,255,255,0.4)"
-                value={inputText}
-                onChangeText={setInputText}
-                multiline
+                 style={styles.input}
+                 placeholder={isPrivateMode ? "Private Message..." : "Message Models..."}
+                 placeholderTextColor="#636366"
+                 value={inputText}
+                 onChangeText={setInputText}
+                 multiline
               />
-              <View style={styles.inputRightActions}>
-                {isGenerating ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : inputText.trim() ? (
-                  <TouchableOpacity
-                    style={styles.iconButtonSmall}
-                    onPress={handleSendGlobal}
-                  >
-                    <Send color="#fff" size={16} />
-                  </TouchableOpacity>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={styles.iconButtonSmall}
-                      onPress={() => setIsWebEnabled(!isWebEnabled)}
-                    >
-                      <Globe
-                        color={
-                          isWebEnabled ? "#10a37f" : "rgba(255,255,255,0.7)"
-                        }
-                        size={16}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.iconButtonSmall}
-                      onPress={() => setPrivateMode(!isPrivateMode)}
-                    >
-                      <EyeOff
-                        color={
-                          isPrivateMode ? "#ff453a" : "rgba(255,255,255,0.7)"
-                        }
-                        size={16}
-                      />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.iconButtonSmall,
-                        isRecording && {
-                          backgroundColor: "rgba(255, 69, 58, 0.2)",
-                          borderRadius: 12,
-                        },
-                      ]}
-                      onPress={() => setIsRecording(!isRecording)}
-                    >
-                      <Mic
-                        color={
-                          isRecording ? "#ff453a" : "rgba(255,255,255,0.7)"
-                        }
-                        size={16}
-                      />
-                    </TouchableOpacity>
-                  </>
-                )}
-              </View>
-            </LinearGradient>
-          </View>
+              <TouchableOpacity onPress={handleSendGlobal} style={styles.sendButton}>
+                 <Send color="#000" size={18} />
+              </TouchableOpacity>
+           </View>
         </View>
-      </BlurView>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  specularTopEdge: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-
-  overlay: {
-    flex: 1,
-    justifyContent: "space-between",
-    paddingTop: 10,
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-  iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.05)", // Darker base for inner bevel
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.15)", // Specular top edge
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.5)", // Shadowed bottom edge
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
-  },
-  searchContainer: {
-    marginHorizontal: 20,
-    marginTop: 10,
-    backgroundColor: "rgba(255,255,255,0.03)",
-    borderRadius: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
-  },
-  searchInput: {
-    flex: 1,
-    color: "#fff",
-    marginLeft: 10,
-    fontSize: 14,
-  },
-  gridSelector: {
-    flexDirection: "row",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 20,
-    padding: 4,
-  },
-  gridButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  gridButtonActive: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-  gridButtonText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  bottomSection: {
-    paddingBottom: 20,
-  },
-  tabsContainer: {
-    marginBottom: 10,
-  },
-  tabsScroll: {
-    paddingHorizontal: 20,
-    gap: 10,
-  },
-  tabButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.03)",
-  },
-  tabButtonActive: {
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-  tabText: {
-    color: "rgba(255,255,255,0.6)",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  tabTextActive: {
-    color: "#fff",
-  },
-  marketPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(66, 133, 244, 0.2)",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-    borderWidth: 1,
-    borderColor: "#4285F4",
-  },
-  marketPillText: {
-    color: "#4285F4",
-    fontSize: 10,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
-  modelTrayContainer: {
-    marginBottom: 20,
-  },
-  modelTrayScroll: {
-    paddingHorizontal: 20,
-    gap: 10,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-  },
-  modelBubble: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.4)', // tactile highlight
-    borderBottomColor: 'rgba(0,0,0,0.6)', // tactile shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5, // Android shadow
-  },
-  modelBubbleText: {
-    fontWeight: "700",
-    fontSize: 13,
-    fontFamily: Platform.OS === 'ios' ? 'AvenirNext-DemiBold' : 'sans-serif-medium',
-    letterSpacing: 0.5,
-  },
-  actionRow: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    gap: 10,
-  },
-  collideButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 165, 0, 0.2)", // Orange tint
-    borderWidth: 1,
-    borderColor: "orange",
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-  collideText: {
-    color: "orange",
-    fontWeight: "800",
-    letterSpacing: 1,
-  },
-
-  holdingArea: {
-    flexDirection: "row",
-    marginBottom: 8,
-    paddingHorizontal: 20,
-    maxHeight: 40,
-  },
-  attachmentPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-    gap: 4,
-  },
-  attachmentPillText: {
-    color: "#fff",
-    fontSize: 10,
-  },
-  attachmentPillSource: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(66, 133, 244, 0.15)",
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: "#4285F4",
-    gap: 4,
-  },
-  attachmentPillTextSource: {
-    color: "#4285F4",
-    fontSize: 10,
-    fontWeight: "700",
-  },
-
-  newConvoBtn: {
-    backgroundColor: "#fff",
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 2, // align with inputMock
-  },
-  inputMock: {
-    flex: 1,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 30,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-    justifyContent: "space-between",
-  },
-  inputTextMock: {
-    color: "#fff",
-    fontSize: 14,
-    flex: 1,
-    marginLeft: 10,
-    maxHeight: 100,
-  },
-  inputRightActions: {
-    flexDirection: "row",
-    gap: 5,
-  },
-  iconButtonSmall: {
-    padding: 5,
-  },
+  overlay: { flex: 1, justifyContent: "space-between" },
+  topBar: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 15, backgroundColor: "#0a0a0c", borderBottomWidth: 1, borderBottomColor: "#1c1c1e" },
+  iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: "#1c1c1e", justifyContent: "center", alignItems: "center" },
+  layoutTray: { position: 'absolute', top: 50, backgroundColor: '#1c1c1e', borderRadius: 12, padding: 5, flexDirection: 'row', gap: 5, zIndex: 1000, borderWidth: 1, borderColor: '#3a3a3c' },
+  trayItem: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8 },
+  trayItemActive: { backgroundColor: '#4285F4' },
+  trayText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
+  bottomSection: { backgroundColor: "#0a0a0c", paddingBottom: 30, borderTopWidth: 1, borderTopColor: "#1c1c1e" },
+  tabsContainer: { paddingVertical: 10 },
+  tabsScroll: { paddingHorizontal: 20, gap: 10 },
+  tabButton: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: "#1c1c1e" },
+  tabButtonActive: { backgroundColor: "#4285F4" },
+  tabText: { color: "#8e8e93", fontWeight: "600" },
+  tabTextActive: { color: "#fff" },
+  modelTrayContainer: { marginBottom: 15 },
+  modelTrayScroll: { paddingHorizontal: 20, gap: 12 },
+  modelBubble: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, borderWidth: 1, gap: 8 },
+  toggleLight: { width: 6, height: 6, borderRadius: 3 },
+  modelBubbleText: { fontWeight: "bold", fontSize: 12 },
+  actionRow: { flexDirection: "row", paddingHorizontal: 20, gap: 10, alignItems: 'center' },
+  collideButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: "#33261a", borderWidth: 1, borderColor: "orange", justifyContent: "center", alignItems: "center" },
+  inputContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: "#1c1c1e", borderRadius: 25, paddingHorizontal: 15, height: 50 },
+  input: { flex: 1, color: "#fff", marginLeft: 10, fontSize: 15 },
+  sendButton: { backgroundColor: "#fff", width: 34, height: 34, borderRadius: 17, justifyContent: "center", alignItems: "center" }
 });

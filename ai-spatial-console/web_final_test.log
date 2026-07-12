@@ -1,15 +1,11 @@
-  --non-interactive is not supported, use $CI=1 instead
 Starting project at /app/ai-spatial-console
+Metro is running in CI mode, reloads are disabled. Remove CI=true to enable watch mode.
 Starting Metro Bundler
 
 Waiting on http://localhost:8081
 Logs for your project will appear below.
-Web Bundled 37046ms index.ts (3323 modules)
-Web Bundled 334ms index.ts (1 module)
+Web Bundled 6724ms index.ts (3201 modules)
 Web  INFO  %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-Web  WARN  "shadow*" style props are deprecated. Use "boxShadow".
-Web  WARN  "textShadow*" style props are deprecated. Use "textShadow".
-Web  WARN  [expo-av]: Expo AV has been deprecated and will be removed in SDK 54. Use the `expo-audio` and `expo-video` packages to replace the required functionality.
 Web  LOG  Running application "main" with appParams:
  {"hydrate": undefined, "rootTag": "#root"}
 Development-level warnings: ON.
