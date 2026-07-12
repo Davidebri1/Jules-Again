@@ -19,6 +19,7 @@ import {
   Globe,
   Mic,
   Send,
+  Grid,
   X,
   EyeOff,
   Plus,
@@ -36,8 +37,7 @@ export const GridOverlay: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isWebEnabled, setIsWebEnabled] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [isLayoutTrayOpen, setIsLayoutTrayOpen] = useState(false);
-
+  const [isGridTrayOpen, setIsGridTrayOpen] = useState(false);
   const {
     activeLayout,
     setActiveLayout,
@@ -59,7 +59,7 @@ export const GridOverlay: React.FC = () => {
     selectedTab,
     setSelectedTab,
     availableModels,
-    activeModelIdsByTab,
+    activeModelIdsByCategory,
     toggleActiveModel,
     setSettingsOpen,
     setConsensusOpen,
@@ -84,12 +84,16 @@ export const GridOverlay: React.FC = () => {
 
   const handleSendGlobal = async () => {
     if (!inputText.trim() || isGenerating) return;
-    if (activeModelIds.length === 0) {
-      Alert.alert("No Models Selected", "Select at least one model.");
+    if ((activeModelIdsByCategory[selectedTab] || []).length === 0) {
+      Alert.alert(
+        "No Models Selected",
+        "Please select at least one model to message.",
+      );
       return;
     }
 
-    const activeModels = activeModelIds
+    // 1. Filter Active Models by Current Tab
+    const activeModels = (activeModelIdsByCategory[selectedTab] || [])
       .map((id) => availableModels.find((m) => m.id === id))
       .filter((m): m is any => m !== undefined);
 
@@ -142,19 +146,33 @@ export const GridOverlay: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Row Customization Button */}
-        <View style={{ alignItems: 'center' }}>
-          <TouchableOpacity style={styles.iconButton} onPress={() => setIsLayoutTrayOpen(!isLayoutTrayOpen)}>
-             <LayoutGrid color="#fff" size={20} />
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => setIsGridTrayOpen(!isGridTrayOpen)}
+          >
+            <Grid color={isGridTrayOpen ? "#4285F4" : "#fff"} size={20} />
           </TouchableOpacity>
-          {isLayoutTrayOpen && (
-             <View style={styles.layoutTray}>
-                {["1x1", "2x2", "3x3"].map((l) => (
-                   <TouchableOpacity key={l} style={[styles.trayItem, activeLayout === l && styles.trayItemActive]} onPress={() => handleLayoutChange(l as any)}>
-                      <Text style={styles.trayText}>{l}</Text>
-                   </TouchableOpacity>
-                ))}
-             </View>
+          {isGridTrayOpen && (
+            <View style={[styles.gridSelector, { marginLeft: 8 }]}>
+              {(["1x1", "2x2", "3x3"] as GridLayout[]).map((layout, i) => (
+                <TouchableOpacity
+                  key={layout}
+                  style={[
+                    styles.gridButton,
+                    activeLayout === layout && styles.gridButtonActive,
+                  ]}
+                  onPress={() => {
+                      handleLayoutChange(layout);
+                      setIsGridTrayOpen(false);
+                  }}
+                >
+                  <Text style={styles.gridButtonText}>
+                    {i === 0 ? "1" : i === 1 ? "2" : "3"}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           )}
         </View>
 
@@ -188,10 +206,11 @@ export const GridOverlay: React.FC = () => {
         <View style={styles.modelTrayContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
             {displayedModels.map((model) => {
-              const isActive = activeModelIds.includes(model.id);
-              let color = "#4285F4";
-              if (model.tier === "elite") color = "#d97757";
-              if (model.tier === "free") color = "#10a37f";
+              const isActive = (activeModelIdsByCategory[selectedTab] || []).includes(model.id);
+              let borderColor = "rgba(255,255,255,0.3)";
+              if (model.tier === "pro") borderColor = "#4285F4"; // Blue for pro
+              if (model.tier === "elite") borderColor = "#d97757"; // Orange for elite
+              if (model.provider === "openai") borderColor = "#10a37f"; // OpenAI Green override
 
               return (
                 <TouchableOpacity
@@ -215,9 +234,56 @@ export const GridOverlay: React.FC = () => {
               <Sparkles color="orange" size={20} />
            </TouchableOpacity>
 
-           <View style={styles.inputContainer}>
-              <TouchableOpacity onPress={() => setFileManagerOpen(true)}>
-                 <Paperclip color="#8e8e93" size={20} />
+          {(pendingContextFiles.length > 0 || pendingSourceFile) && (
+            <ScrollView
+              horizontal
+              style={styles.holdingArea}
+              showsHorizontalScrollIndicator={false}
+            >
+              {pendingSourceFile && (
+                <View style={styles.attachmentPillSource}>
+                  <Text style={styles.attachmentPillTextSource}>
+                    Source: {pendingSourceFile.name}
+                  </Text>
+                  <TouchableOpacity onPress={() => setSourceFile(null)}>
+                    <X color="#4285F4" size={14} />
+                  </TouchableOpacity>
+                </View>
+              )}
+              {pendingContextFiles.map((f) => (
+                <View key={f.id} style={styles.attachmentPill}>
+                  <Text style={styles.attachmentPillText}>{f.name}</Text>
+                  <TouchableOpacity onPress={() => removeContextFile(f.id)}>
+                    <X color="#fff" size={14} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          )}
+          <View
+            style={{ flexDirection: "row", gap: 10, alignItems: "flex-end" }}
+          >
+            <TouchableOpacity
+              style={styles.newConvoBtn}
+              onPress={() =>
+                (activeModelIdsByCategory[selectedTab] || []).forEach((id) => archiveConversation(id))
+              }
+            >
+              <Plus color="#000" size={20} />
+            </TouchableOpacity>
+
+            <LinearGradient
+              colors={["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]}
+              style={[
+                styles.inputMock,
+                isPrivateMode && { borderColor: "rgba(255, 69, 58, 0.4)" },
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.iconButtonSmall}
+                onPress={() => setFileManagerOpen(true)}
+              >
+                <Paperclip color="rgba(255,255,255,0.7)" size={16} />
               </TouchableOpacity>
               <TextInput
                  style={styles.input}

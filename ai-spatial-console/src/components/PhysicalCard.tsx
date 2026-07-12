@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { RoundedBox, Text, MeshTransmissionMaterial } from '@react-three/drei';
+import React, { useRef, useState, useEffect } from 'react';
+import { RoundedBox, Text, MeshTransmissionMaterial, Html } from '@react-three/drei';
 import { useSpring, a } from '@react-spring/three';
 import { ModelProvider, useAppStore } from '../store/useAppStore';
 
@@ -11,7 +11,8 @@ interface PhysicalCardProps {
 
 export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isActive = true }) => {
   const [pressed, setPressed] = useState(false);
-  const [showDesc, setShowDesc] = useState(true);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
   const setFocusedModelId = useAppStore((state) => state.setFocusedModelId);
   const conversations = useAppStore((state) => state.conversations);
   const latestMessage = conversations[model.id]?.messages.slice(-1)[0]?.content || "Awaiting input...";
@@ -69,11 +70,39 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         {model.name}
       </Text>
 
-      {showDesc && (
-        <Text position={[0, 1.3, 0.11]} fontSize={0.12} color="rgba(255,255,255,0.8)" anchorX="center" maxWidth={2.5} textAlign="center">
-          {model.description}
-        </Text>
-      )}
+      {/* Description Html Overlay */}
+      <Html position={[0, 1.1, 0.11]} transform center>
+         <div
+           style={{
+             color: '#dddddd',
+             fontSize: '10px',
+             fontFamily: 'sans-serif',
+             background: 'rgba(0,0,0,0.5)',
+             padding: '4px 8px',
+             borderRadius: '8px',
+             cursor: 'pointer',
+             maxWidth: '120px',
+             textAlign: 'center',
+             whiteSpace: isDescExpanded ? 'normal' : 'nowrap',
+             overflow: isDescExpanded ? 'visible' : 'hidden',
+             textOverflow: isDescExpanded ? 'clip' : 'ellipsis',
+             userSelect: 'none'
+           }}
+           onPointerDown={(e) => { e.stopPropagation(); setIsDescExpanded(!isDescExpanded); }}
+         >
+           {model.description}
+         </div>
+      </Html>
+
+      <Text
+        position={[0, 0.7, 0.11]}
+        fontSize={0.15}
+        color="#dddddd"
+        anchorX="center"
+        anchorY="middle"
+      >
+        {model.tier.toUpperCase()}
+      </Text>
 
       <Text position={[0, -0.2, 0.11]} fontSize={0.11} color="#fff" anchorX="center" maxWidth={2.6} textAlign="left">
          {latestMessage.substring(0, 500)}

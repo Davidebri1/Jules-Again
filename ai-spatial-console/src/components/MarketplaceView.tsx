@@ -3,6 +3,15 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Tex
 import { useAppStore } from '../store/useAppStore';
 import { X, Search, Sparkles, Download, Heart, ArrowUpRight } from 'lucide-react-native';
 
+const MOCK_ARTIFACTS = [
+  { id: '1', title: 'Cyberpunk Cityscape', creator: '@neon_dreams', likes: 1205, type: 'image', uri: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=800&auto=format&fit=crop' },
+  { id: '2', title: 'Artifacts: Full Artifact and Canvas Generator', creator: '@frontend_ninja', likes: 856, type: 'code', uri: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop' },
+  { id: '3', title: 'Cinematic Trailer Audio', creator: '@hans_zimmer_ai', likes: 3402, type: 'audio', uri: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=800&auto=format&fit=crop' },
+  { id: '4', title: 'Quantum Computing Explanation', creator: '@science_bot', likes: 412, type: 'text', uri: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop' },
+  { id: '5', title: '3D Robot Walk Cycle', creator: '@animator_x', likes: 2100, type: 'video', uri: 'https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=800&auto=format&fit=crop' },
+  { id: '6', title: 'Dark Mode SaaS UI', creator: '@ui_ux_god', likes: 1540, type: 'code', uri: 'https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=800&auto=format&fit=crop' },
+];
+
 export const MarketplaceView: React.FC = () => {
   const { isMarketplaceOpen, setMarketplaceOpen, selectedTab } = useAppStore();
   const [query, setQuery] = useState('');

@@ -4,10 +4,17 @@ import { Environment, ContactShadows } from '@react-three/drei';
 import { PhysicalCard } from './PhysicalCard';
 import { useAppStore } from '../store/useAppStore';
 
-const ScrollingGrid = () => {
-  const { activeModelIdsByTab, selectedTab, availableModels, activeLayout } = useAppStore();
-  const activeModelIds = activeModelIdsByTab[selectedTab] || [];
-  const activeModels = useMemo(() => activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(Boolean), [activeModelIds, availableModels]);
+export const ChatDashboard: React.FC = () => {
+  const activeModelIds = useAppStore((state) => (state.activeModelIdsByCategory[state.selectedTab] || []));
+  const availableModels = useAppStore((state) => state.availableModels);
+  const selectedTab = useAppStore((state) => state.selectedTab);
+  const files = useAppStore((state) => state.files);
+  const activeFiles = files.filter(f => activeModelIds.includes(f.modelId || '') && f.category === 'generated');
+  const activeLayout = useAppStore((state) => state.activeLayout);
+
+  const activeModels = useMemo(() => {
+    return activeModelIds.map(id => availableModels.find(m => m.id === id)).filter(Boolean);
+  }, [activeModelIds, availableModels]);
 
   const gridPositions = useMemo(() => {
     const spacingX = 4;
