@@ -1,26 +1,32 @@
-import React, { useState } from "react";
+import { processSmartGen } from '../utils/smartGen';
+import React, { useState, useMemo } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import Markdown from "react-native-markdown-display";
+import * as Clipboard from 'expo-clipboard';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { useAppStore } from "../store/useAppStore";
-import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Globe, Zap, Sparkles, Terminal, LayoutTemplate, Search } from "lucide-react-native";
+import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Globe, Zap, Terminal, LayoutTemplate, Search } from "lucide-react-native";
 import { generateResponse } from "../utils/api";
 
 export const CardDetailView: React.FC = () => {
-  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, userProfile, deductMessage, deductCredits, setUpgradeOpen, selectedTab } = useAppStore();
+  const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, deductMessage, deductCredits, setUpgradeOpen, selectedTab } = useAppStore();
   const [inputText, setInputText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeepResearch, setIsDeepResearch] = useState(false);
   const [isWebEnabled, setIsWebEnabled] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
-  const model = availableModels.find((m) => m.id === focusedModelId);
-  const conversation = focusedModelId ? conversations[focusedModelId] : null;
+  const model = useMemo(() => availableModels.find((m) => m.id === focusedModelId), [focusedModelId, availableModels]);
+  const conversation = useMemo(() => focusedModelId ? conversations[focusedModelId] : null, [focusedModelId, conversations]);
   const messages = conversation?.messages || [];
 
   if (!model) return null;
 
   const handleSend = async () => {
     if (!inputText.trim() || isGenerating) return;
+
+    const fullPrompt = isWebEnabled ? `[WEB SEARCH ENABLED] ${inputText}` : inputText;
 
     if (selectedTab === "general") {
        if (!deductMessage()) { setUpgradeOpen(true); return; }
@@ -30,13 +36,26 @@ export const CardDetailView: React.FC = () => {
 
     let userMsg = inputText.trim();
     setInputText("");
-    addMessage(model.id, "user", userMsg);
+    addMessage(model.id, "user", fullPrompt);
     setIsGenerating(true);
 
     try {
-      const res = await generateResponse(model, [...messages, { role: 'user', content: userMsg, id: 'new', timestamp: Date.now() }]);
-      addMessage(model.id, "assistant", res);
+      const res = await generateResponse(model, [...messages, { role: 'user', content: fullPrompt, id: 'new', timestamp: Date.now() }]);
+      const msgId = addMessage(model.id, "assistant", res);
+    processSmartGen(model.id, msgId, res);
     } catch (e) { console.error(e); } finally { setIsGenerating(false); }
+  };
+
+  const handleActionMenu = (msgContent: string) => {
+     Alert.alert("Message Actions", "Select an operation.", [
+        { text: "Copy Text", onPress: () => Clipboard.setStringAsync(msgContent) },
+        { text: "Download (.txt)", onPress: async () => {
+            const fileUri = FileSystem.cacheDirectory + 'spatial_export.txt';
+            await FileSystem.writeAsStringAsync(fileUri, msgContent);
+            await Sharing.shareAsync(fileUri);
+        }},
+        { text: "Cancel", style: "cancel" }
+     ]);
   };
 
   const showSpecialSuite = () => {
@@ -60,7 +79,7 @@ export const CardDetailView: React.FC = () => {
 
         <ScrollView style={styles.chatArea} contentContainerStyle={styles.chatContent}>
            {messages.map((msg, idx) => (
-              <TouchableOpacity key={idx} onLongPress={() => Alert.alert("Options", "Message Actions", [{text: "Copy"}, {text: "Remix"}, {text: "Delete"}])} delayLongPress={500}>
+              <TouchableOpacity key={msg.id || idx} onLongPress={() => handleActionMenu(msg.content)} delayLongPress={500}>
                  <View style={[styles.messageWrapper, msg.role === 'user' ? styles.messageUser : styles.messageAssistant]}>
                     <View style={[styles.messageBubble, msg.role === 'user' ? styles.bubbleUser : styles.bubbleAssistant]}>
                        {msg.role === 'assistant' ? <Markdown style={markdownStyles}>{msg.content}</Markdown> : <Text style={styles.userText}>{msg.content}</Text>}
@@ -78,6 +97,9 @@ export const CardDetailView: React.FC = () => {
               </TouchableOpacity>
               <TouchableOpacity style={[styles.optionPill, isWebEnabled && styles.activePill]} onPress={() => setIsWebEnabled(!isWebEnabled)}>
                  <Globe color={isWebEnabled ? "#4285F4" : "#fff"} size={14} /><Text style={[styles.optionText, isWebEnabled && styles.activeText]}>Web</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.optionPill, isRecording && { borderColor: 'red' }]} onPress={() => setIsRecording(!isRecording)}>
+                 <Mic color={isRecording ? "red" : "#fff"} size={14} /><Text style={[styles.optionText, isRecording && { color: 'red' }]}>Voice</Text>
               </TouchableOpacity>
            </View>
 

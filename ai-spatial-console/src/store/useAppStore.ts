@@ -146,7 +146,6 @@ const INITIAL_MODELS: ModelProvider[] = [
   { id: 'ideogram', name: 'Ideogram', provider: 'other', tier: 'pro', category: 'image', description: 'Typography focused images.', baseCreditCost: 5 },
   { id: 'flux-pro', name: 'Flux Pro', provider: 'other', tier: 'elite', category: 'image', description: 'Premium Flux model.', routingKey: 'black-forest-labs/flux-pro', baseCreditCost: 15 },
   { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'OpenAI Premium image.', baseCreditCost: 20 },
-  { id: 'midjourney-v6', name: 'Midjourney v6', provider: 'other', tier: 'elite', category: 'image', description: 'Artistic high fidelity.', baseCreditCost: 25 },
 
   // ================= VIDEO =================
   { id: 'luma-dream-machine', name: 'Luma Dream', provider: 'other', tier: 'pro', category: 'video', description: 'Fast video generation.', baseCreditCost: 30 },
@@ -172,6 +171,16 @@ const INITIAL_MODELS: ModelProvider[] = [
   { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus', baseCreditCost: 20 },
   { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'elite', category: 'coding', description: 'Advanced instruction following.', baseCreditCost: 15 },
 ];
+
+
+export const abbreviateName = (name: string) => {
+   if (name.includes('LLaMA')) return 'LLAMA';
+   if (name.includes('Claude')) return 'CLAUDE';
+   if (name.includes('Gemini')) return 'GEMINI';
+   if (name.includes('Gemma')) return 'GEMMA';
+   if (name.includes('GPT')) return 'GPT-4O';
+   return name.substring(0, 6).toUpperCase();
+};
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -354,7 +363,7 @@ export const useAppStore = create<AppState>()(
       isAuthenticated: false,
       setAuthenticated: (isAuth) => set({ isAuthenticated: isAuth }),
       isPrivateMode: false,
-      isSmartGenEnabled: false,
+      isSmartGenEnabled: true,
       setSmartGenEnabled: (enabled) => set({ isSmartGenEnabled: enabled }),
       setPrivateMode: (isPrivate) => set({ isPrivateMode: isPrivate }),
       accountId: null,

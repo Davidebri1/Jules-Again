@@ -8,23 +8,16 @@ import {
   SafeAreaView,
   TextInput,
   Alert,
-  Platform,
 } from "react-native";
 import { useAppStore, StoredFile } from "../store/useAppStore";
 import {
   X,
   Upload,
   FileText,
-  Image as ImageIcon,
-  Video,
   Search,
   MoreVertical,
-  Star,
-  DownloadCloud,
 } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
-import * as Sharing from "expo-sharing";
-import * as MediaLibrary from 'expo-media-library';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 export const FileManagerView: React.FC = () => {
@@ -33,14 +26,10 @@ export const FileManagerView: React.FC = () => {
     setFileManagerOpen,
     files,
     setFiles,
-    starredFiles,
-    toggleStarFile,
-    setSourceFile,
     selectedTab,
   } = useAppStore();
   const [activeTab, setActiveTab] = useState<any>("uploaded");
   const [searchQuery, setSearchQuery] = useState("");
-  const [previewFile, setPreviewFile] = useState<StoredFile | null>(null);
 
   const transX = useSharedValue(500);
   React.useEffect(() => {
@@ -106,16 +95,20 @@ export const FileManagerView: React.FC = () => {
         </View>
 
         <ScrollView contentContainerStyle={{ padding: 20 }}>
-           {displayFiles.map(file => (
-              <View key={file.id} style={styles.fileCard}>
-                 <View style={styles.iconBox}><FileText color="#fff" size={24} /></View>
-                 <View style={{ flex: 1 }}>
-                    <Text style={styles.fileName}>{file.name}</Text>
-                    <Text style={styles.fileMeta}>{(file.size / 1024).toFixed(1)} KB</Text>
+           {displayFiles.length === 0 ? (
+              <Text style={{ color: '#636366', textAlign: 'center', marginTop: 40 }}>No files found.</Text>
+           ) : (
+              displayFiles.map(file => (
+                 <View key={file.id} style={styles.fileCard}>
+                    <View style={styles.iconBox}><FileText color="#fff" size={24} /></View>
+                    <View style={{ flex: 1 }}>
+                       <Text style={styles.fileName}>{file.name}</Text>
+                       <Text style={styles.fileMeta}>{(file.size / 1024).toFixed(1)} KB</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => Alert.alert("File Options", "Download / Delete / Star")}><MoreVertical color="#636366" size={20} /></TouchableOpacity>
                  </View>
-                 <TouchableOpacity onPress={() => setPreviewFile(file)}><MoreVertical color="#636366" size={20} /></TouchableOpacity>
-              </View>
-           ))}
+              ))
+           )}
         </ScrollView>
       </SafeAreaView>
     </Animated.View>

@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
-import { Platform,
+import { processSmartGen } from '../utils/smartGen';
+import React, { useState, useMemo } from "react";
+import {
   StyleSheet,
   View,
   Text,
@@ -8,20 +9,21 @@ import { Platform,
   SafeAreaView,
   TextInput,
   Alert,
-  ActivityIndicator} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { useAppStore, GridLayout, ModelCategory } from "../store/useAppStore";
+} from "react-native";
+import {
+  ModelCategory,
+  ModelProvider,
+  useAppStore,
+  GridLayout,
+  abbreviateName
+} from "../store/useAppStore";
 import {
   Settings,
-  User,
-  Sparkles,
   Clock,
+  User,
   Globe,
-  Mic,
+  Sparkles,
   Send,
-  X,
-  EyeOff,
-  Plus,
   Paperclip,
   Search,
   LayoutGrid,
@@ -31,30 +33,18 @@ import { generateResponse } from "../utils/api";
 
 export const GridOverlay: React.FC = () => {
   const [inputText, setInputText] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isWebEnabled, setIsWebEnabled] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [isLayoutTrayOpen, setIsLayoutTrayOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     activeLayout,
     setActiveLayout,
-    userProfile,
     deductCredits,
     deductMessage,
     setUpgradeOpen,
     addMessage,
     conversations,
-    pendingContextFiles,
-    pendingSourceFile,
-    removeContextFile,
-    setSourceFile,
-    setAuthOpen,
-    isPrivateMode,
-    setPrivateMode,
-    archiveConversation,
     setFileManagerOpen,
     selectedTab,
     setSelectedTab,
@@ -65,6 +55,8 @@ export const GridOverlay: React.FC = () => {
     setConsensusOpen,
     setHistoryOpen,
     setMarketplaceOpen,
+    setAuthOpen,
+    isPrivateMode
   } = useAppStore();
 
   const activeModelIds = activeModelIdsByTab[selectedTab] || [];
@@ -95,14 +87,12 @@ export const GridOverlay: React.FC = () => {
 
     if (selectedTab === "general") {
       if (!deductMessage()) {
-        Alert.alert("Limit Reached", "Free users get 10 messages/day. Upgrade for more.");
         setUpgradeOpen(true);
         return;
       }
     } else {
       const totalCost = activeModels.reduce((sum, m) => sum + m.baseCreditCost, 0);
       if (!deductCredits(totalCost)) {
-        Alert.alert("Insufficient Credits", "You need credits for this tab.");
         setUpgradeOpen(true);
         return;
       }
@@ -118,7 +108,8 @@ export const GridOverlay: React.FC = () => {
         addMessage(model.id, "user", fullMessage);
         const history = conversations[model.id]?.messages || [];
         const res = await generateResponse(model, [...history, { role: 'user', content: fullMessage, id: 'new', timestamp: Date.now() }]);
-        addMessage(model.id, "assistant", res);
+        const msgId = addMessage(model.id, "assistant", res);
+        processSmartGen(model.id, msgId, res);
       })
     );
 
@@ -126,12 +117,15 @@ export const GridOverlay: React.FC = () => {
   };
 
   const displayedModels = useMemo(() => {
-    return availableModels.filter((m) => m.category === selectedTab);
-  }, [availableModels, selectedTab]);
+    return availableModels.filter((m) =>
+       m.category === selectedTab &&
+       m.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [availableModels, selectedTab, searchQuery]);
 
   return (
     <SafeAreaView style={styles.overlay} pointerEvents="box-none">
-      {/* Top Bar - OPAQUE */}
+      {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={{ flexDirection: "row", gap: 10 }}>
           <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
@@ -142,7 +136,6 @@ export const GridOverlay: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Row Customization Button */}
         <View style={{ alignItems: 'center' }}>
           <TouchableOpacity style={styles.iconButton} onPress={() => setIsLayoutTrayOpen(!isLayoutTrayOpen)}>
              <LayoutGrid color="#fff" size={20} />
@@ -169,7 +162,18 @@ export const GridOverlay: React.FC = () => {
       </View>
 
       <View style={styles.bottomSection}>
-        {/* Category Tabs */}
+        {/* Search Bar for Models */}
+        <View style={styles.searchContainer}>
+           <Search color="#636366" size={16} />
+           <TextInput
+              style={styles.searchInput}
+              placeholder="Search Models..."
+              placeholderTextColor="#636366"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+           />
+        </View>
+
         <View style={styles.tabsContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
             {categories.map((cat) => (
@@ -184,7 +188,6 @@ export const GridOverlay: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Model Tray - One Row, Scrollable, Opaque */}
         <View style={styles.modelTrayContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modelTrayScroll}>
             {displayedModels.map((model) => {
@@ -201,7 +204,7 @@ export const GridOverlay: React.FC = () => {
                 >
                   <View style={[styles.toggleLight, { backgroundColor: isActive ? "#fff" : "#444" }]} />
                   <Text style={[styles.modelBubbleText, { color: isActive ? "#000" : "#fff" }]}>
-                    {model.name.substring(0, 6).toUpperCase()}
+                    {abbreviateName(model.name)}
                   </Text>
                 </TouchableOpacity>
               );
@@ -209,7 +212,6 @@ export const GridOverlay: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Action Row */}
         <View style={styles.actionRow}>
            <TouchableOpacity style={styles.collideButton} onPress={() => setConsensusOpen(true)}>
               <Sparkles color="orange" size={20} />
@@ -246,6 +248,8 @@ const styles = StyleSheet.create({
   trayItemActive: { backgroundColor: '#4285F4' },
   trayText: { color: '#fff', fontSize: 12, fontWeight: 'bold' },
   bottomSection: { backgroundColor: "#0a0a0c", paddingBottom: 30, borderTopWidth: 1, borderTopColor: "#1c1c1e" },
+  searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1c1c1e', marginHorizontal: 20, marginTop: 10, paddingHorizontal: 15, borderRadius: 12, height: 36 },
+  searchInput: { flex: 1, color: '#fff', fontSize: 13, marginLeft: 10 },
   tabsContainer: { paddingVertical: 10 },
   tabsScroll: { paddingHorizontal: 20, gap: 10 },
   tabButton: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 20, backgroundColor: "#1c1c1e" },
@@ -256,7 +260,7 @@ const styles = StyleSheet.create({
   modelTrayScroll: { paddingHorizontal: 20, gap: 12 },
   modelBubble: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12, borderWidth: 1, gap: 8 },
   toggleLight: { width: 6, height: 6, borderRadius: 3 },
-  modelBubbleText: { fontWeight: "bold", fontSize: 12 },
+  modelBubbleText: { fontWeight: "bold", fontSize: 10 },
   actionRow: { flexDirection: "row", paddingHorizontal: 20, gap: 10, alignItems: 'center' },
   collideButton: { width: 50, height: 50, borderRadius: 25, backgroundColor: "#33261a", borderWidth: 1, borderColor: "orange", justifyContent: "center", alignItems: "center" },
   inputContainer: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: "#1c1c1e", borderRadius: 25, paddingHorizontal: 15, height: 50 },
