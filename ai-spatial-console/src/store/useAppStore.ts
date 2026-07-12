@@ -2,42 +2,16 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export type SubscriptionTier = 'free' | 'pro' | 'elite';
-
-export type ThemeType = 'image' | 'video';
-export interface Theme {
-    id: string;
-    name: string;
-    uri: string | any;
-    type: ThemeType;
-}
-
 export type ModelCategory = 'general' | 'image' | 'video' | 'music' | 'coding';
+export type UserTier = 'free' | 'pro' | 'elite';
+export type ModelTier = 'free' | 'pro' | 'elite';
 export type GridLayout = '1x1' | '2x2' | '3x3';
-
-export type FileCategory = 'uploaded' | 'generated' | 'collection';
-export interface StoredFile {
-  id: string;
-  name: string;
-  uri: string;
-  type: string;
-  size: number;
-  category: FileCategory;
-  modelId?: string;
-}
-
-export interface UserProfile {
-  tier: SubscriptionTier;
-  credits: number;
-  messageCount: number; // Daily count for free users
-  lastDailyReset: number; // Timestamp
-}
 
 export interface ModelProvider {
   id: string;
   name: string;
   provider: string;
-  tier: SubscriptionTier;
+  tier: ModelTier;
   category: ModelCategory;
   description: string;
   routingKey?: string;
@@ -49,59 +23,78 @@ export interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: number;
-  smartGenEvent?: { type: 'memory' | 'task' | 'reminder', desc: string };
+  smartGenEvent?: {
+    type: 'memory' | 'task' | 'reminder' | 'artifact';
+    description: string;
+  };
 }
 
 export interface Conversation {
-  modelId: string;
   id: string;
+  modelId: string;
   title: string;
   messages: Message[];
   updatedAt: number;
 }
 
-export interface AppState {
-  userProfile: UserProfile;
+export interface StoredFile {
+  id: string;
+  name: string;
+  uri: string;
+  type: string;
+  size: number;
+  category: 'uploaded' | 'generated' | 'collection';
+}
+
+interface AppState {
+  userProfile: {
+    tier: UserTier;
+    credits: number;
+    messageCount: number;
+    lastDailyReset: number;
+  };
+  checkAndResetDaily: () => void;
+  deductMessage: () => boolean;
   deductCredits: (amount: number) => boolean;
   refundCredits: (amount: number) => void;
-  deductMessage: () => boolean; // For free users
-  setUserTier: (tier: SubscriptionTier) => void;
-  checkAndResetDaily: () => void;
+  setUserTier: (tier: UserTier) => void;
 
-  // Layout & Core UI (Persisted)
   activeLayout: GridLayout;
   setActiveLayout: (layout: GridLayout) => void;
-  currentThemeId: string;
-  themes: Theme[];
-  setCurrentThemeId: (id: string) => void;
-  addTheme: (theme: Theme) => void;
 
-  // Models (Partially persisted, per-tab active models)
+  themes: { id: string; name: string; uri: any; type: 'image' | 'video' }[];
+  currentThemeId: string;
+  setCurrentThemeId: (id: string) => void;
+  addTheme: (theme: any) => void;
+
   availableModels: ModelProvider[];
   activeModelIdsByTab: Record<ModelCategory, string[]>;
-  toggleActiveModel: (modelId: string) => void;
+  toggleActiveModel: (id: string) => void;
+
   selectedTab: ModelCategory;
   setSelectedTab: (tab: ModelCategory) => void;
+
   focusedModelId: string | null;
   setFocusedModelId: (id: string | null) => void;
 
-  // Conversations
   conversations: Record<string, Conversation>;
-  addMessage: (modelId: string, role: 'user' | 'assistant' | 'system', content: string) => string;
+  addMessage: (modelId: string, role: 'user' | 'assistant', content: string) => string;
   updateMessageEvent: (modelId: string, msgId: string, event: Message['smartGenEvent']) => void;
   clearConversation: (modelId: string) => void;
 
-  // Drawers & Panels
   isSettingsOpen: boolean;
   setSettingsOpen: (isOpen: boolean) => void;
   isConsensusOpen: boolean;
-  setConsensusOpen: (isOpen) => void;
+  setConsensusOpen: (isOpen: boolean) => void;
   isSmartGenOpen: boolean;
+  setSmartGenOpen: (isOpen: boolean) => void;
   isHistoryOpen: boolean;
   setHistoryOpen: (isOpen: boolean) => void;
   archivedConversations: Conversation[];
   archiveConversation: (modelId: string) => void;
+
   isUpgradeOpen: boolean;
+  setUpgradeOpen: (isOpen: boolean) => void;
   isMarketplaceOpen: boolean;
   setMarketplaceOpen: (isOpen: boolean) => void;
   marketCategory: string;
@@ -117,21 +110,21 @@ export interface AppState {
   toggleStarFile: (id: string) => void;
   isFileManagerOpen: boolean;
   setFileManagerOpen: (isOpen: boolean) => void;
+
   isAuthOpen: boolean;
   setAuthOpen: (isOpen: boolean) => void;
   isAuthenticated: boolean;
   setAuthenticated: (isAuth: boolean) => void;
-  logout: () => void;
   isPrivateMode: boolean;
+  setPrivateMode: (isPrivate: boolean) => void;
   isSmartGenEnabled: boolean;
   setSmartGenEnabled: (enabled: boolean) => void;
-  setPrivateMode: (isPrivate: boolean) => void;
   accountId: string | null;
   login: (accountId: string) => void;
+  logout: () => void;
+
   files: StoredFile[];
-  setFiles: (files: StoredFile[] | ((prev: StoredFile[]) => StoredFile[])) => void;
-  setUpgradeOpen: (isOpen: boolean) => void;
-  setSmartGenOpen: (isOpen: boolean) => void;
+  setFiles: (update: StoredFile[] | ((prev: StoredFile[]) => StoredFile[])) => void;
 }
 
 const INITIAL_MODELS: ModelProvider[] = [
@@ -142,31 +135,42 @@ const INITIAL_MODELS: ModelProvider[] = [
   { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free', baseCreditCost: 0 },
   { id: 'phi-3-mini', name: 'Phi-3 Mini', provider: 'other', tier: 'free', category: 'general', description: 'Microsoft small model.', routingKey: 'microsoft/phi-3-mini-128k-instruct:free', baseCreditCost: 0 },
   { id: 'openchat-3.5', name: 'OpenChat 3.5', provider: 'other', tier: 'free', category: 'general', description: 'Open source chat model.', routingKey: 'openchat/openchat-7b:free', baseCreditCost: 0 },
-
   { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o', baseCreditCost: 0 },
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 0 },
+  { id: 'claude-3-5-sonnet-gen', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 0 },
   { id: 'gemini-1-5-pro', name: 'Gemini 1.5 Pro', provider: 'google', tier: 'pro', category: 'general', description: 'Google multimodal expert.', routingKey: 'google/gemini-1.5-pro', baseCreditCost: 0 },
   { id: 'grok-1-5', name: 'Grok 1.5', provider: 'xai', tier: 'pro', category: 'general', description: 'xAI advanced model.', routingKey: 'x-ai/grok-2', baseCreditCost: 0 },
 
   // ================= IMAGE =================
   { id: 'flux-schnell', name: 'Flux Schnell', provider: 'other', tier: 'pro', category: 'image', description: 'Fast image generation.', routingKey: 'black-forest-labs/flux-schnell', baseCreditCost: 5 },
   { id: 'sdxl', name: 'SDXL', provider: 'other', tier: 'pro', category: 'image', description: 'Stable Diffusion XL.', routingKey: 'stability-ai/sdxl', baseCreditCost: 5 },
+  { id: 'ideogram', name: 'Ideogram', provider: 'other', tier: 'pro', category: 'image', description: 'Typography focused images.', baseCreditCost: 5 },
   { id: 'flux-pro', name: 'Flux Pro', provider: 'other', tier: 'elite', category: 'image', description: 'Premium Flux model.', routingKey: 'black-forest-labs/flux-pro', baseCreditCost: 15 },
   { id: 'dall-e-3', name: 'DALL-E 3', provider: 'openai', tier: 'elite', category: 'image', description: 'OpenAI Premium image.', baseCreditCost: 20 },
+  { id: 'midjourney-v6', name: 'Midjourney v6', provider: 'other', tier: 'elite', category: 'image', description: 'Artistic high fidelity.', baseCreditCost: 25 },
 
   // ================= VIDEO =================
   { id: 'luma-dream-machine', name: 'Luma Dream', provider: 'other', tier: 'pro', category: 'video', description: 'Fast video generation.', baseCreditCost: 30 },
+  { id: 'haiper-v1', name: 'Haiper V1', provider: 'other', tier: 'pro', category: 'video', description: 'Creative video synthesis.', baseCreditCost: 30 },
+  { id: 'pika', name: 'Pika', provider: 'other', tier: 'pro', category: 'video', description: 'Animation specialist.', baseCreditCost: 30 },
   { id: 'sora', name: 'Sora', provider: 'openai', tier: 'elite', category: 'video', description: 'OpenAI video generation.', baseCreditCost: 100 },
   { id: 'runway-gen3', name: 'Runway Gen-3', provider: 'other', tier: 'elite', category: 'video', description: 'High fidelity video synthesis.', baseCreditCost: 100 },
+  { id: 'kling-ai', name: 'Kling AI', provider: 'other', tier: 'elite', category: 'video', description: 'Advanced physics video.', baseCreditCost: 100 },
 
   // ================= MUSIC =================
   { id: 'elevenlabs', name: 'ElevenLabs', provider: 'other', tier: 'pro', category: 'music', description: 'Premium voice synthesis.', baseCreditCost: 10 },
+  { id: 'musicgen', name: 'MusicGen', provider: 'meta', tier: 'pro', category: 'music', description: 'Meta music foundation.', baseCreditCost: 10 },
+  { id: 'openai-tts', name: 'OpenAI TTS', provider: 'openai', tier: 'pro', category: 'music', description: 'Natural speech synthesis.', baseCreditCost: 5 },
   { id: 'suno-v3', name: 'Suno v3', provider: 'other', tier: 'elite', category: 'music', description: 'Full song generation.', baseCreditCost: 50 },
   { id: 'udio', name: 'Udio', provider: 'other', tier: 'elite', category: 'music', description: 'High fidelity music tracks.', baseCreditCost: 60 },
+  { id: 'stable-audio', name: 'Stable Audio', provider: 'other', tier: 'elite', category: 'music', description: 'High quality audio clips.', baseCreditCost: 40 },
 
   // ================= CODING =================
   { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'other', tier: 'pro', category: 'coding', description: 'Specialized coding model.', routingKey: 'deepseek/deepseek-coder', baseCreditCost: 5 },
+  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Anthropic coding expert.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 5 },
+  { id: 'gpt-4o-coding', name: 'GPT-4o (Coding)', provider: 'openai', tier: 'pro', category: 'coding', description: 'OpenAI reasoning model.', routingKey: 'openai/gpt-4o', baseCreditCost: 5 },
+  { id: 'phind-codellama', name: 'Phind CodeLlama', provider: 'other', tier: 'pro', category: 'coding', description: 'Search-focused coding.', baseCreditCost: 5 },
   { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus', baseCreditCost: 20 },
+  { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'elite', category: 'coding', description: 'Advanced instruction following.', baseCreditCost: 15 },
 ];
 
 export const useAppStore = create<AppState>()(
@@ -350,7 +354,7 @@ export const useAppStore = create<AppState>()(
       isAuthenticated: false,
       setAuthenticated: (isAuth) => set({ isAuthenticated: isAuth }),
       isPrivateMode: false,
-      isSmartGenEnabled: false, // Default to off as requested
+      isSmartGenEnabled: false,
       setSmartGenEnabled: (enabled) => set({ isSmartGenEnabled: enabled }),
       setPrivateMode: (isPrivate) => set({ isPrivateMode: isPrivate }),
       accountId: null,

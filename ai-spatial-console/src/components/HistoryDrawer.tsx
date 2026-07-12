@@ -43,7 +43,7 @@ export const HistoryDrawer: React.FC = () => {
 const styles = StyleSheet.create({
   container: { ...StyleSheet.absoluteFill, zIndex: 600 },
   drawer: { width: '80%', backgroundColor: '#0a0a0c', height: '100%', borderRightWidth: 1, borderRightColor: '#1c1c1e' },
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)' }, // Backdrop stays semi-transparent for depth
+  backdrop: { flex: 1, backgroundColor: '#000' }, // Backdrop stays semi-transparent for depth
   header: { flexDirection: 'row', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderBottomColor: '#1c1c1e' },
   title: { color: '#fff', fontSize: 16, fontWeight: '800' },
   empty: { color: '#636366', textAlign: 'center', marginTop: 40 },

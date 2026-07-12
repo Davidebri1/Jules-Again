@@ -19,10 +19,13 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      {/* Opaque black background handles letterboxing for contain mode */}
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000' }]} />
+
       <ImageBackground
          source={typeof currentTheme?.uri === "string" ? { uri: currentTheme?.uri } : currentTheme?.uri}
          style={StyleSheet.absoluteFill}
-         resizeMode="cover"
+         resizeMode="contain"
       />
 
       <View style={styles.canvasContainer}>
@@ -48,7 +51,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000' },
+  container: { flex: 1 },
   canvasContainer: { ...StyleSheet.absoluteFill },
   overlayContainer: { ...StyleSheet.absoluteFill }
 });

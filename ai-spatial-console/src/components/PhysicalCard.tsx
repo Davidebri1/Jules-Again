@@ -42,18 +42,39 @@ export const PhysicalCard: React.FC<PhysicalCardProps> = ({ model, position, isA
         }}
         onPointerOut={() => setPressed(false)}
       >
-        <MeshTransmissionMaterial transmission={1} thickness={0.5} roughness={0.1} color={cardColor} />
+        {/* High-fidelity glass material for absolute transparency and light refraction */}
+        <MeshTransmissionMaterial
+          transmission={1.0}
+          thickness={0.5}
+          roughness={0.05}
+          chromaticAberration={0.06}
+          anisotropy={0.1}
+          distortion={0.1}
+          distortionScale={0.2}
+          temporalDistortion={0.1}
+          ior={1.2}
+          color={cardColor}
+          transparent
+          opacity={0.3}
+        />
       </RoundedBox>
 
-      <Text position={[0, 1.6, 0.11]} fontSize={0.25} color="#fff" anchorX="center">{model.name}</Text>
+      <Text
+        position={[0, 1.6, 0.11]}
+        fontSize={0.25}
+        color="#fff"
+        anchorX="center"
+        font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2"
+      >
+        {model.name}
+      </Text>
 
       {showDesc && (
-        <Text position={[0, 1.3, 0.11]} fontSize={0.12} color="#aaa" anchorX="center" maxWidth={2.5} textAlign="center">
+        <Text position={[0, 1.3, 0.11]} fontSize={0.12} color="rgba(255,255,255,0.8)" anchorX="center" maxWidth={2.5} textAlign="center">
           {model.description}
         </Text>
       )}
 
-      {/* Scrollable text isn't native in R3F Text, so we provide a scrollable box via substring logic or simple display */}
       <Text position={[0, -0.2, 0.11]} fontSize={0.11} color="#fff" anchorX="center" maxWidth={2.6} textAlign="left">
          {latestMessage.substring(0, 500)}
       </Text>

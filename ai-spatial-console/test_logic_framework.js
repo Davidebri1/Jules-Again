@@ -1,5 +1,5 @@
 const axios = require('axios');
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || 'MISSING_KEY';
 
 const systemPrompt = `LOGICAL FRAMEWORK:
 1. Micro window (8KB). Noise = subjective.

@@ -115,6 +115,7 @@ export const GridOverlay: React.FC = () => {
 
     await Promise.all(
       activeModels.map(async (model) => {
+        addMessage(model.id, "user", fullMessage);
         const history = conversations[model.id]?.messages || [];
         const res = await generateResponse(model, [...history, { role: 'user', content: fullMessage, id: 'new', timestamp: Date.now() }]);
         addMessage(model.id, "assistant", res);

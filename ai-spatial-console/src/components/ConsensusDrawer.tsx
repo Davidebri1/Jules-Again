@@ -41,12 +41,23 @@ export const ConsensusDrawer: React.FC = () => {
 
          <View style={styles.mappingArea}>
             <View style={styles.consensusAnchor}><View style={styles.anchorDot} /><Text style={styles.anchorText}>Consensus Center</Text></View>
-            {activeModels.slice(0, 2).map((m, i) => (
-               <View key={m?.id} style={[styles.node, { left: i === 0 ? 40 : width - 120, bottom: 50 }]}>
-                  <View style={[styles.nodeDot, { backgroundColor: scoreColor }]} />
-                  <Text style={styles.nodeText}>{m?.name.substring(0, 8)}</Text>
-               </View>
-            ))}
+
+            {/* Improved Push/Pull Logic Simulation */}
+            {activeModels.map((m, i) => {
+               if (!m) return null;
+               // Simulate spatial distribution: dissenters move to corners, consensus models stay closer to center
+               const isDissenter = i === activeModels.length - 1 && total > 1;
+               const leftPos = isDissenter ? (i % 2 === 0 ? 20 : width - 120) : (width / 2 - 50 + (i * 20));
+               const bottomPos = isDissenter ? 20 : 100 + (i * 10);
+
+               return (
+                  <View key={m.id} style={[styles.node, { left: leftPos, bottom: bottomPos }]}>
+                     <View style={[styles.nodeDot, { backgroundColor: isDissenter ? '#ff4444' : scoreColor }]} />
+                     <Text style={styles.nodeText}>{m.name.substring(0, 8)}</Text>
+                     <View style={[styles.connectingLine, { height: bottomPos, transform: [{rotate: isDissenter ? '45deg' : '0deg'}] }]} />
+                  </View>
+               );
+            })}
          </View>
       </View>
     </SafeAreaView>
@@ -63,11 +74,12 @@ const styles = StyleSheet.create({
   scoreSubtitle: { color: '#8e8e93', fontSize: 14, fontWeight: '600' },
   summaryContainer: { width: '100%', alignItems: 'center', marginBottom: 40 },
   summaryText: { color: '#4285F4', fontSize: 18, textAlign: 'center', fontWeight: 'bold' },
-  mappingArea: { flex: 1, width: '100%', borderWidth: 1, borderColor: '#1c1c1e', borderRadius: 12, position: 'relative' },
-  consensusAnchor: { position: 'absolute', top: 20, alignSelf: 'center', alignItems: 'center' },
+  mappingArea: { flex: 1, width: '100%', borderWidth: 1, borderColor: '#1c1c1e', borderRadius: 12, position: 'relative', overflow: 'hidden' },
+  consensusAnchor: { position: 'absolute', top: 20, alignSelf: 'center', alignItems: 'center', zIndex: 10 },
   anchorDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#4285F4' },
   anchorText: { color: '#4285F4', fontSize: 10, marginTop: 5 },
   node: { position: 'absolute', alignItems: 'center' },
-  nodeDot: { width: 10, height: 10, borderRadius: 5 },
-  nodeText: { color: '#fff', fontSize: 10, marginTop: 5 }
+  nodeDot: { width: 12, height: 12, borderRadius: 6 },
+  nodeText: { color: '#fff', fontSize: 10, marginTop: 5, fontWeight: 'bold' },
+  connectingLine: { position: 'absolute', width: 1, backgroundColor: 'rgba(255,255,255,0.1)', top: -50, zIndex: -1 }
 });
