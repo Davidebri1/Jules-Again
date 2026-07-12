@@ -1,25 +1,57 @@
 {
   "expo": {
-    "name": "ai-spatial-console",
+    "name": "Spatial AI Console",
     "slug": "ai-spatial-console",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0a0c"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.spatial.console.ai",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Spatial AI Console needs access to your photos to let you set custom themes and backgrounds.",
+        "NSCameraUsageDescription": "Spatial AI Console needs access to your camera to take photos for your profile and custom themes.",
+        "NSMicrophoneUsageDescription": "Spatial AI Console needs access to your microphone for voice commands and audio generation features."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.spatial.console.ai",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#0a0a0c"
       },
-      "predictiveBackGestureEnabled": false
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-image-picker",
+      "expo-av",
+      "expo-document-picker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "spatial-ai-console-id"
+      }
     }
   }
 }

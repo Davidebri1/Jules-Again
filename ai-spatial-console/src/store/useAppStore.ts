@@ -135,8 +135,8 @@ const INITIAL_MODELS: ModelProvider[] = [
   { id: 'zephyr-7b', name: 'Zephyr 7B', provider: 'other', tier: 'free', category: 'general', description: 'Helpful assistant.', routingKey: 'huggingfaceh4/zephyr-7b-beta:free', baseCreditCost: 0 },
   { id: 'phi-3-mini', name: 'Phi-3 Mini', provider: 'other', tier: 'free', category: 'general', description: 'Microsoft small model.', routingKey: 'microsoft/phi-3-mini-128k-instruct:free', baseCreditCost: 0 },
   { id: 'openchat-3.5', name: 'OpenChat 3.5', provider: 'other', tier: 'free', category: 'general', description: 'Open source chat model.', routingKey: 'openchat/openchat-7b:free', baseCreditCost: 0 },
-  { id: 'gpt-4o', name: 'GPT-4o', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o', baseCreditCost: 0 },
-  { id: 'claude-3-5-sonnet-gen', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 0 },
+  { id: 'gpt-4o', name: 'GPT-4o (via OpenRouter)', provider: 'openai', tier: 'pro', category: 'general', description: 'OpenAI flagship model.', routingKey: 'openai/gpt-4o', baseCreditCost: 0 },
+  { id: 'claude-3-5-sonnet-gen', name: 'Claude 3.5 (via OpenRouter)', provider: 'anthropic', tier: 'pro', category: 'general', description: 'Anthropic expert model.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 0 },
   { id: 'gemini-1-5-pro', name: 'Gemini 1.5 Pro', provider: 'google', tier: 'pro', category: 'general', description: 'Google multimodal expert.', routingKey: 'google/gemini-1.5-pro', baseCreditCost: 0 },
   { id: 'grok-1-5', name: 'Grok 1.5', provider: 'xai', tier: 'pro', category: 'general', description: 'xAI advanced model.', routingKey: 'x-ai/grok-2', baseCreditCost: 0 },
 
@@ -166,8 +166,8 @@ const INITIAL_MODELS: ModelProvider[] = [
 
   // ================= CODING =================
   { id: 'deepseek-coder', name: 'DeepSeek Coder', provider: 'other', tier: 'pro', category: 'coding', description: 'Specialized coding model.', routingKey: 'deepseek/deepseek-coder', baseCreditCost: 5 },
-  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 Sonnet', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Anthropic coding expert.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 5 },
-  { id: 'gpt-4o-coding', name: 'GPT-4o (Coding)', provider: 'openai', tier: 'pro', category: 'coding', description: 'OpenAI reasoning model.', routingKey: 'openai/gpt-4o', baseCreditCost: 5 },
+  { id: 'claude-3-5-sonnet', name: 'Claude 3.5 (via OpenRouter)', provider: 'anthropic', tier: 'pro', category: 'coding', description: 'Anthropic coding expert.', routingKey: 'anthropic/claude-3.5-sonnet', baseCreditCost: 5 },
+  { id: 'gpt-4o-coding', name: 'GPT-4o (via OpenRouter) (Coding)', provider: 'openai', tier: 'pro', category: 'coding', description: 'OpenAI reasoning model.', routingKey: 'openai/gpt-4o', baseCreditCost: 5 },
   { id: 'phind-codellama', name: 'Phind CodeLlama', provider: 'other', tier: 'pro', category: 'coding', description: 'Search-focused coding.', baseCreditCost: 5 },
   { id: 'claude-3-opus', name: 'Claude 3 Opus', provider: 'anthropic', tier: 'elite', category: 'coding', description: 'Complex code synthesis.', routingKey: 'anthropic/claude-3-opus', baseCreditCost: 20 },
   { id: 'wizardcoder', name: 'WizardCoder', provider: 'other', tier: 'elite', category: 'coding', description: 'Advanced instruction following.', baseCreditCost: 15 },
