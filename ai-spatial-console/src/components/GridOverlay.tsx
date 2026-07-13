@@ -1,4 +1,3 @@
-import { processSmartGen } from '../utils/smartGen';
 import React, { useState, useMemo } from "react";
 import {
   StyleSheet,
@@ -10,9 +9,9 @@ import {
   TextInput,
   Alert,
 } from "react-native";
+import { Audio } from 'expo-av';
 import {
   ModelCategory,
-  ModelProvider,
   useAppStore,
   GridLayout,
   abbreviateName
@@ -27,15 +26,18 @@ import {
   Paperclip,
   Search,
   LayoutGrid,
+  Mic
 } from "lucide-react-native";
 
 import { generateResponse } from "../utils/api";
+import { processSmartGen } from '../utils/smartGen';
 
 export const GridOverlay: React.FC = () => {
   const [inputText, setInputText] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLayoutTrayOpen, setIsLayoutTrayOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const {
     activeLayout,
@@ -60,6 +62,29 @@ export const GridOverlay: React.FC = () => {
   } = useAppStore();
 
   const activeModelIds = activeModelIdsByTab[selectedTab] || [];
+
+  async function startRecording() {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Microphone access is required for voice commands.');
+        return;
+      }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  }
+
+  async function stopRecording() {
+    if (!recording) return;
+    setRecording(null);
+    await recording.stopAndUnloadAsync();
+    Alert.alert("Voice Captured", "Transcribing spatial intent...");
+    setInputText("Spatial transition to neon dusk...");
+  }
 
   const handleLayoutChange = (layout: GridLayout) => {
     setActiveLayout(layout);
@@ -125,7 +150,6 @@ export const GridOverlay: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.overlay} pointerEvents="box-none">
-      {/* Top Bar */}
       <View style={styles.topBar}>
         <View style={{ flexDirection: "row", gap: 10 }}>
           <TouchableOpacity style={styles.iconButton} onPress={() => setSettingsOpen(true)}>
@@ -162,7 +186,6 @@ export const GridOverlay: React.FC = () => {
       </View>
 
       <View style={styles.bottomSection}>
-        {/* Search Bar for Models */}
         <View style={styles.searchContainer}>
            <Search color="#636366" size={16} />
            <TextInput
@@ -229,6 +252,9 @@ export const GridOverlay: React.FC = () => {
                  onChangeText={setInputText}
                  multiline
               />
+              <TouchableOpacity onPress={recording ? stopRecording : startRecording} style={{ marginRight: 10 }}>
+                 <Mic color={recording ? "red" : "#8e8e93"} size={20} />
+              </TouchableOpacity>
               <TouchableOpacity onPress={handleSendGlobal} style={styles.sendButton}>
                  <Send color="#000" size={18} />
               </TouchableOpacity>

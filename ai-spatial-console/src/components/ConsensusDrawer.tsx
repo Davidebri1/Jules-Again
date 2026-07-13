@@ -1,7 +1,8 @@
+import { abbreviateName } from '../store/useAppStore';
 import React, { useMemo, useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
 import { useAppStore } from '../store/useAppStore';
-import { X, Sparkles } from 'lucide-react-native';
+import { X } from 'lucide-react-native';
 import { generateResponse } from '../utils/api';
 
 const { width } = Dimensions.get('window');
@@ -24,29 +25,28 @@ export const ConsensusDrawer: React.FC = () => {
 
   const handleSynthesize = async () => {
      setIsSynthesizing(true);
-     // Gather histories from all active models to synthesize
      const contexts = activeModels.map(m => {
         const msgs = conversations[m!.id]?.messages || [];
         return `[${m!.name}]: ${msgs.slice(-2).map(msg => msg.content).join(' ')}`;
      }).join('\n\n');
 
-     if (!contexts.trim()) {
-        setConsensusResult("No data to synthesize. Start a conversation first.");
+     if (!contexts.trim() || contexts.length < 20) {
+        setConsensusResult("Insufficient data for synthesis. Please engage in dialogue with your spatial models first.");
         setIsSynthesizing(false);
         return;
      }
 
      try {
-        // Use a primary model (GPT-4o) as the Synthesizer
         const synthesizer = availableModels.find(m => m.id === 'gpt-4o') || activeModels[0];
-        const prompt = `SYNTHESIS TASK: You are the Consensus Engine. Below are recent responses from multiple AI models.
-        Synthesize their agreement into a single, high-level blue conclusion (max 3 sentences).
-        DATA:\n\n${contexts}`;
+        const prompt = `SYNTHESIS TASK: You are the Spatial Consensus Engine. Analyze the dialogue across multiple models.
+        Identify the core commonality and one dissenting perspective.
+        Format your response as a concise blue conclusion (max 3 sentences).
+        CONTEXT:\n\n${contexts}`;
 
         const res = await generateResponse(synthesizer!, [{ role: 'user', content: prompt, id: 'sys', timestamp: Date.now() }]);
         setConsensusResult(res);
      } catch (e) {
-        setConsensusResult("Consensus failed to reach a conclusion.");
+        setConsensusResult("Consensus failed to reach a logical bridge.");
      } finally {
         setIsSynthesizing(false);
      }
@@ -55,8 +55,7 @@ export const ConsensusDrawer: React.FC = () => {
   if (!isConsensusOpen) return null;
 
   const total = activeModels.length;
-  // Dynamic dissent logic: Count models whose last message length or content differs significantly from the consensus
-  const agreed = total > 1 ? (consensusResult?.includes("failed") ? 1 : total - 1) : total;
+  const agreed = total > 1 ? (consensusResult?.includes("failed") ? 1 : Math.max(1, total - 1)) : total;
   const proportion = total === 0 ? 0 : agreed / total;
   let scoreColor = proportion >= 0.7 ? '#00C851' : proportion >= 0.4 ? '#ffbb33' : '#ff4444';
 
@@ -98,7 +97,7 @@ export const ConsensusDrawer: React.FC = () => {
                return (
                   <View key={m.id} style={[styles.node, { left: leftPos, bottom: bottomPos }]}>
                      <View style={[styles.nodeDot, { backgroundColor: isDissenter ? '#ff4444' : scoreColor }]} />
-                     <Text style={styles.nodeText}>{m.name.substring(0, 10)}</Text>
+                     <Text style={styles.nodeText}>{abbreviateName(m.name)}</Text>
                      <View style={[styles.connectingLine, { height: bottomPos, transform: [{rotate: isDissenter ? '45deg' : '0deg'}] }]} />
                   </View>
                );

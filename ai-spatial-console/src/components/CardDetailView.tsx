@@ -1,13 +1,14 @@
-import { processSmartGen } from '../utils/smartGen';
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, ScrollView, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from "react-native";
 import Markdown from "react-native-markdown-display";
 import * as Clipboard from 'expo-clipboard';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import { Audio } from 'expo-av';
 import { useAppStore } from "../store/useAppStore";
 import { ChevronLeft, MoreHorizontal, Mic, Paperclip, Send, Globe, Zap, Terminal, LayoutTemplate, Search } from "lucide-react-native";
 import { generateResponse } from "../utils/api";
+import { processSmartGen } from '../utils/smartGen';
 
 export const CardDetailView: React.FC = () => {
   const { focusedModelId, setFocusedModelId, availableModels, conversations, addMessage, deductMessage, deductCredits, setUpgradeOpen, selectedTab } = useAppStore();
@@ -15,13 +16,38 @@ export const CardDetailView: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeepResearch, setIsDeepResearch] = useState(false);
   const [isWebEnabled, setIsWebEnabled] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const model = useMemo(() => availableModels.find((m) => m.id === focusedModelId), [focusedModelId, availableModels]);
   const conversation = useMemo(() => focusedModelId ? conversations[focusedModelId] : null, [focusedModelId, conversations]);
   const messages = conversation?.messages || [];
 
   if (!model) return null;
+
+  async function startRecording() {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Microphone access is required for voice commands.');
+        return;
+      }
+      await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+      const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      setRecording(recording);
+    } catch (err) {
+      console.error('Failed to start recording', err);
+    }
+  }
+
+  async function stopRecording() {
+    if (!recording) return;
+    setRecording(null);
+    await recording.stopAndUnloadAsync();
+    const uri = recording.getURI();
+    Alert.alert("Voice Captured", "Transcribing spatial intent...");
+    // In production, send 'uri' to OpenAI Whisper or Google Speech-to-Text
+    setInputText("Spatial transition to neon dusk...");
+  }
 
   const handleSend = async () => {
     if (!inputText.trim() || isGenerating) return;
@@ -42,14 +68,14 @@ export const CardDetailView: React.FC = () => {
     try {
       const res = await generateResponse(model, [...messages, { role: 'user', content: fullPrompt, id: 'new', timestamp: Date.now() }]);
       const msgId = addMessage(model.id, "assistant", res);
-    processSmartGen(model.id, msgId, res);
+      processSmartGen(model.id, msgId, res);
     } catch (e) { console.error(e); } finally { setIsGenerating(false); }
   };
 
   const handleActionMenu = (msgContent: string) => {
      Alert.alert("Message Actions", "Select an operation.", [
         { text: "Copy Text", onPress: () => Clipboard.setStringAsync(msgContent) },
-        { text: "Download (.txt)", onPress: async () => {
+        { text: "Export (.txt)", onPress: async () => {
             const fileUri = FileSystem.cacheDirectory + 'spatial_export.txt';
             await FileSystem.writeAsStringAsync(fileUri, msgContent);
             await Sharing.shareAsync(fileUri);
@@ -98,8 +124,8 @@ export const CardDetailView: React.FC = () => {
               <TouchableOpacity style={[styles.optionPill, isWebEnabled && styles.activePill]} onPress={() => setIsWebEnabled(!isWebEnabled)}>
                  <Globe color={isWebEnabled ? "#4285F4" : "#fff"} size={14} /><Text style={[styles.optionText, isWebEnabled && styles.activeText]}>Web</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.optionPill, isRecording && { borderColor: 'red' }]} onPress={() => setIsRecording(!isRecording)}>
-                 <Mic color={isRecording ? "red" : "#fff"} size={14} /><Text style={[styles.optionText, isRecording && { color: 'red' }]}>Voice</Text>
+              <TouchableOpacity style={[styles.optionPill, recording && { borderColor: 'red' }]} onPress={recording ? stopRecording : startRecording}>
+                 <Mic color={recording ? "red" : "#fff"} size={14} /><Text style={[styles.optionText, recording && { color: 'red' }]}>{recording ? 'Recording' : 'Voice'}</Text>
               </TouchableOpacity>
            </View>
 

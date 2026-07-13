@@ -48,7 +48,7 @@ export const SpatialAsset: React.FC<SpatialAssetProps> = ({ file, position }) =>
         />
       </RoundedBox>
 
-      {/* Placeholder Icon Graphic mapping */}
+      {/* Spatial Icon Graphic mapping */}
       <Text
         position={[0, 0.5, 0.06]}
         fontSize={0.6}

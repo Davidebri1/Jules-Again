@@ -5,59 +5,61 @@ const GROQ_API_KEY = process.env.EXPO_PUBLIC_GROQ_API_KEY || 'MISSING_KEY';
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY || 'MISSING_KEY';
 
 /**
- * ARCHITECTURAL NOTE:
- * OpenRouter supports specialized generation for various media.
- * This implementation provides a scalable bridge for Text, Image, Video, and Audio.
+ * OpenRouter Unified Generation Utility
  */
-
 export const generateResponse = async (
   model: ModelProvider,
   messages: Message[]
 ): Promise<string> => {
   if (GROQ_API_KEY === 'MISSING_KEY' || OPENROUTER_API_KEY === 'MISSING_KEY') {
-      return "Configuration Error: API Keys are missing. Please add them to your .env file.";
+      return "Configuration Error: API Keys are missing in the environment.";
   }
 
   const lastUserMsg = messages.filter(m => m.role === 'user').pop()?.content || "";
 
-  // 1. Specialized Image Generation (Flux, DALL-E, etc.)
-  if (model.category === 'image') {
-     try {
-        // OpenRouter /api/v1/chat/completions with image-capable models
-        // Note: For DALL-E 3/Flux on OpenRouter, use standard chat completions with generation prompts.
-        const res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-           model: model.routingKey || 'openai/dall-e-3',
-           messages: [{ role: 'user', content: `Generate a high-fidelity image based on: ${lastUserMsg}. Return ONLY the direct image URL if possible, otherwise describe it.` }],
-        }, { headers: { 'Authorization': `Bearer ${OPENROUTER_API_KEY}` } });
-
-        // OpenRouter often returns text describing the image or a URL in the content.
-        // For this MVP, we map the success to a visual placeholder using the generated seed.
-        return `![Generated Image](https://picsum.photos/seed/${model.id + encodeHeight(lastUserMsg)}/1024/1024)\n\n*Spatial Asset synthesized by ${model.name}*`;
-     } catch (e) { return "Image generation failed."; }
-  }
-
-  // 2. Specialized Video Generation (Sora, Runway) - Async Job Pattern
-  if (model.category === 'video') {
-     // Simulate Job Submission & Polling logic
-     return `🎥 **SPATIAL VIDEO JOB SUBMITTED**\n\n**Model**: ${model.name}\n**Status**: Processing Physics Engine...\n\n*Video synthesis is asynchronous. You will be notified in the SmartGen Suite upon completion.*`;
-  }
-
-  // 3. Audio / Music Generation
-  if (model.category === 'music') {
-     return `🎵 **AUDIO SYNTHESIS COMPLETE**\n\n[Spatial Audio Track - 0:30]\n\n*Synthesized by ${model.name} focusing on spatial harmonics.*`;
-  }
-
-  // 4. Standard Text / Coding
-  const formattedMessages = messages.map(m => ({
-    role: m.role,
-    content: m.content
-  }));
-
   try {
+    // 1. Specialized IMAGE Generation (via OpenRouter Tools)
+    if (model.category === 'image') {
+       const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+          model: model.routingKey || 'openai/gpt-4o', // Fallback to a capable model
+          messages: [{ role: 'user', content: lastUserMsg }],
+          tools: [{ "type": "openrouter:image_generation" }]
+       }, {
+          headers: {
+             'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+             'Content-Type': 'application/json'
+          }
+       });
+
+       // OpenRouter returns the image URL in the content if successful
+       const content = response.data.choices[0].message.content;
+       return content.includes('http') ? `![Generated Image](${content})` : content;
+    }
+
+    // 2. Specialized VIDEO Generation (via OpenRouter /videos)
+    if (model.category === 'video') {
+       const response = await axios.post('https://openrouter.ai/api/v1/videos', {
+          model: model.routingKey || 'google/veo-3.1-lite',
+          prompt: lastUserMsg,
+          duration: 4,
+          resolution: "720p",
+          aspect_ratio: "16:9"
+       }, {
+          headers: {
+             'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+             'Content-Type': 'application/json'
+          }
+       });
+
+       const job = response.data;
+       return `🎥 **VIDEO JOB SUBMITTED**\n\n**Job ID**: ${job.id}\n**Status**: ${job.status}\n**Model**: ${model.name}\n\n*Video synthesis is asynchronous. You will be notified in the SmartGen Suite upon completion.*`;
+    }
+
+    // 3. TEXT / CODING Generation (Groq/OpenRouter)
     if (model.routingKey && (model.routingKey.includes('llama') || model.routingKey.includes('gemma') || model.routingKey.includes('mistral'))) {
        const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
           model: model.routingKey,
-          messages: formattedMessages,
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
        }, {
           headers: {
              'Authorization': `Bearer ${GROQ_API_KEY}`,
@@ -68,7 +70,7 @@ export const generateResponse = async (
     } else {
        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
           model: model.routingKey || 'openai/gpt-3.5-turbo',
-          messages: formattedMessages,
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
        }, {
           headers: {
              'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
@@ -79,17 +81,8 @@ export const generateResponse = async (
        });
        return response.data.choices[0].message.content;
     }
-  } catch (error) {
-    console.error('API Error:', error);
-    return "Error: Could not reach the model server.";
+  } catch (error: any) {
+    console.error('API Error:', error.response?.data || error.message);
+    return "Error: Could not reach the model server. Check your connectivity and API keys.";
   }
 };
-
-function encodeHeight(str: string) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
-        hash |= 0;
-    }
-    return Math.abs(hash);
-}
